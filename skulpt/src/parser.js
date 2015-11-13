@@ -87,7 +87,7 @@ Parser.prototype.addtoken = function (type, value, context) {
 	
 	// Classify is used to turn a token into an 'ilabel'
     var ilabel = this.classify(type, value, context);
-    console.log("Next symbol ilabel:" + ilabel + "  type:" + type + "  value:" + value);
+    Sk.debugout("Next symbol ilabel:" + ilabel + "  type:" + type + "  value:" + value);
 
 	// This uses a stack based parser
     OUTERWHILE:
@@ -111,7 +111,7 @@ Parser.prototype.addtoken = function (type, value, context) {
                 // look it up in the list of labels
                 goog.asserts.assert(t < 256);
                 // shift a token; we're done with it
-				console.log("Shifting " + value);
+				Sk.debugout("\tShifting " + value);
                 this.shift(type, value, newstate, context);
                 // pop while we are in an accept-only state
                 state = newstate;
@@ -140,7 +140,7 @@ Parser.prototype.addtoken = function (type, value, context) {
                 return false;
             }
 			
-			// t > 256 if the arc represents a "non-terminal production"
+			// t > 256 if the arc represents a "non-terminal production" (I honestly can't remember the technical name for it)
 			else if (t >= 256) {
                 itsdfa = this.grammar.dfas[t];
 				
@@ -148,7 +148,7 @@ Parser.prototype.addtoken = function (type, value, context) {
                 itsfirst = itsdfa[1];
                 if (itsfirst.hasOwnProperty(ilabel)) {
                     // push a non-terminal symbol
-					console.log("Pushing " + this.grammar.number2symbol[t])
+					Sk.debugout("\tPushing " + this.grammar.number2symbol[t])
                     this.push(t, this.grammar.dfas[t], newstate, context);
                     continue OUTERWHILE;
                 }
