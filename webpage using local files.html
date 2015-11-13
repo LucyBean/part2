@@ -6,7 +6,60 @@
 <script src="../skulpt/src/tokenize.js" type="text/javascript"></script>
 <script src="../skulpt/src/symtable.js" type="text/javascript"></script>
 <script src="../skulpt/src/compile.js" type="text/javascript"></script>
+<script src="../skulpt/gen/parse_tables.js" type="text/javascript"></script>
+<script src="../skulpt/gen/astnodes.js" type="text/javascript"></script>
 <script src="../skulpt/src/ast.js" type="text/javascript"></script>
+<script src="../skulpt/src/misceval.js" type="text/javascript"></script>
+<script src="../skulpt/src/type.js" type="text/javascript"></script>
+<script src="../skulpt/src/builtin.js" type="text/javascript"></script>
+<script src="../skulpt/src/builtindict.js" type="text/javascript"></script>
+<script src="../skulpt/src/abstract.js" type="text/javascript"></script>
+<script src="../skulpt/src/object.js" type="text/javascript"></script>
+<script src="../skulpt/src/function.js" type="text/javascript"></script>
+<script src="../skulpt/src/seqtype.js" type="text/javascript"></script>
+<script src="../skulpt/src/numtype.js" type="text/javascript"></script>
+<script src="../skulpt/src/list.js" type="text/javascript"></script>
+<script src="../skulpt/src/tuple.js" type="text/javascript"></script>
+<script src="../skulpt/src/module.js" type="text/javascript"></script>
+<script src="../skulpt/src/int.js" type="text/javascript"></script>
+<script src="../skulpt/src/bool.js" type="text/javascript"></script>
+<script src="../skulpt/src/str.js" type="text/javascript"></script>
+<script src="../skulpt/src/dict.js" type="text/javascript"></script>
+<script src="../skulpt/src/errors.js" type="text/javascript"></script>
+<script src="../skulpt/src/import.js" type="text/javascript"></script>
+
+<!-- As of yet unneeded scripts
+
+<script src="../skulpt/src/enumerate.js" type="text/javascript"></script>
+<script src="../skulpt/src/set.js" type="text/javascript"></script>
+<script src="../skulpt/src/slice.js" type="text/javascript"></script>
+<script src="../skulpt/src/method.js" type="text/javascript"></script>
+<script src="../skulpt/src/structseq.js" type="text/javascript"></script>
+
+<script src="../skulpt/src/sorted.js" type="text/javascript"></script>
+<script src="../skulpt/src/timsort.js" type="text/javascript"></script>
+
+<script src="../skulpt/src/file.js" type="text/javascript"></script>
+
+<script src="../skulpt/src/native.js" type="text/javascript"></script>
+<script src="../skulpt/src/ffi.js" type="text/javascript"></script>
+<script src="../skulpt/src/generator.js" type="text/javascript"></script>
+<script src="../skulpt/src/fromcodepoint.js" type="text/javascript"></script>
+
+<script src="../skulpt/src/complex.js" type="text/javascript"></script>
+<script src="../skulpt/src/biginteger.js" type="text/javascript"></script>
+<script src="../skulpt/src/long.js" type="text/javascript"></script>
+<script src="../skulpt/src/float.js" type="text/javascript"></script>
+<script src="../skulpt/src/constants.js" type="text/javascript"></script>
+
+<script src="../skulpt/src/formatting.js" type="text/javascript"></script>
+<script src="../skulpt/src/print.js" type="text/javascript"></script>
+
+<script src="../skulpt/gen/closure_ctor_hack.js" type="text/javascript"></script>
+<script src="../skulpt/gen/googlocs.js" type="text/javascript"></script>
+<script src="../skulpt/gen/debug_import_all_closure.js" type="text/javascript"></script>
+
+-->
 
 </head> 
 
@@ -35,9 +88,13 @@ function runit() {
    mypre.innerHTML = ''; 
    Sk.pre = "output";
    Sk.configure({output:outf, read:builtinRead});
+   
+	var result = Sk.importMainWithBody("<stdin>", false, prog, true);
+   
    var myPromise = Sk.misceval.asyncToPromise(function() {
-       return Sk.importMainWithBody("<stdin>", false, prog, true);
+       return result;
    });
+   
    myPromise.then(function(mod) {
        console.log('success');
    },
@@ -50,11 +107,13 @@ function runit() {
 <h3>Try This</h3> 
 <form> 
 <textarea id="yourcode" cols="40" rows="10">
-print "Hello World" 
+pint "Hello World"
+print 5 + 6
 </textarea><br /> 
 <button type="button" onclick="runit()">Run</button> 
 </form> 
-<pre id="output" ></pre> 
+<pre id="output"></pre> 
+<pre id="help"></pre>
 
 </body> 
 
