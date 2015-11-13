@@ -121,10 +121,12 @@ Parser.prototype.addtoken = function (type, value, context) {
                     && states[state][0][0] === 0
                     && states[state][0][1] === state) {
                     // states[state] == [(0, state)])
+					Sk.debugout("\tPopping for a mystery reason");
                     this.pop();
                     //print("in after pop:"+JSON.stringify(states[state]) + ":state:"+state+":"+JSON.stringify(states[state]));
                     if (this.stack.length === 0) {
                         // done!
+						Sk.debugout("Finished parsing");
                         return true;
                     }
                     tp = this.stack[this.stack.length - 1];
@@ -148,6 +150,7 @@ Parser.prototype.addtoken = function (type, value, context) {
                 itsfirst = itsdfa[1];
                 if (itsfirst.hasOwnProperty(ilabel)) {
                     // push a non-terminal symbol
+					//debugger
 					Sk.debugout("\tPushing " + this.grammar.number2symbol[t])
                     this.push(t, this.grammar.dfas[t], newstate, context);
                     continue OUTERWHILE;
@@ -159,6 +162,7 @@ Parser.prototype.addtoken = function (type, value, context) {
         if (findInDfa(arcs, [0, tp.state])) {
             // an accepting state, pop it and try somethign else
             //print("WAA");
+			Sk.debugout("\tPopping " + this.grammar.number2symbol[this.stack[this.stack.length-1].node.type]);
             this.pop();
             if (this.stack.length === 0) {
                 throw new Sk.builtin.ParseError("too much input", this.filename);
@@ -167,6 +171,12 @@ Parser.prototype.addtoken = function (type, value, context) {
             // no transition
             errline = context[0][0];
 			console.log("Parsing error: " + context[2]);
+			Sk.helpout("It looks like there was an error on line " + errline);
+			// End of project
+			
+			// Collect diagnostic data
+			
+			//debugger
             throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
         }
     }
@@ -229,6 +239,7 @@ Parser.prototype.shift = function (type, value, newstate, context) {
         state: newstate,
         node : node
     };
+	Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 // push a nonterminal
@@ -252,6 +263,7 @@ Parser.prototype.push = function (type, newdfa, newstate, context) {
         state: 0,
         node : newnode
     });
+	Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 //var ac = 0;
@@ -276,6 +288,7 @@ Parser.prototype.pop = function () {
             this.rootnode.used_names = this.used_names;
         }
     }
+	Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 /**

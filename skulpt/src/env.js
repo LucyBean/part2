@@ -23,6 +23,9 @@ Sk.configure = function (options) {
     "use strict";
     Sk.output = options["output"] || Sk.output;
     goog.asserts.assert(typeof Sk.output === "function");
+	
+	Sk.helpout = options["helpout"] || Sk.helpout;
+	goog.asserts.assert(typeof Sk.helpout === "function");
 
     Sk.debugout = options["debugout"] || Sk.debugout;
     goog.asserts.assert(typeof Sk.debugout === "function");
@@ -109,6 +112,13 @@ Sk.yieldLimit = Number.POSITIVE_INFINITY;
  * Replacable output redirection (called from print, etc).
  */
 Sk.output = function (x) {
+};
+
+/*
+ * Function for outputting the help
+ */
+Sk.helpOut = function (x) {
+	
 };
 
 /*

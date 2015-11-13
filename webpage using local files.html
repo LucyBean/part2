@@ -83,6 +83,10 @@ function debugOut(arg) {
 		console.log(arg);
 	}
 }
+function help(text) {
+	var helparea = document.getElementById("help");
+	helparea.innerHTML = helparea.innerHTML + text;
+}
 // Here's everything you need to run a python program in skulpt
 // grab the code from your textarea
 // get a reference to your pre element for output
@@ -91,9 +95,12 @@ function debugOut(arg) {
 function runit() { 
    var prog = document.getElementById("yourcode").value; 
    var mypre = document.getElementById("output"); 
+   var helparea = document.getElementById("help");
    mypre.innerHTML = ''; 
+   helparea.innerHTML = '';
+   
    Sk.pre = "output";
-   Sk.configure({output:outf, read:builtinRead, debugout:debugOut});
+   Sk.configure({output:outf, read:builtinRead, debugout:debugOut, helpout:help});
    
 	var result = Sk.importMainWithBody("<stdin>", false, prog, true);
    
@@ -117,8 +124,16 @@ print "Hello World"
 print 5 + 6</textarea><br /> 
 <button type="button" onclick="runit()">Run</button> 
 </form> 
+
+<div style = "background-color: #ccffcc">
+<h2>Output</h2>
 <pre id="output"></pre> 
+</div>
+
+<div style = "background-color: #ff99cc">
+<h2>Help</h2>
 <pre id="help"></pre>
+</div>
 
 </body> 
 
