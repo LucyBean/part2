@@ -294,6 +294,7 @@ Sk.Tokenizer.prototype.generateTokens = function (line) {
 
     if (this.contstr.length > 0) {
         if (!line) {
+			Sk.debugout("Looks like you didn't close your string properly on line " + strstart[0]);
             throw new Sk.builtin.TokenError("EOF in multi-line string", this.filename, this.strstart[0], this.strstart[1], this.contline);
         }
         this.endprog.lastIndex = 0;
@@ -597,6 +598,8 @@ Sk.Tokenizer.prototype.generateTokens = function (line) {
 		// No match with the regular expression but there are still characters remaining in the stream, so
 		//  this must be an invalid token!
         else {
+			var fix = Sk.Tokenizer.eolInString(line, pos);
+			
             if (this.callback(Sk.Tokenizer.Tokens.T_ERRORTOKEN, line.charAt(pos),
                 [this.lnum, pos], [this.lnum, pos + 1], line)) {
                 return 'done';

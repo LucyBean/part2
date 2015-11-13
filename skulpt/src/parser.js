@@ -96,13 +96,17 @@ Parser.prototype.addtoken = function (type, value, context) {
         tp = this.stack[this.stack.length - 1];
         states = tp.dfa[0];
         first = tp.dfa[1];
+		
         arcs = states[tp.state];
 
         // for the current state we are in, check for a transition that can shift the current
 		//  token we are looking at, or another state we can change into that has the current
 		//  token in its first set
         for (a = 0; a < arcs.length; ++a) {
-			// i = ilabel of the state we are looking for
+			// i - ilabel of the state we are looking for
+			// newstate - the state that the parser will transition into if we take the current arc
+			// t - ???
+			// v - ???
             i = arcs[a][0];
             newstate = arcs[a][1];
             t = this.grammar.labels[i][0];
@@ -142,7 +146,7 @@ Parser.prototype.addtoken = function (type, value, context) {
                 return false;
             }
 			
-			// t > 256 if the arc represents a "non-terminal production" (I honestly can't remember the technical name for it)
+			// t > 256 if the arc represents a "non-terminal production"? (I honestly can't remember the technical name for it)
 			else if (t >= 256) {
                 itsdfa = this.grammar.dfas[t];
 				
@@ -171,7 +175,7 @@ Parser.prototype.addtoken = function (type, value, context) {
             // no transition
             errline = context[0][0];
 			console.log("Parsing error: " + context[2]);
-			Sk.helpout("It looks like there was an error on line " + errline);
+			Sk.helpout("It looks like there was an error on line " + errline + "\n");
 			// End of project
 			
 			// Collect diagnostic data
@@ -182,7 +186,7 @@ Parser.prototype.addtoken = function (type, value, context) {
     }
 };
 
-// turn a token into a label
+// turn a token into an ilabel value
 Parser.prototype.classify = function (type, value, context) {
     var ilabel;
 	
