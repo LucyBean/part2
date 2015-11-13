@@ -1,63 +1,63 @@
 <html> 
 <head> 
-<script src="../skulpt/support/closure-library/closure/goog/base.js" type="text/javascript"></script>
-<script src="../skulpt/src/env.js" type="text/javascript"></script>
-<script src="../skulpt/src/parser.js" type="text/javascript"></script>
-<script src="../skulpt/src/tokenize.js" type="text/javascript"></script>
-<script src="../skulpt/src/symtable.js" type="text/javascript"></script>
-<script src="../skulpt/src/compile.js" type="text/javascript"></script>
-<script src="../skulpt/gen/parse_tables.js" type="text/javascript"></script>
-<script src="../skulpt/gen/astnodes.js" type="text/javascript"></script>
-<script src="../skulpt/src/ast.js" type="text/javascript"></script>
-<script src="../skulpt/src/misceval.js" type="text/javascript"></script>
-<script src="../skulpt/src/type.js" type="text/javascript"></script>
-<script src="../skulpt/src/builtin.js" type="text/javascript"></script>
-<script src="../skulpt/src/builtindict.js" type="text/javascript"></script>
-<script src="../skulpt/src/abstract.js" type="text/javascript"></script>
-<script src="../skulpt/src/object.js" type="text/javascript"></script>
-<script src="../skulpt/src/function.js" type="text/javascript"></script>
-<script src="../skulpt/src/seqtype.js" type="text/javascript"></script>
-<script src="../skulpt/src/numtype.js" type="text/javascript"></script>
-<script src="../skulpt/src/list.js" type="text/javascript"></script>
-<script src="../skulpt/src/tuple.js" type="text/javascript"></script>
-<script src="../skulpt/src/module.js" type="text/javascript"></script>
-<script src="../skulpt/src/int.js" type="text/javascript"></script>
-<script src="../skulpt/src/bool.js" type="text/javascript"></script>
-<script src="../skulpt/src/str.js" type="text/javascript"></script>
-<script src="../skulpt/src/dict.js" type="text/javascript"></script>
-<script src="../skulpt/src/errors.js" type="text/javascript"></script>
-<script src="../skulpt/src/import.js" type="text/javascript"></script>
+<script src="./skulpt/support/closure-library/closure/goog/base.js" type="text/javascript"></script>
+<script src="./skulpt/src/env.js" type="text/javascript"></script>
+<script src="./skulpt/src/parser.js" type="text/javascript"></script>
+<script src="./skulpt/src/tokenize.js" type="text/javascript"></script>
+<script src="./skulpt/src/symtable.js" type="text/javascript"></script>
+<script src="./skulpt/src/compile.js" type="text/javascript"></script>
+<script src="./skulpt/gen/parse_tables.js" type="text/javascript"></script>
+<script src="./skulpt/gen/astnodes.js" type="text/javascript"></script>
+<script src="./skulpt/src/ast.js" type="text/javascript"></script>
+<script src="./skulpt/src/misceval.js" type="text/javascript"></script>
+<script src="./skulpt/src/type.js" type="text/javascript"></script>
+<script src="./skulpt/src/builtin.js" type="text/javascript"></script>
+<script src="./skulpt/src/builtindict.js" type="text/javascript"></script>
+<script src="./skulpt/src/abstract.js" type="text/javascript"></script>
+<script src="./skulpt/src/object.js" type="text/javascript"></script>
+<script src="./skulpt/src/function.js" type="text/javascript"></script>
+<script src="./skulpt/src/seqtype.js" type="text/javascript"></script>
+<script src="./skulpt/src/numtype.js" type="text/javascript"></script>
+<script src="./skulpt/src/list.js" type="text/javascript"></script>
+<script src="./skulpt/src/tuple.js" type="text/javascript"></script>
+<script src="./skulpt/src/module.js" type="text/javascript"></script>
+<script src="./skulpt/src/int.js" type="text/javascript"></script>
+<script src="./skulpt/src/bool.js" type="text/javascript"></script>
+<script src="./skulpt/src/str.js" type="text/javascript"></script>
+<script src="./skulpt/src/dict.js" type="text/javascript"></script>
+<script src="./skulpt/src/errors.js" type="text/javascript"></script>
+<script src="./skulpt/src/import.js" type="text/javascript"></script>
 
 <!-- As of yet unneeded scripts
 
-<script src="../skulpt/src/enumerate.js" type="text/javascript"></script>
-<script src="../skulpt/src/set.js" type="text/javascript"></script>
-<script src="../skulpt/src/slice.js" type="text/javascript"></script>
-<script src="../skulpt/src/method.js" type="text/javascript"></script>
-<script src="../skulpt/src/structseq.js" type="text/javascript"></script>
+<script src="./skulpt/src/enumerate.js" type="text/javascript"></script>
+<script src="./skulpt/src/set.js" type="text/javascript"></script>
+<script src="./skulpt/src/slice.js" type="text/javascript"></script>
+<script src="./skulpt/src/method.js" type="text/javascript"></script>
+<script src="./skulpt/src/structseq.js" type="text/javascript"></script>
 
-<script src="../skulpt/src/sorted.js" type="text/javascript"></script>
-<script src="../skulpt/src/timsort.js" type="text/javascript"></script>
+<script src="./skulpt/src/sorted.js" type="text/javascript"></script>
+<script src="./skulpt/src/timsort.js" type="text/javascript"></script>
 
-<script src="../skulpt/src/file.js" type="text/javascript"></script>
+<script src="./skulpt/src/file.js" type="text/javascript"></script>
 
-<script src="../skulpt/src/native.js" type="text/javascript"></script>
-<script src="../skulpt/src/ffi.js" type="text/javascript"></script>
-<script src="../skulpt/src/generator.js" type="text/javascript"></script>
-<script src="../skulpt/src/fromcodepoint.js" type="text/javascript"></script>
+<script src="./skulpt/src/native.js" type="text/javascript"></script>
+<script src="./skulpt/src/ffi.js" type="text/javascript"></script>
+<script src="./skulpt/src/generator.js" type="text/javascript"></script>
+<script src="./skulpt/src/fromcodepoint.js" type="text/javascript"></script>
 
-<script src="../skulpt/src/complex.js" type="text/javascript"></script>
-<script src="../skulpt/src/biginteger.js" type="text/javascript"></script>
-<script src="../skulpt/src/long.js" type="text/javascript"></script>
-<script src="../skulpt/src/float.js" type="text/javascript"></script>
-<script src="../skulpt/src/constants.js" type="text/javascript"></script>
+<script src="./skulpt/src/complex.js" type="text/javascript"></script>
+<script src="./skulpt/src/biginteger.js" type="text/javascript"></script>
+<script src="./skulpt/src/long.js" type="text/javascript"></script>
+<script src="./skulpt/src/float.js" type="text/javascript"></script>
+<script src="./skulpt/src/constants.js" type="text/javascript"></script>
 
-<script src="../skulpt/src/formatting.js" type="text/javascript"></script>
-<script src="../skulpt/src/print.js" type="text/javascript"></script>
+<script src="./skulpt/src/formatting.js" type="text/javascript"></script>
+<script src="./skulpt/src/print.js" type="text/javascript"></script>
 
-<script src="../skulpt/gen/closure_ctor_hack.js" type="text/javascript"></script>
-<script src="../skulpt/gen/googlocs.js" type="text/javascript"></script>
-<script src="../skulpt/gen/debug_import_all_closure.js" type="text/javascript"></script>
+<script src="./skulpt/gen/closure_ctor_hack.js" type="text/javascript"></script>
+<script src="./skulpt/gen/googlocs.js" type="text/javascript"></script>
+<script src="./skulpt/gen/debug_import_all_closure.js" type="text/javascript"></script>
 
 -->
 
@@ -77,6 +77,12 @@ function builtinRead(x) {
             throw "File not found: '" + x + "'";
     return Sk.builtinFiles["files"][x];
 }
+function debugOut(arg) {
+	var debug = true;
+	if (debug) {
+		console.log(arg);
+	}
+}
 // Here's everything you need to run a python program in skulpt
 // grab the code from your textarea
 // get a reference to your pre element for output
@@ -87,7 +93,7 @@ function runit() {
    var mypre = document.getElementById("output"); 
    mypre.innerHTML = ''; 
    Sk.pre = "output";
-   Sk.configure({output:outf, read:builtinRead});
+   Sk.configure({output:outf, read:builtinRead, debugout:debugOut});
    
 	var result = Sk.importMainWithBody("<stdin>", false, prog, true);
    
@@ -107,9 +113,8 @@ function runit() {
 <h3>Try This</h3> 
 <form> 
 <textarea id="yourcode" cols="40" rows="10">
-pint "Hello World"
-print 5 + 6
-</textarea><br /> 
+print "Hello World"
+print 5 + 6</textarea><br /> 
 <button type="button" onclick="runit()">Run</button> 
 </form> 
 <pre id="output"></pre> 
