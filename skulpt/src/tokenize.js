@@ -597,6 +597,7 @@ Sk.Tokenizer.prototype.generateTokens = function (line) {
 		
 		// No match with the regular expression but there are still characters remaining in the stream, so
 		//  this must be an invalid token!
+		//  Probably due to an EOL occurring in the string
         else {
 			var fix = Sk.Tokenizer.eolInString(line, pos);
 			

@@ -84,10 +84,12 @@ Parser.prototype.addtoken = function (type, value, context) {
     var first;
     var states;
     var tp;
+	var root;
 	
 	// Classify is used to turn a token into an 'ilabel'
     var ilabel = this.classify(type, value, context);
-    Sk.debugout("Next symbol ilabel:" + ilabel + "  type:" + type + "  value:" + value);
+    Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)
+		+ "  type:" + type + "  value:" + value);
 
 	// This uses a stack based parser
     OUTERWHILE:
@@ -95,7 +97,11 @@ Parser.prototype.addtoken = function (type, value, context) {
 		// Initialise the top pointer
         tp = this.stack[this.stack.length - 1];
         states = tp.dfa[0];
+		
+		// first represents the ilabels of all possible nodes that could be the first symbol
+		// for that production
         first = tp.dfa[1];
+		root = this.stack[0].node;
 		
         arcs = states[tp.state];
 
@@ -103,19 +109,20 @@ Parser.prototype.addtoken = function (type, value, context) {
 		//  token we are looking at, or another state we can change into that has the current
 		//  token in its first set
         for (a = 0; a < arcs.length; ++a) {
-			// i - ilabel of the state we are looking for
+			// i - ilabel of the state we are looking for if we are going to shift a terminal
 			// newstate - the state that the parser will transition into if we take the current arc
-			// t - ???
+			// t - ilabel of the state we are looking for if we are going to push a non-terminal
 			// v - ???
             i = arcs[a][0];
+			var istate = Sk.ilabelMeaning(i);
             newstate = arcs[a][1];
             t = this.grammar.labels[i][0];
+			var tstate = Sk.ilabelMeaning(t);
             v = this.grammar.labels[i][1];
             if (ilabel === i) {
                 // look it up in the list of labels
                 goog.asserts.assert(t < 256);
                 // shift a token; we're done with it
-				Sk.debugout("\tShifting " + value);
                 this.shift(type, value, newstate, context);
                 // pop while we are in an accept-only state
                 state = newstate;
@@ -125,11 +132,12 @@ Parser.prototype.addtoken = function (type, value, context) {
                     && states[state][0][0] === 0
                     && states[state][0][1] === state) {
                     // states[state] == [(0, state)])
-					Sk.debugout("\tPopping for a mystery reason");
+					//Sk.debugout("\tPopping for a mystery reason");
                     this.pop();
                     //print("in after pop:"+JSON.stringify(states[state]) + ":state:"+state+":"+JSON.stringify(states[state]));
                     if (this.stack.length === 0) {
                         // done!
+	
 						Sk.debugout("Finished parsing");
                         return true;
                     }
@@ -155,7 +163,7 @@ Parser.prototype.addtoken = function (type, value, context) {
                 if (itsfirst.hasOwnProperty(ilabel)) {
                     // push a non-terminal symbol
 					//debugger
-					Sk.debugout("\tPushing " + this.grammar.number2symbol[t])
+					//Sk.debugout("\tPushing " + this.grammar.number2symbol[t])
                     this.push(t, this.grammar.dfas[t], newstate, context);
                     continue OUTERWHILE;
                 }
@@ -166,7 +174,7 @@ Parser.prototype.addtoken = function (type, value, context) {
         if (findInDfa(arcs, [0, tp.state])) {
             // an accepting state, pop it and try somethign else
             //print("WAA");
-			Sk.debugout("\tPopping " + this.grammar.number2symbol[this.stack[this.stack.length-1].node.type]);
+			//Sk.debugout("\tPopping " + this.grammar.number2symbol[this.stack[this.stack.length-1].node.type]);
             this.pop();
             if (this.stack.length === 0) {
                 throw new Sk.builtin.ParseError("too much input", this.filename);
@@ -178,7 +186,8 @@ Parser.prototype.addtoken = function (type, value, context) {
 			Sk.helpout("It looks like there was an error on line " + errline + "\n");
 			// End of project
 			
-			// Collect diagnostic data
+			Sk.parseStackDump(this.stack);
+			Sk.statesDump(states);
 			
 			//debugger
             throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
@@ -243,7 +252,7 @@ Parser.prototype.shift = function (type, value, newstate, context) {
         state: newstate,
         node : node
     };
-	Sk.debugout("\t\tStack size: " + this.stack.length);
+	//Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 // push a nonterminal
@@ -267,7 +276,7 @@ Parser.prototype.push = function (type, newdfa, newstate, context) {
         state: 0,
         node : newnode
     });
-	Sk.debugout("\t\tStack size: " + this.stack.length);
+	//Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 //var ac = 0;
@@ -292,7 +301,7 @@ Parser.prototype.pop = function () {
             this.rootnode.used_names = this.used_names;
         }
     }
-	Sk.debugout("\t\tStack size: " + this.stack.length);
+	//Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 /**
