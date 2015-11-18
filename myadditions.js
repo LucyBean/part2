@@ -50,7 +50,9 @@ Sk.Tokenizer.checkLex = function (fix) {
 	}
 }
 
-Sk.parseStackDump = function (stack) {
+Sk.help = {};
+
+Sk.help.parseStackDump = function (stack) {
 	for (var i = 0; i < stack.length; i++) {
 		var node = stack[i].node;
 		
@@ -58,29 +60,33 @@ Sk.parseStackDump = function (stack) {
 		Sk.debugout(Sk.parseTreeDump(node));
 		Sk.debugout('\n-----------------------');
 	}
-}
+};
 
-Sk.statesDump = function (states) {
-	debugger
-	for (var i = 0; i < states.length; i++) {
-		var ilabel = states[i][0][0];
-		var term = Sk.ParseTables.labels[ilabel][0];
-		
-		// Expected a terminal
-		if (term < 256) {
-			Sk.debugout('Expected: ' + Sk.ilabelMeaning(ilabel));
-		}
-		// Expected a non-terminal production
-		else {
-			var dfa = Sk.ParseTables.dfas[term];
-			var first = dfa[1];
+// Prints all the possible next 
+Sk.help.printAlts = function (istate, value, alts) {
+	Sk.debugout("\t\tUnfound alternative symbol for " + istate + " " + value);
 			
-			// TODO: Print out ilabelMeaning of first set (using Object.keys?)
-			
-		}
-	}
-	Sk.debugout('\n-----------------------');
-}
+			for (i in alts) {
+				var a = alts[i];
+				var meaning = Sk.ilabelMeaning(a);
+				var t = Sk.ParseTables.labels[a][0];
+				
+				// This keeps printing out i as 51????
+				if (meaning !== undefined) {
+					Sk.debugout("\t\t" + a + " " + meaning);
+				}
+				
+				// non-terminal production expected
+				// print first set
+				if (t > 256) {
+					var first = Object.keys(Sk.ParseTables.dfas[t]);
+					
+					for (j in first) {
+						Sk.debugout("\t\t\t" + first[j]);
+					}
+				}
+			}
+};
 
 Sk.ilabelMeaning = function (ilabel) {
 	if (ilabel === 256) return 'START';
@@ -93,7 +99,7 @@ Sk.ilabelMeaning = function (ilabel) {
 	var nonterm = Sk.ilabelMeaning.nonterms(t);
 	
 	return keyword || token || nonterm;
-}
+};
 
 Sk.ilabelMeaning.keywords = function (ilabel) {
 	var map = {
@@ -167,9 +173,10 @@ Sk.ilabelMeaning.token = function (ilabel) {
 };
 
 Sk.ilabelMeaning.nonterms = function (ilabel) {
+	//return Sk.ParseTables.number2symbol[ilabel];
 	ilabel -= 257;
 	
 	if (ilabel >= 0) {
 		return Object.keys(Sk.ParseTables.sym)[ilabel];
 	}
-}
+};

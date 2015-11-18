@@ -90,6 +90,8 @@ Parser.prototype.addtoken = function (type, value, context) {
     var ilabel = this.classify(type, value, context);
     Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)
 		+ "  type:" + type + "  value:" + value);
+		
+	var alternatives = [];
 
 	// This uses a stack based parser
     OUTERWHILE:
@@ -103,6 +105,7 @@ Parser.prototype.addtoken = function (type, value, context) {
         first = tp.dfa[1];
 		root = this.stack[0].node;
 		
+		// arcs represents all the possible transitions that can be taken by the parser
         arcs = states[tp.state];
 
         // for the current state we are in, check for a transition that can shift the current
@@ -137,7 +140,7 @@ Parser.prototype.addtoken = function (type, value, context) {
                     //print("in after pop:"+JSON.stringify(states[state]) + ":state:"+state+":"+JSON.stringify(states[state]));
                     if (this.stack.length === 0) {
                         // done!
-	
+						//Sk.debugout(Sk.parseTreeDump(this.rootnode));
 						Sk.debugout("Finished parsing");
                         return true;
                     }
@@ -150,7 +153,15 @@ Parser.prototype.addtoken = function (type, value, context) {
                 }
                 /* jshint ignore:end */
                 // done with this token
-                //print("DONE, return false");
+                
+				// Display the alternatives
+				// Store any unconsidered arcs as alternatives
+				for (b = a; b < arcs.length; ++b) {
+					var j = arcs[b][0];
+					alternatives.push(j);
+				}
+				Sk.help.printAlts(istate, value, alternatives);
+				
                 return false;
             }
 			
@@ -168,6 +179,10 @@ Parser.prototype.addtoken = function (type, value, context) {
                     continue OUTERWHILE;
                 }
             }
+			
+			else {
+				alternatives.push(i);
+			}
         }
 
         //print("findInDfa: " + JSON.stringify(arcs)+" vs. " + tp.state);
@@ -175,6 +190,7 @@ Parser.prototype.addtoken = function (type, value, context) {
             // an accepting state, pop it and try somethign else
             //print("WAA");
 			//Sk.debugout("\tPopping " + this.grammar.number2symbol[this.stack[this.stack.length-1].node.type]);
+			
             this.pop();
             if (this.stack.length === 0) {
                 throw new Sk.builtin.ParseError("too much input", this.filename);
@@ -186,8 +202,9 @@ Parser.prototype.addtoken = function (type, value, context) {
 			Sk.helpout("It looks like there was an error on line " + errline + "\n");
 			// End of project
 			
-			Sk.parseStackDump(this.stack);
-			Sk.statesDump(states);
+			Sk.help.parseStackDump(this.stack);
+			
+			Sk.help.printAlts(istate, value, alternatives);
 			
 			//debugger
             throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
@@ -252,7 +269,6 @@ Parser.prototype.shift = function (type, value, newstate, context) {
         state: newstate,
         node : node
     };
-	//Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 // push a nonterminal
@@ -276,7 +292,6 @@ Parser.prototype.push = function (type, newdfa, newstate, context) {
         state: 0,
         node : newnode
     });
-	//Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 //var ac = 0;
@@ -301,7 +316,6 @@ Parser.prototype.pop = function () {
             this.rootnode.used_names = this.used_names;
         }
     }
-	//Sk.debugout("\t\tStack size: " + this.stack.length);
 };
 
 /**

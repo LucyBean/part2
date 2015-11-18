@@ -403,6 +403,7 @@ Sk.Tokenizer.prototype.generateTokens = function (line) {
     else // continued statement
     {
         if (!line) {
+			// This occurs for unbalanced paretheses I believe
             throw new Sk.builtin.TokenError("EOF in multi-line statement", this.filename, this.lnum, 0, line);
         }
         this.continued = false;
