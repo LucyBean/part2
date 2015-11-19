@@ -160,7 +160,7 @@ Parser.prototype.addtoken = function (type, value, context) {
 					var j = arcs[b][0];
 					alternatives.push(j);
 				}
-				Sk.help.printAlts(istate, value, alternatives);
+				Sk.help.printAlts(ilabel, value, alternatives);
 				
                 return false;
             }
@@ -178,6 +178,9 @@ Parser.prototype.addtoken = function (type, value, context) {
                     this.push(t, this.grammar.dfas[t], newstate, context);
                     continue OUTERWHILE;
                 }
+				else {
+					alternatives.push(i);
+				}
             }
 			
 			else {
@@ -202,11 +205,10 @@ Parser.prototype.addtoken = function (type, value, context) {
 			Sk.helpout("It looks like there was an error on line " + errline + "\n");
 			// End of project
 			
-			Sk.help.parseStackDump(this.stack);
+			Sk.help.printAlts(ilabel, value, alternatives);
 			
-			Sk.help.printAlts(istate, value, alternatives);
-			
-			//debugger
+			//Sk.help.parseStackDump(this.stack);
+
             throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
         }
     }
@@ -421,6 +423,8 @@ Sk.parse = function parse (filename, input) {
         ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
     }
 
+	//ret is the root node of the completed parse tree
+	
     /*
      * Small adjustments here in order to return th flags and the cst
      */

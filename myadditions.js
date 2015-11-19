@@ -4,6 +4,8 @@
 Sk.Tokenizer.eolInString = function (line, errPosition) {
 	Sk.helpout(line + " has a string that contains a newline character\n");
 	
+	// TODO: Find parethesis depth of the error
+	
 	// Try inserting a quote at the end
 	var quotesUsed = line.charAt(errPosition);
 	var fix = line.substring(0, line.length-1);
@@ -63,13 +65,13 @@ Sk.help.parseStackDump = function (stack) {
 };
 
 // Prints all the possible next 
-Sk.help.printAlts = function (istate, value, alts) {
-	Sk.debugout("\t\tUnfound alternative symbol for " + istate + " " + value);
+Sk.help.printAlts = function (ilabel, value, alts) {
+	Sk.debugout("\t\tUnfound alternative symbol for " + Sk.ilabelMeaning(ilabel) + " " + value);
 			
 			for (i in alts) {
 				var a = alts[i];
 				var meaning = Sk.ilabelMeaning(a);
-				var t = Sk.ParseTables.labels[a][0];
+				var t = Sk.ilabelMeaning.ilabelToNonTerm(a);
 				
 				// This keeps printing out i as 51????
 				if (meaning !== undefined) {
@@ -78,14 +80,30 @@ Sk.help.printAlts = function (istate, value, alts) {
 				
 				// non-terminal production expected
 				// print first set
-				if (t > 256) {
-					var first = Object.keys(Sk.ParseTables.dfas[t]);
-					
-					for (j in first) {
-						Sk.debugout("\t\t\t" + first[j]);
-					}
+				// only if t > 256?
+				Sk.help.printFirstSet(t);
+			}
+};
+
+Sk.help.printFirstSet = function (ilabel) {	
+	if (ilabel > 256) {
+		var firstSet = Object.keys(Sk.ParseTables.dfas[ilabel][1]);
+		
+		for (i in firstSet) {
+			var first = firstSet[i];
+			var firstM = Sk.ilabelMeaning(first);
+			var t = Sk.ilabelMeaning.ilabelToNonTerm(first);
+			
+			if (t > 256) {
+				Sk.help.printFirstSet(t);
+			}
+			else {
+				if (firstM !== undefined) {
+					Sk.debugout("\t\t\t" + first + " " +  firstM);
 				}
 			}
+		}
+	}
 };
 
 Sk.ilabelMeaning = function (ilabel) {
@@ -100,6 +118,10 @@ Sk.ilabelMeaning = function (ilabel) {
 	
 	return keyword || token || nonterm;
 };
+
+Sk.ilabelMeaning.ilabelToNonTerm = function (ilabel) {
+	return Sk.ParseTables.labels[ilabel][0];
+}
 
 Sk.ilabelMeaning.keywords = function (ilabel) {
 	var map = {
@@ -173,10 +195,10 @@ Sk.ilabelMeaning.token = function (ilabel) {
 };
 
 Sk.ilabelMeaning.nonterms = function (ilabel) {
-	//return Sk.ParseTables.number2symbol[ilabel];
-	ilabel -= 257;
+	return Sk.ParseTables.number2symbol[ilabel];
+	/*ilabel -= 257;
 	
 	if (ilabel >= 0) {
 		return Object.keys(Sk.ParseTables.sym)[ilabel];
-	}
+	}*/
 };
