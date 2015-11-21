@@ -424,8 +424,13 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
         namestr = "new Sk.builtin.str('" + modname + "')";
         finalcode += "\n" + co.funcname + "(" + namestr + ");";
 
-		// This is throwing an exception
-        modlocs = goog.global.eval(finalcode);
+		try {
+			modlocs = goog.global.eval(finalcode);
+		}
+		catch (err) {
+			Sk.debugout(err.toString());
+			Sk.helpout("Looks like you've got a run-time error");
+		}
 
         return (function finishLoading(modlocs) {
 

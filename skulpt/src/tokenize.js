@@ -421,6 +421,9 @@ Sk.Tokenizer.prototype.generateTokens = function (line) {
         while (capos === ' ' || capos === '\f' || capos === '\t') {
             pos += 1;
             capos = line.charAt(pos);
+			if (pos >= max) {
+				return false;
+			}
         }
 		
 		// What are pseudoprog and pseudomatch here?

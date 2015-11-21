@@ -1,3 +1,13 @@
+stripTrailingNewLine = function (string) {
+	var nl = string.indexOf('\n');
+	if (nl !== -1) {
+		return string.substring(0, nl);
+	}
+	else {
+		return string;
+	}
+}
+
 /**
  *	Returns feedback on an eolInString error.
  */
@@ -55,21 +65,17 @@ Sk.Tokenizer.checkLex = function (fix) {
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (alts, context) {
+Sk.fix.unfinishedInfix = function (alts, context, parser, currentToken) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var string = context[2];
+	var stringStart = string.substring(0, end-1);
+	var stringEnd = string.substring(end-1);
 	
-	//Strip newline character
-	var nl = string.indexOf('\n');
-	if (nl !== -1) {
-		string = string.substring(0, nl);
-		string;
-	}
-	
+	// possibleAppends holds the ilabels of tokens that may work
 	var possibleAppends = [];
 	
-	Sk.helpout(string + ' is an unfinished expression\n');
+	Sk.helpout(stripTrailingNewLine(string) + ' is an unfinished expression\n');
 	
 	for (i in alts) {
 		var a = alts[i];
@@ -78,14 +84,33 @@ Sk.fix.unfinishedInfix = function (alts, context) {
 	}
 	
 	for (i in possibleAppends) {
-		var p = possibleAppends[i];
-		var pM = Sk.ilabelMeaning(p);
+		var ilabel = possibleAppends[i];
+		var meaning = Sk.ilabelMeaning(ilabel);
 		
-		// TODO: Check if they work
-		Sk.helpout(string + ' ' + pM + ' --may work\n');
+		// Converting back to a token number
+		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+		
+		// Empty context
+		var context = [[], [], stringStart + ' ' + meaning + ' ' + stringEnd];
+		
+		// Creates a new parser to check the parsing of this line
+		var p = makeParser(undefined, undefined, false);
+		var parseFunc = p[0];
+		var manualAdd = p[1];
+		
+		try {			
+			var a = parseFunc(stringStart);
+			var b = manualAdd(tokenNum, meaning, context);
+			var c = parseFunc(stringEnd);
+			var d = manualAdd(4, Sk.Tokenizer.tokenNames[4], context);
+			
+			Sk.helpout(stripTrailingNewLine(context[2]) + ' appeared to work\n');
+			
+		}
+		catch (err) {
+			Sk.debugout(meaning + ' was tried and did not work');
+		}
 	}
-	
-	
 }
 
 Sk.help = {};
@@ -252,16 +277,8 @@ Sk.ilabelMeaning.keywords = function (ilabel) {
 };
 
 Sk.ilabelMeaning.token = function (ilabel) {
-	// tti is a token# -> ilabel table
-	var tti = Sk.ParseTables.tokens;
-	
-	// check each token within the table to see whether it has
-	// the required ilabel
-	for (i = 0; i < Object.keys(tti).length; i++) {
-		if (ilabel == tti[i]) {
-			return Sk.Tokenizer.tokenNames[i];
-		}
-	}
+	var tn = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+	return Sk.Tokenizer.tokenNames[tn];
 };
 
 Sk.ilabelMeaning.nonterms = function (ilabel) {
@@ -272,3 +289,16 @@ Sk.ilabelMeaning.nonterms = function (ilabel) {
 		return Object.keys(Sk.ParseTables.sym)[ilabel];
 	}*/
 };
+
+Sk.ilabelMeaning.ilabelToTokenNumber = function (ilabel) {
+	// tti is a token# -> ilabel table
+	var tti = Sk.ParseTables.tokens;
+	
+	// check each token within the table to see whether it has
+	// the required ilabel
+	for (i = 0; i < Object.keys(tti).length; i++) {
+		if (ilabel == tti[i]) {
+			return i;
+		}
+	}
+}

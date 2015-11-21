@@ -70,7 +70,7 @@ function findInDfa (a, obj) {
 
 
 // Add a token; return true if we're done
-Parser.prototype.addtoken = function (type, value, context) {
+Parser.prototype.addtoken = function (type, value, context, fixErrs) {
     var errline;
     var itsfirst;
     var itsdfa;
@@ -86,10 +86,14 @@ Parser.prototype.addtoken = function (type, value, context) {
     var tp;
 	var root;
 	
+	if (fixErrs === undefined) {
+		fixErrs = true;
+	}
+	
 	// Classify is used to turn a token into an 'ilabel'
     var ilabel = this.classify(type, value, context);
-    Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)
-		+ "  type:" + type + "  value:" + value);
+    //Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)
+	//	+ "  type:" + type + "  value:" + value);
 		
 	var alternatives = [];
 
@@ -160,7 +164,7 @@ Parser.prototype.addtoken = function (type, value, context) {
 					var j = arcs[b][0];
 					alternatives.push(j);
 				}
-				Sk.help.printAlts(ilabel, value, alternatives);
+				//Sk.help.printAlts(ilabel, value, alternatives);
 				
                 return false;
             }
@@ -199,18 +203,21 @@ Parser.prototype.addtoken = function (type, value, context) {
                 throw new Sk.builtin.ParseError("too much input", this.filename);
             }
         } else {
-            // no transition
             errline = context[0][0];
-			console.log("Parsing error: " + context[2]);
-			Sk.helpout("It looks like there was an error on line " + errline + "\n");
-			// End of project
 			
-			Sk.help.printAlts(ilabel, value, alternatives);
-			
-			// TODO: When should this be run?
-			Sk.fix.unfinishedInfix(alternatives, context);
+			if (fixErrs) {
+				Sk.helpout("It looks like there was an error on line " + errline + "\n");
+				//Sk.help.printAlts(ilabel, value, alternatives);
+				var token = {t: type, v:value, c:context};
+				
+				// TODO: When should these be run
+				Sk.fix.unfinishedInfix(alternatives, context, this, token);
+			}
 			
 			//Sk.help.parseStackDump(this.stack);
+			
+            // no transition
+			console.log("Parsing error: " + context[2]);
 
             throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
         }
@@ -331,7 +338,7 @@ Parser.prototype.pop = function () {
  * @param {string} filename
  * @param {string=} style root of parse tree (optional)
  */
-function makeParser (filename, style) {
+function makeParser (filename, style, fixErrs) {
     var tokenizer;
     var T_OP;
     var T_NL;
@@ -340,6 +347,11 @@ function makeParser (filename, style) {
     var column;
     var lineno;
     var p;
+	
+	if (fixErrs === undefined) {
+		fixErrs = true;
+	}
+	
     if (style === undefined) {
         style = "file_input";
     }
@@ -389,7 +401,7 @@ function makeParser (filename, style) {
         }
 		
 		// Parse the token, and check it is as expected by the grammar.
-        if (p.addtoken(type, value, [start, end, line])) {
+        if (p.addtoken(type, value, [start, end, line], fixErrs)) {
             return true;
         }
     });
@@ -406,17 +418,22 @@ function makeParser (filename, style) {
         }
         return false;
     };
+	
+	// manually add a token
+	var addToken = function (type, value, context) {
+		return p.addtoken(type, value, context, fixErrs);
+	}
 
     // set flags, and return
     parseFunc.p_flags = p.p_flags;
-    return parseFunc;
+    return [parseFunc, addToken];
 }
 
 Sk.parse = function parse (filename, input) {
     var i;
     var ret;
     var lines;
-    var parseFunc = makeParser(filename);
+    var parseFunc = makeParser(filename)[0];
     if (input.substr(input.length - 1, 1) !== "\n") {
         input += "\n";
     }
