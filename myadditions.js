@@ -19,6 +19,7 @@ Sk.Tokenizer.eolInString = function (line, errPosition) {
 
 /*
  * Check fix will return true or false on whether the lexer can successfully
+ * parse the tokens. Need to prevent infinite loops.
  */
 Sk.Tokenizer.checkLex = function (fix) {
 	var fixed = true;
@@ -52,6 +53,41 @@ Sk.Tokenizer.checkLex = function (fix) {
 	}
 }
 
+Sk.fix = {};
+
+Sk.fix.unfinishedInfix = function (alts, context) {
+	var start = context[0][1];
+	var end = context[1][1];
+	var string = context[2];
+	
+	//Strip newline character
+	var nl = string.indexOf('\n');
+	if (nl !== -1) {
+		string = string.substring(0, nl);
+		string;
+	}
+	
+	var possibleAppends = [];
+	
+	Sk.helpout(string + ' is an unfinished expression\n');
+	
+	for (i in alts) {
+		var a = alts[i];
+		var first = Sk.help.generateFirstSet(a);
+		possibleAppends.push.apply(possibleAppends, first);
+	}
+	
+	for (i in possibleAppends) {
+		var p = possibleAppends[i];
+		var pM = Sk.ilabelMeaning(p);
+		
+		// TODO: Check if they work
+		Sk.helpout(string + ' ' + pM + ' --may work\n');
+	}
+	
+	
+}
+
 Sk.help = {};
 
 Sk.help.parseStackDump = function (stack) {
@@ -71,56 +107,90 @@ Sk.help.printAlts = function (ilabel, value, alts) {
 			for (i in alts) {
 				var a = alts[i];
 				var meaning = Sk.ilabelMeaning(a);
-				var t = Sk.ilabelMeaning.ilabelToNonTerm(a);
 				
-				// This keeps printing out i as 51????
 				if (meaning !== undefined) {
-					Sk.debugout("\t\t" + a + " " + meaning);
+					var print = meaning;
+					
+					if (meaning === 'terminal') {
+						print = Sk.ilabelMeaning(Sk.ilabelMeaning.ilabelToNonTerm(a));
+					}
+					Sk.debugout("\t\t" + a + " " + print);
 				}
 				
 				// non-terminal production expected
 				// print first set
 				// only if t > 256?
-				Sk.help.printFirstSet(t);
+				if (meaning === 'terminal') {
+					Sk.help.printFirstSet(a);
+				}
 			}
 };
 
-Sk.help.printFirstSet = function (ilabel) {	
-	if (ilabel > 256) {
-		var firstSet = Object.keys(Sk.ParseTables.dfas[ilabel][1]);
+Sk.help.printFirstSet = function (ilabel) {
+	var set = Sk.help.generateFirstSet(ilabel);
+	
+	for (i in set) {
+		var s = set[i];
+		var sM = Sk.ilabelMeaning(s);
 		
-		for (i in firstSet) {
-			var first = firstSet[i];
-			var firstM = Sk.ilabelMeaning(first);
-			var t = Sk.ilabelMeaning.ilabelToNonTerm(first);
-			
-			if (t > 256) {
-				Sk.help.printFirstSet(t);
-			}
-			else {
-				if (firstM !== undefined) {
-					Sk.debugout("\t\t\t" + first + " " +  firstM);
-				}
-			}
+		if (sM !== undefined) {
+			Sk.debugout("\t\t\t" + s + " " + sM);
 		}
 	}
 };
+
+Sk.help.generateFirstSet = function (ilabel) {
+	var aset = [];
+	
+	var term = Sk.ilabelMeaning.ilabelToNonTerm(ilabel);
+	
+	if (term > 256) {
+		var firstSet = Object.keys(Sk.ParseTables.dfas[term][1]);
+		
+		for (i in firstSet) {
+			var first = firstSet[i];			
+			var tset = Sk.help.generateFirstSet(first);
+			
+			for (t in tset) {
+				aset.push(tset[t]);
+			}
+		}
+		
+	} else {
+		var meaning = Sk.ilabelMeaning(ilabel);
+		if (meaning !== undefined) {
+			aset.push(ilabel);
+		}
+	}
+	
+	return aset;
+}
 
 Sk.ilabelMeaning = function (ilabel) {
 	if (ilabel === 256) return 'START';
 	if (ilabel > 256) return Sk.ilabelMeaning.nonterms(ilabel);
 	
 	var keyword = Sk.ilabelMeaning.keywords(ilabel);
+	if (keyword) {
+		return keyword;
+	}
+	
 	var token = Sk.ilabelMeaning.token(ilabel);
+	if (token) {
+		return token;
+	}
 	
-	var t = Sk.ParseTables.labels[ilabel][0];
-	var nonterm = Sk.ilabelMeaning.nonterms(t);
-	
-	return keyword || token || nonterm;
+	var t = Sk.ilabelMeaning.ilabelToNonTerm(ilabel);
+	if (t) {
+		return 'terminal';
+	}
 };
 
 Sk.ilabelMeaning.ilabelToNonTerm = function (ilabel) {
-	return Sk.ParseTables.labels[ilabel][0];
+	var table = Sk.ParseTables.labels[ilabel];
+	if (table !== undefined) {
+		return table[0];
+	}
 }
 
 Sk.ilabelMeaning.keywords = function (ilabel) {
@@ -188,7 +258,7 @@ Sk.ilabelMeaning.token = function (ilabel) {
 	// check each token within the table to see whether it has
 	// the required ilabel
 	for (i = 0; i < Object.keys(tti).length; i++) {
-		if (ilabel === tti[i]) {
+		if (ilabel == tti[i]) {
 			return Sk.Tokenizer.tokenNames[i];
 		}
 	}

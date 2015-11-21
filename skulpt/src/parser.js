@@ -207,6 +207,9 @@ Parser.prototype.addtoken = function (type, value, context) {
 			
 			Sk.help.printAlts(ilabel, value, alternatives);
 			
+			// TODO: When should this be run?
+			Sk.fix.unfinishedInfix(alternatives, context);
+			
 			//Sk.help.parseStackDump(this.stack);
 
             throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
