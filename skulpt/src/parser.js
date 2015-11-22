@@ -86,8 +86,11 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
     var tp;
 	var root;
 	
-	if (fixErrs === undefined) {
-		fixErrs = true;
+	// Simply setting this to 2 does not work!!
+	fixErrs = fixErrs || 1;
+	
+	if (fixErrs < 0) {
+		fixErrs = 0;
 	}
 	
 	// Classify is used to turn a token into an 'ilabel'
@@ -211,7 +214,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 				var token = {t: type, v:value, c:context};
 				
 				// TODO: When should these be run
-				Sk.fix.unfinishedInfix(alternatives, context, this, token);
+				Sk.fix.unfinishedInfix(alternatives, context, this, token, fixErrs - 1);
 			}
 			
 			//Sk.help.parseStackDump(this.stack);
@@ -348,9 +351,7 @@ function makeParser (filename, style, fixErrs) {
     var lineno;
     var p;
 	
-	if (fixErrs === undefined) {
-		fixErrs = true;
-	}
+	fixErrs = fixErrs || 0;
 	
     if (style === undefined) {
         style = "file_input";
@@ -437,18 +438,28 @@ Sk.parse = function parse (filename, input) {
     if (input.substr(input.length - 1, 1) !== "\n") {
         input += "\n";
     }
-    //print("input:"+input);
-    lines = input.split("\n");
-    for (i = 0; i < lines.length; ++i) {
-        ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
-    }
-
-	//ret is the root node of the completed parse tree
 	
-    /*
-     * Small adjustments here in order to return th flags and the cst
-     */
-    return {"cst": ret, "flags": parseFunc.p_flags};
+	var brackets = Sk.help.findUnbalancedBrackets(input);
+	
+	if (!brackets.isvalid) {
+		Sk.helpout("Your program has unbalanced brackets");
+		Sk.fix.unbalancedBrackets(input, brackets);
+		// Throw exception
+	} else {
+	
+		//print("input:"+input);
+		lines = input.split("\n");
+		for (i = 0; i < lines.length; ++i) {
+			ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
+		}
+
+		//ret is the root node of the completed parse tree
+		
+		/*
+		 * Small adjustments here in order to return th flags and the cst
+		 */
+		return {"cst": ret, "flags": parseFunc.p_flags};
+	}
 };
 
 Sk.parseTreeDump = function parseTreeDump (n, indent) {

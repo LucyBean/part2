@@ -403,7 +403,8 @@ Sk.Tokenizer.prototype.generateTokens = function (line) {
     else // continued statement
     {
         if (!line) {
-			// This occurs for unbalanced paretheses I believe
+			// This occurs when the end of the program is reached without all brackets
+			// being balanced
             throw new Sk.builtin.TokenError("EOF in multi-line statement", this.filename, this.lnum, 0, line);
         }
         this.continued = false;
@@ -605,7 +606,7 @@ Sk.Tokenizer.prototype.generateTokens = function (line) {
 		//  Could also be caused by a ? or $ token appearing
         else {
 			if ('\'\"'.indexOf(line.charAt(pos)) !== -1) {
-				var fix = Sk.Tokenizer.eolInString(line, pos);
+				var fix = Sk.fix.eolInString(line, pos);
 			}
 			
             if (this.callback(Sk.Tokenizer.Tokens.T_ERRORTOKEN, line.charAt(pos),

@@ -6,26 +6,7 @@ stripTrailingNewLine = function (string) {
 	else {
 		return string;
 	}
-}
-
-/**
- *	Returns feedback on an eolInString error.
- */
-Sk.Tokenizer.eolInString = function (line, errPosition) {
-	Sk.helpout(line + " has a string that contains a newline character\n");
-	
-	// TODO: Find parethesis depth of the error
-	
-	// Try inserting a quote at the end
-	var quotesUsed = line.charAt(errPosition);
-	var fix = line.substring(0, line.length-1);
-	fix += quotesUsed + '\n'
-	
-	var fixed = Sk.Tokenizer.checkLex(fix);
-	if (fixed) {
-		Sk.helpout(fix + " is an alternative that may work.");
-	}
-}
+};
 
 /*
  * Check fix will return true or false on whether the lexer can successfully
@@ -63,19 +44,33 @@ Sk.Tokenizer.checkLex = function (fix) {
 	}
 }
 
+Sk.Tokenizer.classifyToken = function (string) {
+	var result;
+	
+	var classify = new Sk.Tokenizer(this.filename, this.interactive, function (type, value, start, end, line) {
+		result = type;
+		return true;
+	});
+	
+	classify.generateTokens(string);
+	
+	return Sk.Tokenizer.tokenNames[result];
+}
+
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (alts, context, parser, currentToken) {
+Sk.fix.unfinishedInfix = function (alts, context, parser, currentToken, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var string = context[2];
 	var stringStart = string.substring(0, end-1);
 	var stringEnd = string.substring(end-1);
+	fixErrs = fixErrs || 0;
 	
 	// possibleAppends holds the ilabels of tokens that may work
 	var possibleAppends = [];
 	
-	Sk.helpout(stripTrailingNewLine(string) + ' is an unfinished expression\n');
+	Sk.helpout(stripTrailingNewLine(string) + ' is an invalid expression\n');
 	
 	for (i in alts) {
 		var a = alts[i];
@@ -94,7 +89,7 @@ Sk.fix.unfinishedInfix = function (alts, context, parser, currentToken) {
 		var context = [[], [], stringStart + ' ' + meaning + ' ' + stringEnd];
 		
 		// Creates a new parser to check the parsing of this line
-		var p = makeParser(undefined, undefined, false);
+		var p = makeParser(undefined, undefined, fixErrs - 1);
 		var parseFunc = p[0];
 		var manualAdd = p[1];
 		
@@ -108,12 +103,100 @@ Sk.fix.unfinishedInfix = function (alts, context, parser, currentToken) {
 			
 		}
 		catch (err) {
-			Sk.debugout(meaning + ' was tried and did not work');
+			Sk.debugout(stripTrailingNewLine(context[2]) + ' was tried and did not work');
 		}
 	}
-}
+};
+
+// Attempts to fix unbalanced brackets by inserting brackets into the string
+// Brackets should be the object returned from Sk.help.findUnbalancedBrackets
+Sk.fix.unbalancedBrackets = function (input, brackets) {
+	var b = "()[]{}";
+	
+	// offset measures the number of characters inserted and deleted. This is
+	// used to translate between the position of the brackets in the original
+	// string and their position in the edited string
+	var offset = 0;
+	
+	if (brackets === undefined) {
+		brackets = Sk.help.findUnbalancedBrackets(input);
+	}
+	
+	var extractedBrackets = brackets.brackets;
+	
+	for (var i = 0; i < extractedBrackets.length; i++) {
+		var current = extractedBrackets[i];
+		
+		if (!current.matched) {
+			var index = b.indexOf(current.type);
+			
+			// If it is an unmatched opening bracket
+			if (index % 2 === 0) {
+				var closeBracket = b[index+1];
+				// Insert the corresponding closing bracket before
+				// the next bracket or at EOF
+				var next = extractedBrackets[i+1];
+				if (next === undefined) {
+					input = input.slice(0, input.length-1) + closeBracket + "\n";
+				}
+				else {
+					input = input.slice(0, next.pos + offset) + closeBracket + input.slice(next.pos + offset);
+					offset++;
+				}
+			}
+			// Else it is an unmatched closing bracket
+			else {
+				// Delete the offending bracket from the input
+				input = input.slice(0, current.pos + offset) + input.slice(current.pos + 1 + offset);
+				offset--;
+			}
+		}
+	}
+	
+	Sk.helpout("\nTry:\n" + input);
+	Sk.help.checkParse(input);
+};
+
+/**
+ *	Returns feedback on an eolInString error.
+ */
+Sk.fix.eolInString = function (line, errPosition) {
+	Sk.helpout(line + " has a string that contains a newline character\n");
+	
+	// TODO: Find parethesis depth of the error
+	
+	// Try inserting a quote at the end
+	var quotesUsed = line.charAt(errPosition);
+	var fix = line.substring(0, line.length-1);
+	fix += quotesUsed + '\n'
+	
+	var fixed = Sk.Tokenizer.checkLex(fix);
+	if (fixed) {
+		Sk.helpout(fix + " is an alternative that may work.");
+	}
+};
 
 Sk.help = {};
+
+Sk.help.checkParse = function (string, checkErrs) {
+	checkErrs = checkErrs || 0;
+	
+	if (string.charAt(string.length-1) !== "\n") {
+		string += "\n";
+	}
+	
+	var parseFunc = makeParser(undefined, undefined, checkErrs)[0];
+	
+	try {
+		parseFunc(string);
+		Sk.debugout(stripTrailingNewLine(string) + " does parse");
+		return true;
+	}
+	catch (err) {
+		Sk.debugout(stripTrailingNewLine(string) + " does not parse");
+		return false;
+	}
+};
 
 Sk.help.parseStackDump = function (stack) {
 	for (var i = 0; i < stack.length; i++) {
@@ -149,6 +232,115 @@ Sk.help.printAlts = function (ilabel, value, alts) {
 					Sk.help.printFirstSet(a);
 				}
 			}
+};
+
+Sk.help.stripStringCharacters = function (string, replacement) {
+	var input = string;
+	var insideQuote = false;
+	var escaped = false;
+	replacement = replacement || '_';
+	
+	//This will replace all characters within a string with the replacement char
+	for (var i = 0; i < input.length; i++) {
+		var c = input.charAt(i);
+		
+		// Check for escaping backslashes
+		if (!escaped && c === "\\") {
+			escaped = true;
+			
+			if (insideQuote) {
+					var prefix = input.slice(0,i);
+					var suffix = input.slice(i+1);
+					var input = prefix + replacement + suffix;
+			}
+		}
+		else {
+			// If we find an unescaped quote then flip inside/outside indicator
+			if (!escaped && (c === "\"" || c === "'")) {
+				insideQuote = !insideQuote;
+			} else {
+				
+				// If we are inside a quote then replace the characters
+				if (insideQuote) {
+					var prefix = input.slice(0,i);
+					var suffix = input.slice(i+1);
+					var input = prefix + replacement + suffix;
+				}
+			}
+			
+			escaped = false;
+		}
+	}
+	
+	return input;
+};
+
+// Detects whether the set of brackets within the program is balanced
+// Not the most efficient way of doing it but it works
+// I'm almost certain some of these loops can be combined
+Sk.help.findUnbalancedBrackets = function (input) {
+	var lines = Sk.help.stripStringCharacters(input);
+	
+	var brackets = "()[]{}";
+	var extractedBrackets = [];
+	
+	// Extract all the brackets and their positions in the string
+	for (var k = 0; k < lines.length; k++) {
+		var index = brackets.indexOf(lines.charAt(k));
+		
+		if (index !== -1) {
+			extractedBrackets.push({type:brackets.charAt(index), pos:k, matched:false});
+		}
+	}
+	
+	// Remove matching pairs of brackets
+	var i = 0;
+	while (i < extractedBrackets.length - 1) {
+		if (extractedBrackets[i].matched) {
+			// The current bracket we are checking has been matched
+			i++;
+		} else {
+			// The bracket has been unmatched
+			var current = extractedBrackets[i];
+			
+			// Find the next unmatched bracket
+			while (i < extractedBrackets.length - 1 && extractedBrackets[i+1].matched) {
+				i++;
+			}
+			if (i === extractedBrackets.length - 1) {
+				break;
+			}
+			var next = extractedBrackets[i+1];
+			
+			// Check if they can be matched up
+			var cn = brackets.indexOf(current.type);
+			var nn = brackets.indexOf(next.type);
+			
+			// If they are a matching pair of brackets, mark them as matched
+			// and start from the beginning
+			if (cn%2 == 0 && nn === cn + 1) {
+				current.matched = true;
+				next.matched = true;
+				i = 0;
+			}
+			// Else move on to next bracket
+			else {
+				i++;
+			}
+		}
+	}
+	
+	var balanced = true;
+	
+	for (j in extractedBrackets) {
+		var b = extractedBrackets[j];
+		if (!b.matched) {
+			Sk.debugout('Unmatched bracket ' + b.type + ' at ' + b.pos);
+			balanced = false;
+		}
+	}
+	
+	return {isvalid:balanced, brackets:extractedBrackets};
 };
 
 Sk.help.printFirstSet = function (ilabel) {
