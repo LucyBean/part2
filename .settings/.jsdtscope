@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="skulpt/support/closure-library/closure/goog/uri/|skulpt/support/closure-library/closure/goog/labs/style/|skulpt/doc/ide/static/codemirror/contrib/sql/js/|skulpt/doc/ide/static/closure-library/closure/goog/testing/ui/|skulpt/doc/static/env/|skulpt/support/closure-library/closure/goog/gears/|skulpt/doc/ide/static/closure-library/closure/goog/testing/events/|skulpt/src/builtin/|skulpt/doc/static/ProgMan/scripts/prettify/|skulpt/doc/ide/static/closure-library/closure/goog/async/|skulpt/support/closure-library/closure/goog/testing/editor/|skulpt/support/closure-library/closure/goog/iter/|skulpt/doc/ide/static/closure-library/closure/goog/dom/browserrange/|skulpt/test/|skulpt/support/closure-library/closure/goog/asserts/|skulpt/doc/ide/static/closure-library/closure/goog/ui/emoji/|skulpt/doc/ide/static/closure-library/closure/goog/proto2/|skulpt/support/closure-library/closure/goog/timer/|skulpt/support/closure-library/closure/goog/async/|skulpt/gen/|skulpt/support/closure-library/|skulpt/support/closure-library/closure/goog/fx/anim/|skulpt/support/closure-library/closure/goog/dom/browserrange/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/t/|skulpt/doc/ide/static/closure-library/closure/goog/ui/style/app/|skulpt/support/closure-library/third_party/closure/goog/osapi/|skulpt/support/jsbeautify/|skulpt/support/closure-library/closure/goog/fx/css3/|skulpt/doc/static/env/codemirror/js/|skulpt/support/closure-library/third_party/closure/goog/jpeg_encoder/|skulpt/support/closure-library/closure/goog/module/testdata/|skulpt/doc/ide/static/closure-library/closure/goog/iter/|skulpt/doc/ide/static/closure-library/closure/goog/cssom/|skulpt/support/closure-library/closure/goog/labs/testing/|skulpt/doc/ide/static/closure-library/closure/goog/net/xpc/|skulpt/support/closure-library/closure/goog/i18n/|skulpt/doc/ide/static/closure-library/closure/goog/asserts/|skulpt/support/closure-library/closure/goog/testing/messaging/|skulpt/support/closure-library/closure/goog/cssom/iframe/|skulpt/doc/ide/static/closure-library/closure/goog/uri/|skulpt/doc/ide/static/closure-library/closure/goog/i18n/|skulpt/support/closure-library/closure/goog/net/testdata/|skulpt/support/closure-library/closure/goog/spell/|skulpt/support/closure-library/closure/goog/ui/ac/|skulpt/doc/ide/static/closure-library/closure/goog/string/|skulpt/doc/static/|skulpt/doc/ide/static/closure-library/closure/goog/net/|skulpt/support/closure-library/closure/goog/string/|skulpt/support/closure-library/closure/goog/soy/|skulpt/support/closure-library/closure/goog/net/|skulpt/support/closure-library/closure/goog/labs/format/|skulpt/doc/ide/static/closure-library/closure/goog/testing/editor/|skulpt/doc/ide/static/closure-library/closure/goog/demos/|skulpt/support/closure-library/closure/goog/testing/async/|skulpt/support/closure-library/closure/goog/messaging/testdata/|skulpt/support/closure-library/closure/goog/i18n/uchar/|skulpt/support/closure-library/closure/goog/ui/style/app/|skulpt/support/closure-library/closure/goog/json/|skulpt/doc/ide/static/closure-library/closure/goog/graphics/ext/|skulpt/doc/ide/static/closure-library/closure/goog/format/|skulpt/support/closure-library/closure/goog/labs/events/|skulpt/support/closure-library/closure/goog/format/|skulpt/support/closure-library/closure/goog/stats/|skulpt/support/closure-library/closure/goog/testing/style/|skulpt/support/closure-library/closure/goog/structs/|skulpt/doc/ide/static/closure-library/closure/goog/crypt/|skulpt/support/closure-library/closure/goog/math/interpolator/|skulpt/support/closure-library/third_party/closure/goog/loremipsum/text/|skulpt/support/closure-library/closure/goog/proto2/|skulpt/doc/ide/static/closure-library/closure/goog/structs/|skulpt/doc/ide/static/closure-library/closure/goog/json/|skulpt/support/closure-library/third_party/closure/goog/dojo/dom/|skulpt/doc/ide/static/closure-library/closure/goog/pubsub/|skulpt/doc/ide/static/closure-library/closure/goog/events/|skulpt/doc/ide/static/closure-library/closure/goog/timer/|skulpt/doc/ide/static/closure-library/closure/goog/dom/pattern/callback/|skulpt/support/closure-library/closure/goog/labs/net/|skulpt/support/closure-library/closure/goog/date/|skulpt/src/|skulpt/support/tmp/|skulpt/doc/ide/static/closure-library/closure/goog/gears/|skulpt/repl/|skulpt/doc/ide/static/closure-library/closure/goog/testing/style/|skulpt/src/lib/webgl/|skulpt/support/closure-library/closure/goog/editor/plugins/|skulpt/doc/ide/static/closure-library/closure/goog/demos/graphics/|skulpt/support/closure-library/closure/goog/labs/structs/|skulpt/support/closure-library/closure/goog/demos/graphics/|skulpt/doc/ide/static/closure-library/closure/goog/date/|skulpt/support/closure-library/closure/goog/pubsub/|skulpt/support/closure-library/closure/goog/demos/|skulpt/doc/ide/static/closure-library/closure/goog/editor/plugins/|skulpt/support/closure-library/closure/goog/events/|skulpt/support/closure-library/closure/goog/storage/|skulpt/doc/ide/static/codemirror/contrib/plsql/js/|skulpt/doc/ide/static/closure-library/closure/goog/dom/pattern/|skulpt/support/closure-library/closure/goog/graphics/|skulpt/support/closure-library/closure/goog/positioning/|skulpt/support/closure-library/third_party/closure/goog/caja/string/html/|skulpt/doc/ide/static/closure-library/closure/goog/ui/tree/|skulpt/support/es6-promise-polyfill/|skulpt/support/closure-library/closure/goog/labs/useragent/|skulpt/support/closure-library/closure/goog/array/|skulpt/doc/ide/static/closure-library/closure/goog/positioning/|skulpt/support/closure-library/closure/goog/bootstrap/|skulpt/doc/ide/static/|skulpt/test/turtle/lib/js-imagediff/|skulpt/support/closure-library/closure/goog/useragent/|skulpt/support/closure-library/closure/goog/fs/|skulpt/doc/ide/static/closure-library/closure/goog/demos/editor/|skulpt/support/closure-library/closure/goog/reflect/|skulpt/doc/ide/static/closure-library/closure/goog/proto/|skulpt/support/closure-library/third_party/closure/goog/|skulpt/support/closure-library/closure/goog/result/|skulpt/support/closure-library/closure/goog/crypt/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/handlers/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/|skulpt/support/closure-library/closure/goog/proto/|skulpt/doc/ide/static/closure-library/closure/goog/ui/editor/|skulpt/test/turtle/lib/jasmine-2.0.0/|skulpt/support/closure-library/closure/goog/datasource/|skulpt/doc/ide/static/closure-library/closure/goog/demos/tree/|skulpt/support/closure-library/closure/goog/labs/classdef/|skulpt/doc/ide/static/closure-library/closure/goog/array/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/lib/JSDOC/|skulpt/doc/ide/static/closure-library/closure/goog/ui/|skulpt/doc/ide/static/closure-library/closure/goog/locale/|skulpt/support/closure-library/closure/goog/demos/tree/|skulpt/doc/ide/static/closure-library/closure/goog/history/|skulpt/support/closure-library/closure/goog/vec/|skulpt/support/closure-library/closure/goog/fx/|skulpt/doc/ide/static/closure-library/closure/goog/memoize/|skulpt/support/closure-library/closure/goog/debug/devcss/|skulpt/support/closure-library/closure/goog/disposable/|skulpt/src/lib/|skulpt/support/closure-library/closure/goog/graphics/ext/|skulpt/doc/ide/static/closure-library/closure/goog/fx/|skulpt/support/closure-library/closure/goog/ui/|skulpt/support/closure-library/closure/goog/ui/tree/|skulpt/support/closure-library/closure/goog/history/|skulpt/doc/ide/static/codemirror/contrib/lua/js/|skulpt/support/closure-library/closure/goog/net/xpc/|skulpt/support/closure-library/closure/goog/labs/observe/|skulpt/doc/ide/static/closure-library/closure/goog/disposable/|skulpt/doc/ide/static/codemirror/contrib/php/js/|skulpt/support/closure-library/closure/goog/ui/media/|skulpt/support/closure-library/closure/goog/testing/storage/|skulpt/support/closure-library/closure/goog/memoize/|skulpt/support/closure-library/closure/goog/messaging/|skulpt/doc/ide/static/closure-library/closure/goog/graphics/|skulpt/support/closure-library/closure/goog/locale/|skulpt/doc/ide/static/closure-library/closure/goog/ui/media/|skulpt/doc/ide/static/closure-library/closure/goog/reflect/|skulpt/src/lib/urllib/request/|skulpt/support/closure-library/closure/goog/testing/fs/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/templates/jsdoc/|skulpt/doc/ide/static/closure-library/closure/goog/useragent/|skulpt/doc/static/ProgMan/scripts/|skulpt/doc/ide/static/closure-library/closure/goog/functions/|skulpt/doc/ide/static/closure-library/closure/goog/cssom/iframe/|skulpt/doc/ide/static/closure-library/closure/goog/color/|skulpt/support/closure-library/closure/goog/testing/i18n/|skulpt/support/closure-library/closure/goog/color/|skulpt/support/closure-library/closure/goog/ui/equation/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/test/|skulpt/support/closure-library/closure/goog/webgl/|skulpt/support/closure-library/closure/goog/labs/mock/|skulpt/support/closure-library/closure/goog/demos/editor/|skulpt/support/jslint/|skulpt/support/closure-library/closure/goog/testing/events/|skulpt/doc/ide/static/closure-library/closure/goog/ui/autocomplete/|skulpt/doc/ide/static/closure-library/closure/goog/spell/|skulpt/support/closure-library/closure/goog/|skulpt/doc/ide/static/closure-library/closure/goog/module/|skulpt/doc/ide/static/closure-library/closure/goog/|skulpt/doc/ide/static/closure-library/closure/goog/module/testdata/|skulpt/support/closure-library/closure/goog/cssom/|skulpt/doc/ide/static/codemirror/contrib/csharp/js/|skulpt/doc/ide/static/closure-library/closure/goog/testing/|skulpt/support/closure-library/closure/goog/testing/proto2/|skulpt/support/closure-library/closure/goog/math/|skulpt/doc/ide/static/closure-library/closure/goog/dom/|skulpt/support/closure-library/closure/goog/testing/|skulpt/support/closure-library/closure/goog/editor/|skulpt/support/closure-library/closure/goog/testing/ui/|skulpt/support/closure-library/closure/goog/module/|skulpt/support/closure-library/closure/goog/functions/|skulpt/support/closure-library/closure/goog/ui/emoji/|skulpt/support/closure-library/closure/goog/storage/mechanism/|skulpt/support/closure-library/closure/goog/ui/editor/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/plugins/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/handlers/XMLDOC/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/lib/|skulpt/doc/ide/static/closure-library/closure/goog/window/|skulpt/doc/ide/static/closure-library/closure/goog/testing/net/|skulpt/support/closure-library/closure/goog/log/|skulpt/support/closure-library/closure/goog/debug/|skulpt/support/closure-library/closure/goog/tweak/|skulpt/doc/ide/static/closure-library/closure/goog/math/|skulpt/doc/ide/static/closure-library/closure/goog/debug/|skulpt/doc/ide/static/codemirror/|skulpt/support/closure-library/closure/goog/dom/|skulpt/support/closure-library/closure/goog/labs/object/|skulpt/doc/ide/static/closure-library/closure/goog/testing/benchmarks/|skulpt/support/closure-library/closure/goog/window/|skulpt/doc/ide/static/closure-library/closure/goog/datasource/|skulpt/support/closure-library/closure/goog/style/|skulpt/support/closure-library/closure/goog/dom/pattern/|skulpt/doc/ide/static/closure-library/closure/goog/editor/|skulpt/doc/ide/static/codemirror/js/|skulpt/support/closure-library/third_party/closure/goog/mochikit/async/|skulpt/support/closure-library/closure/goog/labs/net/webchannel/|skulpt/support/closure-library/closure/goog/a11y/aria/|skulpt/support/closure-library/closure/goog/dom/pattern/callback/|skulpt/support/closure-wrap-gen/skulptwrap/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/test/scripts/|skulpt/support/closure-library/closure/goog/object/|skulpt/support/closure-library/closure/goog/db/|skulpt/support/d8/tools/|skulpt/support/closure-library/closure/goog/testing/net/|skulpt/src/lib/urllib/|skulpt/doc/ide/static/closure-library/closure/goog/object/|skulpt/doc/ide/static/closure-library/closure/goog/style/|skulpt/test/turtle/spec/|skulpt/support/closure-library/closure/goog/demos/xpc/|skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/frame/|skulpt/doc/ide/static/codemirror/contrib/python/js/|skulpt/doc/ide/static/closure-library/closure/goog/demos/xpc/" kind="src" path=""/>
+	<classpathentry excluding="codemirror/contrib/sql/js/|closure-library/closure/goog/testing/ui/|closure-library/closure/goog/testing/events/|closure-library/closure/goog/async/|closure-library/closure/goog/dom/browserrange/|closure-library/closure/goog/ui/emoji/|closure-library/closure/goog/proto2/|closure-library/closure/goog/ui/style/app/|closure-library/closure/goog/iter/|closure-library/closure/goog/cssom/|closure-library/closure/goog/net/xpc/|closure-library/closure/goog/asserts/|closure-library/closure/goog/uri/|closure-library/closure/goog/i18n/|closure-library/closure/goog/string/|closure-library/closure/goog/net/|closure-library/closure/goog/testing/editor/|closure-library/closure/goog/demos/|closure-library/closure/goog/graphics/ext/|closure-library/closure/goog/format/|closure-library/closure/goog/crypt/|closure-library/closure/goog/structs/|closure-library/closure/goog/json/|closure-library/closure/goog/pubsub/|closure-library/closure/goog/events/|closure-library/closure/goog/timer/|closure-library/closure/goog/dom/pattern/callback/|closure-library/closure/goog/gears/|closure-library/closure/goog/testing/style/|closure-library/closure/goog/demos/graphics/|closure-library/closure/goog/date/|closure-library/closure/goog/editor/plugins/|codemirror/contrib/plsql/js/|closure-library/closure/goog/dom/pattern/|closure-library/closure/goog/ui/tree/|closure-library/closure/goog/positioning/|closure-library/closure/goog/demos/editor/|closure-library/closure/goog/proto/|closure-library/closure/goog/ui/editor/|closure-library/closure/goog/demos/tree/|closure-library/closure/goog/array/|closure-library/closure/goog/ui/|closure-library/closure/goog/locale/|closure-library/closure/goog/history/|closure-library/closure/goog/memoize/|closure-library/closure/goog/fx/|codemirror/contrib/lua/js/|closure-library/closure/goog/disposable/|codemirror/contrib/php/js/|closure-library/closure/goog/graphics/|closure-library/closure/goog/ui/media/|closure-library/closure/goog/reflect/|closure-library/closure/goog/useragent/|closure-library/closure/goog/functions/|closure-library/closure/goog/cssom/iframe/|closure-library/closure/goog/color/|closure-library/closure/goog/ui/autocomplete/|closure-library/closure/goog/spell/|closure-library/closure/goog/module/|closure-library/closure/goog/|closure-library/closure/goog/module/testdata/|codemirror/contrib/csharp/js/|closure-library/closure/goog/testing/|closure-library/closure/goog/dom/|closure-library/closure/goog/window/|closure-library/closure/goog/testing/net/|closure-library/closure/goog/math/|closure-library/closure/goog/debug/|codemirror/|closure-library/closure/goog/testing/benchmarks/|closure-library/closure/goog/datasource/|closure-library/closure/goog/editor/|codemirror/js/|closure-library/closure/goog/object/|closure-library/closure/goog/style/|codemirror/contrib/python/js/|closure-library/closure/goog/demos/xpc/" kind="src" path="skulpt/doc/ide/static"/>
+	<classpathentry excluding="testing/ui/|testing/events/|async/|dom/browserrange/|ui/emoji/|proto2/|ui/style/app/|iter/|cssom/|net/xpc/|asserts/|uri/|i18n/|string/|net/|testing/editor/|demos/|graphics/ext/|format/|crypt/|structs/|json/|pubsub/|events/|timer/|dom/pattern/callback/|gears/|testing/style/|demos/graphics/|date/|editor/plugins/|dom/pattern/|ui/tree/|positioning/|demos/editor/|proto/|ui/editor/|demos/tree/|array/|ui/|locale/|history/|memoize/|fx/|disposable/|graphics/|ui/media/|reflect/|useragent/|functions/|cssom/iframe/|color/|ui/autocomplete/|spell/|module/|module/testdata/|testing/|dom/|window/|testing/net/|math/|debug/|testing/benchmarks/|datasource/|editor/|object/|style/|demos/xpc/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/array"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/asserts"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/async"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/color"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/crypt"/>
+	<classpathentry excluding="iframe/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/cssom"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/cssom/iframe"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/datasource"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/date"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/debug"/>
+	<classpathentry excluding="graphics/|editor/|tree/|xpc/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/demos"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/demos/editor"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/demos/graphics"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/demos/tree"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/demos/xpc"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/disposable"/>
+	<classpathentry excluding="browserrange/|pattern/callback/|pattern/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/dom"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/dom/browserrange"/>
+	<classpathentry excluding="callback/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/dom/pattern"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/dom/pattern/callback"/>
+	<classpathentry excluding="plugins/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/editor"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/editor/plugins"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/events"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/format"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/functions"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/fx"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/gears"/>
+	<classpathentry excluding="ext/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/graphics"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/graphics/ext"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/history"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/i18n"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/iter"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/json"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/locale"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/math"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/memoize"/>
+	<classpathentry excluding="testdata/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/module"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/module/testdata"/>
+	<classpathentry excluding="xpc/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/net"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/net/xpc"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/object"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/positioning"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/proto"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/proto2"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/pubsub"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/reflect"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/spell"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/string"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/structs"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/style"/>
+	<classpathentry excluding="ui/|events/|editor/|style/|net/|benchmarks/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/testing"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/testing/benchmarks"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/testing/editor"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/testing/events"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/testing/net"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/testing/style"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/testing/ui"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/timer"/>
+	<classpathentry excluding="emoji/|style/app/|tree/|editor/|media/|autocomplete/" kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/ui"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/ui/autocomplete"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/ui/editor"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/ui/emoji"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/ui/media"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/ui/style/app"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/ui/tree"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/uri"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/useragent"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/closure-library/closure/goog/window"/>
+	<classpathentry excluding="contrib/sql/js/|contrib/plsql/js/|contrib/lua/js/|contrib/php/js/|contrib/csharp/js/|js/|contrib/python/js/" kind="src" path="skulpt/doc/ide/static/codemirror"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/codemirror/contrib/csharp/js"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/codemirror/contrib/lua/js"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/codemirror/contrib/php/js"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/codemirror/contrib/plsql/js"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/codemirror/contrib/python/js"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/codemirror/contrib/sql/js"/>
+	<classpathentry kind="src" path="skulpt/doc/ide/static/codemirror/js"/>
+	<classpathentry excluding="env/|ProgMan/scripts/prettify/|env/codemirror/js/|ProgMan/scripts/" kind="src" path="skulpt/doc/static"/>
+	<classpathentry excluding="codemirror/js/" kind="src" path="skulpt/doc/static/env"/>
+	<classpathentry kind="src" path="skulpt/doc/static/env/codemirror/js"/>
+	<classpathentry excluding="prettify/" kind="src" path="skulpt/doc/static/ProgMan/scripts"/>
+	<classpathentry kind="src" path="skulpt/doc/static/ProgMan/scripts/prettify"/>
+	<classpathentry kind="src" path="skulpt/gen"/>
+	<classpathentry kind="src" path="skulpt/repl"/>
+	<classpathentry excluding="builtin/|lib/webgl/|lib/|lib/urllib/request/|lib/urllib/" kind="src" path="skulpt/src"/>
+	<classpathentry kind="src" path="skulpt/src/builtin"/>
+	<classpathentry excluding="webgl/|urllib/request/|urllib/" kind="src" path="skulpt/src/lib"/>
+	<classpathentry excluding="request/" kind="src" path="skulpt/src/lib/urllib"/>
+	<classpathentry kind="src" path="skulpt/src/lib/urllib/request"/>
+	<classpathentry kind="src" path="skulpt/src/lib/webgl"/>
+	<classpathentry excluding="closure/goog/uri/|closure/goog/labs/style/|closure/goog/gears/|closure/goog/testing/editor/|closure/goog/iter/|closure/goog/asserts/|closure/goog/timer/|closure/goog/async/|closure/goog/fx/anim/|closure/goog/dom/browserrange/|third_party/closure/goog/osapi/|closure/goog/fx/css3/|third_party/closure/goog/jpeg_encoder/|closure/goog/module/testdata/|closure/goog/labs/testing/|closure/goog/i18n/|closure/goog/testing/messaging/|closure/goog/cssom/iframe/|closure/goog/net/testdata/|closure/goog/spell/|closure/goog/ui/ac/|closure/goog/string/|closure/goog/soy/|closure/goog/net/|closure/goog/labs/format/|closure/goog/testing/async/|closure/goog/messaging/testdata/|closure/goog/i18n/uchar/|closure/goog/ui/style/app/|closure/goog/json/|closure/goog/labs/events/|closure/goog/format/|closure/goog/stats/|closure/goog/testing/style/|closure/goog/structs/|closure/goog/math/interpolator/|third_party/closure/goog/loremipsum/text/|closure/goog/proto2/|third_party/closure/goog/dojo/dom/|closure/goog/labs/net/|closure/goog/date/|closure/goog/editor/plugins/|closure/goog/labs/structs/|closure/goog/demos/graphics/|closure/goog/pubsub/|closure/goog/demos/|closure/goog/events/|closure/goog/storage/|closure/goog/graphics/|closure/goog/positioning/|third_party/closure/goog/caja/string/html/|closure/goog/labs/useragent/|closure/goog/array/|closure/goog/bootstrap/|closure/goog/useragent/|closure/goog/fs/|closure/goog/reflect/|third_party/closure/goog/|closure/goog/result/|closure/goog/crypt/|closure/goog/proto/|closure/goog/datasource/|closure/goog/labs/classdef/|closure/goog/demos/tree/|closure/goog/vec/|closure/goog/fx/|closure/goog/debug/devcss/|closure/goog/disposable/|closure/goog/graphics/ext/|closure/goog/ui/|closure/goog/ui/tree/|closure/goog/history/|closure/goog/net/xpc/|closure/goog/labs/observe/|closure/goog/ui/media/|closure/goog/testing/storage/|closure/goog/memoize/|closure/goog/messaging/|closure/goog/locale/|closure/goog/testing/fs/|closure/goog/testing/i18n/|closure/goog/color/|closure/goog/ui/equation/|closure/goog/webgl/|closure/goog/labs/mock/|closure/goog/demos/editor/|closure/goog/testing/events/|closure/goog/|closure/goog/cssom/|closure/goog/testing/proto2/|closure/goog/math/|closure/goog/testing/|closure/goog/editor/|closure/goog/testing/ui/|closure/goog/module/|closure/goog/functions/|closure/goog/ui/emoji/|closure/goog/storage/mechanism/|closure/goog/ui/editor/|closure/goog/log/|closure/goog/debug/|closure/goog/tweak/|closure/goog/dom/|closure/goog/labs/object/|closure/goog/window/|closure/goog/style/|closure/goog/dom/pattern/|third_party/closure/goog/mochikit/async/|closure/goog/labs/net/webchannel/|closure/goog/a11y/aria/|closure/goog/dom/pattern/callback/|closure/goog/object/|closure/goog/db/|closure/goog/testing/net/|closure/goog/demos/xpc/" kind="src" path="skulpt/support/closure-library"/>
+	<classpathentry excluding="uri/|labs/style/|gears/|testing/editor/|iter/|asserts/|timer/|async/|fx/anim/|dom/browserrange/|fx/css3/|module/testdata/|labs/testing/|i18n/|testing/messaging/|cssom/iframe/|net/testdata/|spell/|ui/ac/|string/|soy/|net/|labs/format/|testing/async/|messaging/testdata/|i18n/uchar/|ui/style/app/|json/|labs/events/|format/|stats/|testing/style/|structs/|math/interpolator/|proto2/|labs/net/|date/|editor/plugins/|labs/structs/|demos/graphics/|pubsub/|demos/|events/|storage/|graphics/|positioning/|labs/useragent/|array/|bootstrap/|useragent/|fs/|reflect/|result/|crypt/|proto/|datasource/|labs/classdef/|demos/tree/|vec/|fx/|debug/devcss/|disposable/|graphics/ext/|ui/|ui/tree/|history/|net/xpc/|labs/observe/|ui/media/|testing/storage/|memoize/|messaging/|locale/|testing/fs/|testing/i18n/|color/|ui/equation/|webgl/|labs/mock/|demos/editor/|testing/events/|cssom/|testing/proto2/|math/|testing/|editor/|testing/ui/|module/|functions/|ui/emoji/|storage/mechanism/|ui/editor/|log/|debug/|tweak/|dom/|labs/object/|window/|style/|dom/pattern/|labs/net/webchannel/|a11y/aria/|dom/pattern/callback/|object/|db/|testing/net/|demos/xpc/" kind="src" path="skulpt/support/closure-library/closure/goog"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/a11y/aria"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/array"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/asserts"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/async"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/bootstrap"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/color"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/crypt"/>
+	<classpathentry excluding="iframe/" kind="src" path="skulpt/support/closure-library/closure/goog/cssom"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/cssom/iframe"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/datasource"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/date"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/db"/>
+	<classpathentry excluding="devcss/" kind="src" path="skulpt/support/closure-library/closure/goog/debug"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/debug/devcss"/>
+	<classpathentry excluding="graphics/|tree/|editor/|xpc/" kind="src" path="skulpt/support/closure-library/closure/goog/demos"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/demos/editor"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/demos/graphics"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/demos/tree"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/demos/xpc"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/disposable"/>
+	<classpathentry excluding="browserrange/|pattern/|pattern/callback/" kind="src" path="skulpt/support/closure-library/closure/goog/dom"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/dom/browserrange"/>
+	<classpathentry excluding="callback/" kind="src" path="skulpt/support/closure-library/closure/goog/dom/pattern"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/dom/pattern/callback"/>
+	<classpathentry excluding="plugins/" kind="src" path="skulpt/support/closure-library/closure/goog/editor"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/editor/plugins"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/events"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/format"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/fs"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/functions"/>
+	<classpathentry excluding="anim/|css3/" kind="src" path="skulpt/support/closure-library/closure/goog/fx"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/fx/anim"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/fx/css3"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/gears"/>
+	<classpathentry excluding="ext/" kind="src" path="skulpt/support/closure-library/closure/goog/graphics"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/graphics/ext"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/history"/>
+	<classpathentry excluding="uchar/" kind="src" path="skulpt/support/closure-library/closure/goog/i18n"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/i18n/uchar"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/iter"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/json"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/classdef"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/events"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/format"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/mock"/>
+	<classpathentry excluding="webchannel/" kind="src" path="skulpt/support/closure-library/closure/goog/labs/net"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/net/webchannel"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/object"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/observe"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/structs"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/style"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/testing"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/labs/useragent"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/locale"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/log"/>
+	<classpathentry excluding="interpolator/" kind="src" path="skulpt/support/closure-library/closure/goog/math"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/math/interpolator"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/memoize"/>
+	<classpathentry excluding="testdata/" kind="src" path="skulpt/support/closure-library/closure/goog/messaging"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/messaging/testdata"/>
+	<classpathentry excluding="testdata/" kind="src" path="skulpt/support/closure-library/closure/goog/module"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/module/testdata"/>
+	<classpathentry excluding="testdata/|xpc/" kind="src" path="skulpt/support/closure-library/closure/goog/net"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/net/testdata"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/net/xpc"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/object"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/positioning"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/proto"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/proto2"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/pubsub"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/reflect"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/result"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/soy"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/spell"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/stats"/>
+	<classpathentry excluding="mechanism/" kind="src" path="skulpt/support/closure-library/closure/goog/storage"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/storage/mechanism"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/string"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/structs"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/style"/>
+	<classpathentry excluding="editor/|messaging/|async/|style/|storage/|fs/|i18n/|events/|proto2/|ui/|net/" kind="src" path="skulpt/support/closure-library/closure/goog/testing"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/async"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/editor"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/events"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/fs"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/i18n"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/messaging"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/net"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/proto2"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/storage"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/style"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/testing/ui"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/timer"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/tweak"/>
+	<classpathentry excluding="ac/|style/app/|tree/|media/|equation/|emoji/|editor/" kind="src" path="skulpt/support/closure-library/closure/goog/ui"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/ui/ac"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/ui/editor"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/ui/emoji"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/ui/equation"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/ui/media"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/ui/style/app"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/ui/tree"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/uri"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/useragent"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/vec"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/webgl"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/closure/goog/window"/>
+	<classpathentry excluding="osapi/|jpeg_encoder/|loremipsum/text/|dojo/dom/|caja/string/html/|mochikit/async/" kind="src" path="skulpt/support/closure-library/third_party/closure/goog"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/third_party/closure/goog/caja/string/html"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/third_party/closure/goog/dojo/dom"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/third_party/closure/goog/jpeg_encoder"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/third_party/closure/goog/loremipsum/text"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/third_party/closure/goog/mochikit/async"/>
+	<classpathentry kind="src" path="skulpt/support/closure-library/third_party/closure/goog/osapi"/>
+	<classpathentry excluding="t/|handlers/|lib/JSDOC/|test/|plugins/|handlers/XMLDOC/|lib/|test/scripts/|frame/" kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app"/>
+	<classpathentry kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/frame"/>
+	<classpathentry excluding="XMLDOC/" kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/handlers"/>
+	<classpathentry kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/handlers/XMLDOC"/>
+	<classpathentry excluding="JSDOC/" kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/lib"/>
+	<classpathentry kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/lib/JSDOC"/>
+	<classpathentry kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/plugins"/>
+	<classpathentry kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/t"/>
+	<classpathentry excluding="scripts/" kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/test"/>
+	<classpathentry kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/app/test/scripts"/>
+	<classpathentry kind="src" path="skulpt/support/closure-wrap-gen/jsdoc-toolkit/templates/jsdoc"/>
+	<classpathentry kind="src" path="skulpt/support/closure-wrap-gen/skulptwrap"/>
+	<classpathentry kind="src" path="skulpt/support/d8/tools"/>
+	<classpathentry kind="src" path="skulpt/support/es6-promise-polyfill"/>
+	<classpathentry kind="src" path="skulpt/support/jsbeautify"/>
+	<classpathentry kind="src" path="skulpt/support/jslint"/>
+	<classpathentry kind="src" path="skulpt/support/tmp"/>
+	<classpathentry excluding="turtle/lib/js-imagediff/|turtle/lib/jasmine-2.0.0/|turtle/spec/" kind="src" path="skulpt/test"/>
+	<classpathentry kind="src" path="skulpt/test/turtle/lib/jasmine-2.0.0"/>
+	<classpathentry kind="src" path="skulpt/test/turtle/lib/js-imagediff"/>
+	<classpathentry kind="src" path="skulpt/test/turtle/spec"/>
+	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

@@ -95,8 +95,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 	
 	// Classify is used to turn a token into an 'ilabel'
     var ilabel = this.classify(type, value, context);
-    //Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)
-	//	+ "  type:" + type + "  value:" + value);
+    Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)	+ "  type:" + type + "  value:" + value);
 		
 	var alternatives = [];
 
@@ -142,7 +141,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
                     && states[state][0][0] === 0
                     && states[state][0][1] === state) {
                     // states[state] == [(0, state)])
-					//Sk.debugout("\tPopping for a mystery reason");
+					Sk.debugout("\tPopping accepting states");
                     this.pop();
                     //print("in after pop:"+JSON.stringify(states[state]) + ":state:"+state+":"+JSON.stringify(states[state]));
                     if (this.stack.length === 0) {
@@ -181,7 +180,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
                 if (itsfirst.hasOwnProperty(ilabel)) {
                     // push a non-terminal symbol
 					//debugger
-					//Sk.debugout("\tPushing " + this.grammar.number2symbol[t])
+					Sk.debugout("\tPushing " + this.grammar.number2symbol[t])
                     this.push(t, this.grammar.dfas[t], newstate, context);
                     continue OUTERWHILE;
                 }
