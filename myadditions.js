@@ -8,6 +8,10 @@ stripTrailingNewLine = function (string) {
 	}
 };
 
+Sk.helpoutCode = function (string) {
+	Sk.helpout("<code>" + string + "</code>");
+}
+
 /*
  * Check fix will return true or false on whether the lexer can successfully
  * parse the tokens. Need to prevent infinite loops.
@@ -74,14 +78,25 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var string = context[2];
 	fixErrs = fixErrs || 0;
 	
-	Sk.helpout(stripTrailingNewLine(string) + ' is an invalid expression\n');
-	
 	// Extract the currently parsed string from the stack
 	// By extracting it from the stack rather than the context, we can
 	// use a recursive approach
 	// This is compiled into a string for the context
 	var prevTokens = Sk.help.extractTokensFromStack(stack);
 	var stringStart = Sk.help.tokensToString(prevTokens);
+	
+	// Display the message to the user. I am using a filthy hack to make sure
+	// that this is only shown once per line.
+	// If this is the first time that an error has been shown then <string> will
+	// hold the actual string attempting to be parsed. If this is the second error
+	// fix being attempted for the line then <string> will hold the text in the line
+	// starting from the position of the last error.
+	// So we can only show this message if <stringStart> is a prefix of <string>
+	if (string.startsWith(stringStart)) {
+		Sk.helpoutCode(stripTrailingNewLine(string));
+		Sk.helpout(" is an <b>invalid expression</b> on line " + lineNo + "<br/>");
+	}
+	
 	
 	// Extract the next token from the unparsed stringEnd
 	var stringEnd = string.substring(end-1);
@@ -126,9 +141,10 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			manualAdd(tokenNum, meaning, genContext(meaning));
 			var a = manualAdd(nextToken.type, nextToken.value, genContext(nextToken.value));
 			parseFunc(stringEnd);
-			manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
+			var a = manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
 			
-			Sk.helpout(stripTrailingNewLine(fixedString) + ' appeared to work\n');
+			Sk.helpoutCode(stripTrailingNewLine(fixedString))
+			Sk.helpout(' appeared to work<br/>');
 		}
 		catch (err) {
 			Sk.debugout(stripTrailingNewLine(fixedString) + ' was tried and did not work');

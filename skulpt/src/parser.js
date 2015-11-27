@@ -210,7 +210,6 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
             errline = context[0][0];
 			
 			if (fixErrs) {
-				Sk.helpout("It looks like there was an error on line " + errline + "\n");
 				//Sk.help.printAlts(ilabel, value, alternatives);
 				var token = {t: type, v:value, c:context};
 				
