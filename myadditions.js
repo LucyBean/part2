@@ -59,19 +59,23 @@ Sk.Tokenizer.classifyToken = function (string) {
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (alts, context, fixErrs) {
+Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var string = context[2];
-	var stringStart = string.substring(0, end-1);
 	var stringEnd = string.substring(end-1);
 	fixErrs = fixErrs || 0;
 	
-	// possibleAppends holds the ilabels of tokens that may work
-	var possibleAppends = [];
-	
 	Sk.helpout(stripTrailingNewLine(string) + ' is an invalid expression\n');
 	
+	// Extract the currently parsed string from the stack
+	// By extracting it from the stack rather than the context, we can
+	// use a recursive approach
+	var tokens = Sk.help.extractTokensFromStack(stack);
+	
+	// possibleAppends holds the ilabels of tokens that may work. It is populated
+	// by checking all the first sets of the alternative symbols
+	var possibleAppends = [];
 	for (i in alts) {
 		var a = alts[i];
 		var first = Sk.help.generateFirstSet(a);
@@ -86,21 +90,22 @@ Sk.fix.unfinishedInfix = function (alts, context, fixErrs) {
 		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
 		
 		// Empty context
-		var context = [[], [], stringStart + ' ' + meaning + ' ' + stringEnd];
+		var context = [[], [], ''];
 		
 		// Creates a new parser to check the parsing of this line
 		var p = makeParser(undefined, undefined, fixErrs - 1);
 		var parseFunc = p[0];
 		var manualAdd = p[1];
 		
-		try {			
-			var a = parseFunc(stringStart);
-			var b = manualAdd(tokenNum, meaning, context);
-			var c = parseFunc(stringEnd);
-			var d = manualAdd(4, Sk.Tokenizer.tokenNames[4], context);
+		try {
+			for (var i = 0; i < tokens.length; i++) {
+				manualAdd(tokens[i].type, tokens[i].value, context);
+			}
+			manualAdd(tokenNum, meaning, context);
+			parseFunc(stringEnd);
+			manualAdd(4, Sk.Tokenizer.tokenNames[4], context);
 			
-			Sk.helpout(stripTrailingNewLine(context[2]) + ' appeared to work\n');
-			
+			Sk.helpout('Inserting ' + stripTrailingNewLine(meaning) + ' appeared to work\n');
 		}
 		catch (err) {
 			Sk.debugout(stripTrailingNewLine(context[2]) + ' was tried and did not work');
@@ -274,6 +279,45 @@ Sk.help.stripStringCharacters = function (string, replacement) {
 	
 	return input;
 };
+
+// Given a parse stack, this will extract all the tokens
+Sk.help.extractTokensFromStack = function (stack) {
+	var tokens = [];
+	
+	for (var i = 0; i < stack.length; i++) {
+		var st = Sk.help.stackNodeToTokens(stack[i].node);
+		
+		for (var j = 0; j < st.length; j++) {
+			tokens.push(st[j]);
+		}
+	}
+	
+	return tokens;
+};
+
+// Given a parse tree node, this will extract all the children token
+Sk.help.stackNodeToTokens = function (node) {
+	var tokens = [];
+	
+	// If the node is a leaf it represents a token.
+	if (node.children === null) {
+		var t = {type:node.type, value:node.value};
+		tokens.push(t);
+	}
+	// Else the node represents a branch and represents a rule rather\
+	// than a token
+	else {
+		for (var i = 0; i < node.children.length; i++) {
+			var ct = Sk.help.stackNodeToTokens(node.children[i]);
+			
+			for (var j = 0; j < ct.length; j++) {
+				tokens.push(ct[j]);
+			}
+		}
+	}
+	
+	return tokens;
+}
 
 // Detects whether the set of brackets within the program is balanced
 // Not the most efficient way of doing it but it works
