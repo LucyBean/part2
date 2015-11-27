@@ -45,16 +45,24 @@ Sk.Tokenizer.checkLex = function (fix) {
 }
 
 Sk.Tokenizer.classifyToken = function (string) {
-	var result;
+	var token = Sk.Tokenizer.extractOneToken(string);
+	return Sk.Tokenizer.tokenNames[token.type];
+}
+
+Sk.Tokenizer.extractOneToken = function (string) {
+	var token;
 	
-	var classify = new Sk.Tokenizer(this.filename, this.interactive, function (type, value, start, end, line) {
-		result = type;
+	var extract = new Sk.Tokenizer(this.filename, this.interactive, function (t, v, s, e, l) {
+		if (t === Sk.Tokenizer.Tokens.T_OP) {
+            t = Sk.OpMap[v];
+        }
+		token = {type:t, value:v, start:s, end:e, line:l}
 		return true;
 	});
 	
-	classify.generateTokens(string);
+	extract.generateTokens(string);
 	
-	return Sk.Tokenizer.tokenNames[result];
+	return token;
 }
 
 Sk.fix = {};
@@ -63,7 +71,6 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var string = context[2];
-	var stringEnd = string.substring(end-1);
 	fixErrs = fixErrs || 0;
 	
 	Sk.helpout(stripTrailingNewLine(string) + ' is an invalid expression\n');
@@ -71,7 +78,14 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	// Extract the currently parsed string from the stack
 	// By extracting it from the stack rather than the context, we can
 	// use a recursive approach
-	var tokens = Sk.help.extractTokensFromStack(stack);
+	// This is compiled into a string for the context
+	var prevTokens = Sk.help.extractTokensFromStack(stack);
+	var stringStart = Sk.help.tokensToString(prevTokens);
+	
+	// Extract the next token from the unparsed stringEnd
+	var stringEnd = string.substring(end-1);
+	var nextToken = Sk.Tokenizer.extractOneToken(stringEnd);
+	stringEnd = stringEnd.slice(nextToken.value.length);
 	
 	// possibleAppends holds the ilabels of tokens that may work. It is populated
 	// by checking all the first sets of the alternative symbols
@@ -90,22 +104,23 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
 		
 		// Empty context
-		var context = [[], [], ''];
+		var context = [[], [], stringStart + ' ' + meaning + ' ' + ' ' + nextToken.value + ' ' + stringEnd];
 		
 		// Creates a new parser to check the parsing of this line
-		var p = makeParser(undefined, undefined, fixErrs - 1);
+		var p = makeParser(undefined, undefined, fixErrs);
 		var parseFunc = p[0];
 		var manualAdd = p[1];
 		
 		try {
-			for (var i = 0; i < tokens.length; i++) {
-				manualAdd(tokens[i].type, tokens[i].value, context);
+			for (var i = 0; i < prevTokens.length; i++) {
+				manualAdd(prevTokens[i].type, prevTokens[i].value, context);
 			}
 			manualAdd(tokenNum, meaning, context);
+			var a = manualAdd(nextToken.type, nextToken.value, context);
 			parseFunc(stringEnd);
 			manualAdd(4, Sk.Tokenizer.tokenNames[4], context);
 			
-			Sk.helpout('Inserting ' + stripTrailingNewLine(meaning) + ' appeared to work\n');
+			Sk.helpout(stripTrailingNewLine(context[2]) + ' appeared to work\n');
 		}
 		catch (err) {
 			Sk.debugout(stripTrailingNewLine(context[2]) + ' was tried and did not work');
@@ -317,7 +332,17 @@ Sk.help.stackNodeToTokens = function (node) {
 	}
 	
 	return tokens;
-}
+};
+
+Sk.help.tokensToString = function (tokens) {
+	var s = "";
+	
+	for (var i = 0; i < tokens.length; i++) {
+		s += tokens[i].value;
+	}
+	
+	return s;
+};
 
 // Detects whether the set of brackets within the program is balanced
 // Not the most efficient way of doing it but it works

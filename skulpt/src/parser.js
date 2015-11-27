@@ -87,7 +87,9 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 	var root;
 	
 	// Simply setting this to 2 does not work!!
-	fixErrs = fixErrs || 1;
+	if (fixErrs === undefined) {
+		fixErrs = 2;
+	}
 	
 	if (fixErrs < 0) {
 		fixErrs = 0;
@@ -95,7 +97,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 	
 	// Classify is used to turn a token into an 'ilabel'
     var ilabel = this.classify(type, value, context);
-    Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)	+ "  type:" + type + "  value:" + value);
+    //Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)	+ "  type:" + type + "  value:" + value);
 		
 	var alternatives = [];
 
@@ -349,8 +351,6 @@ function makeParser (filename, style, fixErrs) {
     var column;
     var lineno;
     var p;
-	
-	fixErrs = fixErrs || 0;
 	
     if (style === undefined) {
         style = "file_input";
