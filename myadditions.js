@@ -59,7 +59,7 @@ Sk.Tokenizer.classifyToken = function (string) {
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (alts, context, parser, currentToken, fixErrs) {
+Sk.fix.unfinishedInfix = function (alts, context, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var string = context[2];

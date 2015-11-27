@@ -213,7 +213,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 				var token = {t: type, v:value, c:context};
 				
 				// TODO: When should these be run
-				Sk.fix.unfinishedInfix(alternatives, context, this, token, fixErrs - 1);
+				Sk.fix.unfinishedInfix(alternatives, context, fixErrs - 1);
 			}
 			
 			//Sk.help.parseStackDump(this.stack);
