@@ -70,6 +70,7 @@ Sk.fix = {};
 Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
+	var lineNo = context[0][0];
 	var string = context[2];
 	fixErrs = fixErrs || 0;
 	
@@ -103,8 +104,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		// Converting back to a token number
 		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
 		
-		// Empty context
-		var context = [[], [], stringStart + ' ' + meaning + ' ' + ' ' + nextToken.value + ' ' + stringEnd];
+		var fixedString = stringStart + meaning  + nextToken.value + stringEnd;
 		
 		// Creates a new parser to check the parsing of this line
 		var p = makeParser(undefined, undefined, fixErrs);
@@ -112,18 +112,26 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		var manualAdd = p[1];
 		
 		try {
-			for (var i = 0; i < prevTokens.length; i++) {
-				manualAdd(prevTokens[i].type, prevTokens[i].value, context);
+			var pos = 0;
+			var genContext = function (tokenVal) {
+				var len = tokenVal.length;
+				var context = [[lineNo, pos], [lineNo, pos+len], fixedString];
+				pos += len;
+				return context;
 			}
-			manualAdd(tokenNum, meaning, context);
-			var a = manualAdd(nextToken.type, nextToken.value, context);
-			parseFunc(stringEnd);
-			manualAdd(4, Sk.Tokenizer.tokenNames[4], context);
 			
-			Sk.helpout(stripTrailingNewLine(context[2]) + ' appeared to work\n');
+			for (var i = 0; i < prevTokens.length; i++) {
+				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
+			}
+			manualAdd(tokenNum, meaning, genContext(meaning));
+			var a = manualAdd(nextToken.type, nextToken.value, genContext(nextToken.value));
+			parseFunc(stringEnd);
+			manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
+			
+			Sk.helpout(stripTrailingNewLine(fixedString) + ' appeared to work\n');
 		}
 		catch (err) {
-			Sk.debugout(stripTrailingNewLine(context[2]) + ' was tried and did not work');
+			Sk.debugout(stripTrailingNewLine(fixedString) + ' was tried and did not work');
 		}
 	}
 };
