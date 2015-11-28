@@ -8,6 +8,10 @@ stripTrailingNewLine = function (string) {
 	}
 };
 
+Sk.helpoutCode = function (string) {
+	Sk.helpout("<code>" + string + "</code>");
+}
+
 /*
  * Check fix will return true or false on whether the lexer can successfully
  * parse the tokens. Need to prevent infinite loops.
@@ -45,33 +49,63 @@ Sk.Tokenizer.checkLex = function (fix) {
 }
 
 Sk.Tokenizer.classifyToken = function (string) {
-	var result;
+	var token = Sk.Tokenizer.extractOneToken(string);
+	return Sk.Tokenizer.tokenNames[token.type];
+}
+
+Sk.Tokenizer.extractOneToken = function (string) {
+	var token;
 	
-	var classify = new Sk.Tokenizer(this.filename, this.interactive, function (type, value, start, end, line) {
-		result = type;
+	var extract = new Sk.Tokenizer(this.filename, this.interactive, function (t, v, s, e, l) {
+		if (t === Sk.Tokenizer.Tokens.T_OP) {
+            t = Sk.OpMap[v];
+        }
+		token = {type:t, value:v, start:s, end:e, line:l}
 		return true;
 	});
 	
-	classify.generateTokens(string);
+	extract.generateTokens(string);
 	
-	return Sk.Tokenizer.tokenNames[result];
+	return token;
 }
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (alts, context, parser, currentToken, fixErrs) {
+Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
+	var lineNo = context[0][0];
 	var string = context[2];
-	var stringStart = string.substring(0, end-1);
-	var stringEnd = string.substring(end-1);
 	fixErrs = fixErrs || 0;
 	
-	// possibleAppends holds the ilabels of tokens that may work
+	// Extract the currently parsed string from the stack
+	// By extracting it from the stack rather than the context, we can
+	// use a recursive approach
+	// This is compiled into a string for the context
+	var prevTokens = Sk.help.extractTokensFromStack(stack);
+	var stringStart = Sk.help.tokensToString(prevTokens);
+	
+	// Display the message to the user. I am using a filthy hack to make sure
+	// that this is only shown once per line.
+	// If this is the first time that an error has been shown then <string> will
+	// hold the actual string attempting to be parsed. If this is the second error
+	// fix being attempted for the line then <string> will hold the text in the line
+	// starting from the position of the last error.
+	// So we can only show this message if <stringStart> is a prefix of <string>
+	if (string.startsWith(stringStart)) {
+		Sk.helpoutCode(stripTrailingNewLine(string));
+		Sk.helpout(" is an <b>invalid expression</b> on line " + lineNo + "<br/>");
+	}
+	
+	
+	// Extract the next token from the unparsed stringEnd
+	var stringEnd = string.substring(end-1);
+	var nextToken = Sk.Tokenizer.extractOneToken(stringEnd);
+	stringEnd = stringEnd.slice(nextToken.value.length);
+	
+	// possibleAppends holds the ilabels of tokens that may work. It is populated
+	// by checking all the first sets of the alternative symbols
 	var possibleAppends = [];
-	
-	Sk.helpout(stripTrailingNewLine(string) + ' is an invalid expression\n');
-	
 	for (i in alts) {
 		var a = alts[i];
 		var first = Sk.help.generateFirstSet(a);
@@ -85,25 +119,35 @@ Sk.fix.unfinishedInfix = function (alts, context, parser, currentToken, fixErrs)
 		// Converting back to a token number
 		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
 		
-		// Empty context
-		var context = [[], [], stringStart + ' ' + meaning + ' ' + stringEnd];
+		var fixedString = stringStart + meaning  + nextToken.value + stringEnd;
 		
 		// Creates a new parser to check the parsing of this line
-		var p = makeParser(undefined, undefined, fixErrs - 1);
+		var p = makeParser(undefined, undefined, fixErrs);
 		var parseFunc = p[0];
 		var manualAdd = p[1];
 		
-		try {			
-			var a = parseFunc(stringStart);
-			var b = manualAdd(tokenNum, meaning, context);
-			var c = parseFunc(stringEnd);
-			var d = manualAdd(4, Sk.Tokenizer.tokenNames[4], context);
+		try {
+			var pos = 0;
+			var genContext = function (tokenVal) {
+				var len = tokenVal.length;
+				var context = [[lineNo, pos], [lineNo, pos+len], fixedString];
+				pos += len;
+				return context;
+			}
 			
-			Sk.helpout(stripTrailingNewLine(context[2]) + ' appeared to work\n');
+			for (var i = 0; i < prevTokens.length; i++) {
+				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
+			}
+			manualAdd(tokenNum, meaning, genContext(meaning));
+			var a = manualAdd(nextToken.type, nextToken.value, genContext(nextToken.value));
+			parseFunc(stringEnd);
+			var a = manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
 			
+			Sk.helpoutCode(stripTrailingNewLine(fixedString))
+			Sk.helpout(' appeared to work<br/>');
 		}
 		catch (err) {
-			Sk.debugout(stripTrailingNewLine(context[2]) + ' was tried and did not work');
+			Sk.debugout(stripTrailingNewLine(fixedString) + ' was tried and did not work');
 		}
 	}
 };
@@ -273,6 +317,55 @@ Sk.help.stripStringCharacters = function (string, replacement) {
 	}
 	
 	return input;
+};
+
+// Given a parse stack, this will extract all the tokens
+Sk.help.extractTokensFromStack = function (stack) {
+	var tokens = [];
+	
+	for (var i = 0; i < stack.length; i++) {
+		var st = Sk.help.stackNodeToTokens(stack[i].node);
+		
+		for (var j = 0; j < st.length; j++) {
+			tokens.push(st[j]);
+		}
+	}
+	
+	return tokens;
+};
+
+// Given a parse tree node, this will extract all the children token
+Sk.help.stackNodeToTokens = function (node) {
+	var tokens = [];
+	
+	// If the node is a leaf it represents a token.
+	if (node.children === null) {
+		var t = {type:node.type, value:node.value};
+		tokens.push(t);
+	}
+	// Else the node represents a branch and represents a rule rather\
+	// than a token
+	else {
+		for (var i = 0; i < node.children.length; i++) {
+			var ct = Sk.help.stackNodeToTokens(node.children[i]);
+			
+			for (var j = 0; j < ct.length; j++) {
+				tokens.push(ct[j]);
+			}
+		}
+	}
+	
+	return tokens;
+};
+
+Sk.help.tokensToString = function (tokens) {
+	var s = "";
+	
+	for (var i = 0; i < tokens.length; i++) {
+		s += tokens[i].value;
+	}
+	
+	return s;
 };
 
 // Detects whether the set of brackets within the program is balanced
