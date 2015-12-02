@@ -438,6 +438,17 @@ Sk.parse = function parse (filename, input) {
         input += "\n";
     }
 	
+	// Check for any unterminated strings on each line
+	// BUT NOT WHEN THE NEWLINE IS IN A STRING OMG
+	lines = input.split("\n");
+	for (var j = 0; j < lines.length; j++) {
+		var errPos = Sk.find.unfinishedString(lines[j]);
+		if (errPos) {
+			var fix = Sk.fix.eolInString(lines[j], errPos);
+			lines[j] = fix;
+		}
+	}
+	
 	var brackets = Sk.help.findUnbalancedBrackets(input);
 	
 	if (!brackets.isvalid) {
@@ -447,7 +458,6 @@ Sk.parse = function parse (filename, input) {
 	} else {
 	
 		//print("input:"+input);
-		lines = input.split("\n");
 		for (i = 0; i < lines.length; ++i) {
 			ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
 		}

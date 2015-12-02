@@ -152,12 +152,12 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	}
 };
 
-// Attempts to fix unbalanced brackets by inserting brackets into the string
+// Attempts to fix unbalanced brackets by inserting brackets into the line
 // Brackets should be the object returned from Sk.help.findUnbalancedBrackets
 Sk.fix.unbalancedBrackets = function (input, brackets) {
 	var b = "()[]{}";
 	
-	// offset measures the number of characters inserted and deleted. This is
+	// <offset> measures the number of characters inserted and deleted. This is
 	// used to translate between the position of the brackets in the original
 	// string and their position in the edited string
 	var offset = 0;
@@ -197,7 +197,8 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 		}
 	}
 	
-	Sk.helpout("\nTry:\n" + input);
+	Sk.helpout("<br>Try:<br>");
+	Sk.helpoutCode(input);
 	Sk.help.checkParse(input);
 };
 
@@ -205,23 +206,70 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
  *	Returns feedback on an eolInString error.
  */
 Sk.fix.eolInString = function (line, errPosition) {
-	Sk.helpout(line + " has a string that contains a newline character\n");
+	// Strip the newline for ease. We'll put it back on at the end.
+	line = stripTrailingNewLine(line);
 	
-	// TODO: Find parethesis depth of the error
+	Sk.helpoutCode(line);
+	Sk.helpout(" has a string that contains a newline character\n");
 	
-	// Try inserting a quote at the end
+	
+	// Find the unbalanced brackets within the line and check whether
+	// these have accidentally been included in the string
+	var unbalanced = Sk.help.findUnbalancedBrackets(line).brackets;
+	var brackets = "()[]{}";
+	var string = line.slice(errPosition);
+	
+	// <ubIndex> represents the unbalanced bracket we are currently trying
+	// to match
+	// <quotePoint> represents the position (from the end of the string) to
+	// insert the quote mark
+	var ubIndex = 0;
+	var quotePoint = 0;
+	
+	// Attempt to match each unbalanced bracket from the end of the string
+	for (var j = 0; j < string.length; j++) {
+		var i = string.length - 1 - j;
+		// Extract the bracket to be matched and its match
+		var toMatch = unbalanced[ubIndex].type;
+		var index = brackets.indexOf(toMatch);
+		var b;
+		if (index%2 === 0) {
+			b = brackets.charAt(index+1);
+		} else {
+			b = brackets.charAt(index-1);
+		}
+		
+		var c = string.charAt(i);
+		if (c === b) {
+			quotePoint = j+1;
+			ubIndex++;
+		}
+		
+		if (ubIndex >= unbalanced.length) {
+			break;
+		}
+	}
+	
+	// Try inserting a quote at <quotePoint> from the end of the string
 	var quotesUsed = line.charAt(errPosition);
-	var fix = line.substring(0, line.length-1);
-	fix += quotesUsed + '\n'
+	var start = line.substring(0, line.length-quotePoint);
+	var end = line.substring(line.length-quotePoint);
+	var fix = start + quotesUsed + end + '\n';
 	
 	var fixed = Sk.Tokenizer.checkLex(fix);
 	if (fixed) {
-		Sk.helpout(fix + " is an alternative that may work.");
+		Sk.helpout("<br>");
+		Sk.helpoutCode(fix);
+		Sk.helpout(" is an alternative that may work.");
 	}
+	
+	return fixed;
 };
 
 Sk.help = {};
 
+// This will parse as string, correcting up to <checkErrs> number of errors
+// Returns true or false depending on whether the string does parse
 Sk.help.checkParse = function (string, checkErrs) {
 	checkErrs = checkErrs || 0;
 	
@@ -242,6 +290,8 @@ Sk.help.checkParse = function (string, checkErrs) {
 	}
 };
 
+// Given a parse stack, this will dump the parse tree for each node currently
+// on the stack
 Sk.help.parseStackDump = function (stack) {
 	for (var i = 0; i < stack.length; i++) {
 		var node = stack[i].node;
@@ -252,7 +302,7 @@ Sk.help.parseStackDump = function (stack) {
 	}
 };
 
-// Prints all the possible next 
+// Prints all the first sets of every transition in <alts>
 Sk.help.printAlts = function (ilabel, value, alts) {
 	Sk.debugout("\t\tUnfound alternative symbol for " + Sk.ilabelMeaning(ilabel) + " " + value);
 			
@@ -278,6 +328,9 @@ Sk.help.printAlts = function (ilabel, value, alts) {
 			}
 };
 
+// Strips all characters within a string and replaces them with <replacement> char
+// (default = '_'). This is useful for checking for unbalanced brackets, as we
+// do not want to attempt to match brackets that appear within a string.
 Sk.help.stripStringCharacters = function (string, replacement) {
 	var input = string;
 	var insideQuote = false;
@@ -319,7 +372,7 @@ Sk.help.stripStringCharacters = function (string, replacement) {
 	return input;
 };
 
-// Given a parse stack, this will extract all the tokens
+// Given a parse stack, this will extract all the tokens into an array.
 Sk.help.extractTokensFromStack = function (stack) {
 	var tokens = [];
 	
@@ -358,6 +411,7 @@ Sk.help.stackNodeToTokens = function (node) {
 	return tokens;
 };
 
+// Converts an array of tokens into a string.
 Sk.help.tokensToString = function (tokens) {
 	var s = "";
 	
@@ -474,6 +528,37 @@ Sk.help.generateFirstSet = function (ilabel) {
 	}
 	
 	return aset;
+}
+
+Sk.find = {};
+
+// Returns true/false depending on whether there is an unterminated string
+Sk.find.unfinishedString = function (line) {
+	var insideQuote = false;
+	var escaped = false;
+	var lastQuote;
+	
+	for (var i = 0; i < line.length; i++) {
+		var c = line.charAt(i);
+		
+		// Check for escaping backslashes
+		if (!escaped && c === "\\") {
+			escaped = true;
+		}
+		else {
+			// If we find an unescaped quote then flip inside/outside indicator
+			if (!escaped && (c === "\"" || c === "'")) {
+				insideQuote = !insideQuote;
+				lastQuote = i;
+			}
+			
+			escaped = false;
+		}
+	}
+	
+	if (insideQuote) {
+		return lastQuote;
+	}
 }
 
 Sk.ilabelMeaning = function (ilabel) {
