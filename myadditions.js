@@ -93,6 +93,9 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var prevTokens = Sk.help.extractTokensFromStack(stack);
 	var stringStart = Sk.help.tokensToString(prevTokens);
 	
+	var lines = Sk.help.splitToLines(stringStart);
+	var currentLine = lines[lineNo-1];
+	
 	// Display the message to the user. I am using a filthy hack to make sure
 	// that this is only shown once per line.
 	// If this is the first time that an error has been shown then <string> will
@@ -100,7 +103,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	// fix being attempted for the line then <string> will hold the text in the line
 	// starting from the position of the last error.
 	// So we can only show this message if <stringStart> is a prefix of <string>
-	if (string.startsWith(stringStart)) {
+	if (string.startsWith(currentLine)) {
 		Sk.helpoutCode(stripTrailingNewLine(string));
 		Sk.helpout(" is an <b>invalid expression</b> on line " + lineNo + "<br/>");
 	}
@@ -131,6 +134,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
 		
 		var fixedString = stringStart + meaning  + nextToken.value + stringEnd;
+		var fixedLine = currentLine + meaning + nextToken.value + stringEnd;
 		
 		// Creates a new parser to check the parsing of this line
 		var p = makeParser(undefined, undefined, fixErrs);
@@ -160,11 +164,11 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			//parseFunc(stringEnd);
 			//manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
 			
-			Sk.helpoutCode(stripTrailingNewLine(fixedString))
+			Sk.helpoutCode(stripTrailingNewLine(fixedLine))
 			Sk.helpout(' appeared to work<br/>');
 		}
 		catch (err) {
-			Sk.debugout(stripTrailingNewLine(fixedString) + ' was tried and did not work');
+			Sk.debugout(stripTrailingNewLine(fixedLine) + ' was tried and did not work');
 		}
 	}
 	
