@@ -1,7 +1,7 @@
 stripTrailingNewLine = function (string) {
 	var lastChar = string.charAt(string.length-1);
 	if (lastChar == '\n') {
-		return string.substring(0, string.length-2);
+		return string.substring(0, string.length-1);
 	}
 	else {
 		return string;

@@ -215,6 +215,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 				
 				// TODO: When should these be run
 				Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
+				throw "Incorrect syntax";
 			}
 			
 			//Sk.help.parseStackDump(this.stack);
@@ -407,14 +408,15 @@ function makeParser (filename, style, fixErrs) {
 
     // create parser function
     var parseFunc = function (line) {
-        var ret = tokenizer.generateTokens(line);
-        //print("tok:"+ret);
-        if (ret) {
-            if (ret !== "done") {
-                throw new Sk.builtin.ParseError("incomplete input", this.filename);
-            }
-            return p.rootnode;
-        }
+		var ret = tokenizer.generateTokens(line);
+		//print("tok:"+ret);
+		if (ret) {
+			if (ret !== "done") {
+				throw new Sk.builtin.ParseError("incomplete input", this.filename);
+			}
+			return p.rootnode;
+		}
+		
         return false;
     };
 	

@@ -124,18 +124,24 @@ function runit() {
    Sk.pre = "output";
    Sk.configure({output:outf, read:builtinRead, debugout:debugOut, helpout:help});
    
-	var result = Sk.importMainWithBody("<stdin>", false, prog, true);
-   
-   var myPromise = Sk.misceval.asyncToPromise(function() {
-       return result;
-   });
-   
-   myPromise.then(function(mod) {
-       console.log('success');
-   },
-       function(err) {
-       console.log(err.toString());
-   });
+   try {
+		var result = Sk.importMainWithBody("<stdin>", false, prog, true);
+	   
+		var myPromise = Sk.misceval.asyncToPromise(function() {
+			return result;
+		});
+	   
+		myPromise.then(function(mod) {console.log('success');},	function(err) {console.log(err.toString());});
+		
+	}
+	catch (err) {
+		if (err === "Incorrect syntax")	{
+			console.log("Syntax was incorrect, but a fix was attempted.");
+		}
+		else {
+			console.log(err);
+		}
+	}
 } 
 </script> 
 
