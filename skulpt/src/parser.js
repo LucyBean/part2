@@ -439,36 +439,63 @@ Sk.parse = function parse (filename, input) {
     }
 	
 	// Check for any unterminated strings on each line
-	// BUT NOT WHEN THE NEWLINE IS IN A STRING OMG
-	lines = input.split("\n");
+	// BUT NOT WHEN THE NEWLINE IS IN A STRING
+	var lines = Sk.help.splitToLines(input);
+	
+	// Check each line for an unfinished string and balanced brackets
 	for (var j = 0; j < lines.length; j++) {
 		var errPos = Sk.find.unfinishedString(lines[j]);
 		if (errPos) {
+			Sk.helpout("<br>There's an unterminated string at " + errPos + " on line " + j);
 			var fix = Sk.fix.eolInString(lines[j], errPos);
-			lines[j] = fix;
+			
+			if (fix) {
+				lines[j] = fix;
+			}
+			else {
+				// The error could not be fixed
+			}
+		}
+		
+		var brackets = Sk.help.findUnbalancedBrackets(lines[j]);
+		
+		if (!brackets.isvalid) {
+			Sk.helpout("<br>Line " + j + " has unbalanced brackets");
+			var fix = Sk.fix.unbalancedBrackets(lines[j], brackets);
+			
+			if (fix !== undefined) {
+				lines[j] = fix;
+			}
+			else {
+				// The error could not be fixed
+			}
 		}
 	}
 	
-	var brackets = Sk.help.findUnbalancedBrackets(input);
+	for (i = 0; i < lines.length; ++i) {
+		ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
+	}
+	
+	// ret is the root node of the completed parse tree
+	// Small adjustments here in order to return th flags and the cst
+	return {"cst": ret, "flags": parseFunc.p_flags};
+	
+	/*var brackets = Sk.help.findUnbalancedBrackets(input);
 	
 	if (!brackets.isvalid) {
 		Sk.helpout("Your program has unbalanced brackets");
 		Sk.fix.unbalancedBrackets(input, brackets);
 		// Throw exception
 	} else {
-	
-		//print("input:"+input);
-		for (i = 0; i < lines.length; ++i) {
-			ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
-		}
-
-		//ret is the root node of the completed parse tree
+		lines = input.split("\n");
 		
-		/*
-		 * Small adjustments here in order to return th flags and the cst
-		 */
-		return {"cst": ret, "flags": parseFunc.p_flags};
-	}
+		//print("input:"+input);
+		
+
+		
+		
+		
+	}*/
 };
 
 Sk.parseTreeDump = function parseTreeDump (n, indent) {

@@ -1,11 +1,19 @@
 stripTrailingNewLine = function (string) {
-	var nl = string.indexOf('\n');
+	var lastChar = string.charAt(string.length-1);
+	if (lastChar == '\n') {
+		return string.substring(0, string.length-2);
+	}
+	else {
+		return string;
+	}
+	
+	/*var nl = string.indexOf('\n');
 	if (nl !== -1) {
 		return string.substring(0, nl);
 	}
 	else {
 		return string;
-	}
+	}*/
 };
 
 Sk.helpoutCode = function (string) {
@@ -181,7 +189,7 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 				// the next bracket or at EOF
 				var next = extractedBrackets[i+1];
 				if (next === undefined) {
-					input = input.slice(0, input.length-1) + closeBracket + "\n";
+					input = input + closeBracket;
 				}
 				else {
 					input = input.slice(0, next.pos + offset) + closeBracket + input.slice(next.pos + offset);
@@ -197,19 +205,18 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 		}
 	}
 	
-	Sk.helpout("<br>Try:<br>");
+	Sk.helpout("<br>Try: ");
 	Sk.helpoutCode(input);
-	Sk.help.checkParse(input);
+	if (Sk.help.checkParse(input)) {
+		return input;
+	}
 };
 
 /**
  *	Returns feedback on an eolInString error.
  */
-Sk.fix.eolInString = function (line, errPosition) {
-	// Strip the newline for ease. We'll put it back on at the end.
-	line = stripTrailingNewLine(line);
-	
-	Sk.helpoutCode(line);
+Sk.fix.eolInString = function (line, errPosition) {	
+	Sk.helpoutCode("<br>" + line);
 	Sk.helpout(" has a string that contains a newline character\n");
 	
 	
@@ -254,16 +261,15 @@ Sk.fix.eolInString = function (line, errPosition) {
 	var quotesUsed = line.charAt(errPosition);
 	var start = line.substring(0, line.length-quotePoint);
 	var end = line.substring(line.length-quotePoint);
-	var fix = start + quotesUsed + end + '\n';
+	var fix = start + quotesUsed + end;
 	
 	var fixed = Sk.Tokenizer.checkLex(fix);
 	if (fixed) {
 		Sk.helpout("<br>");
 		Sk.helpoutCode(fix);
 		Sk.helpout(" is an alternative that may work.");
+		return fix;
 	}
-	
-	return fixed;
 };
 
 Sk.help = {};
@@ -530,33 +536,125 @@ Sk.help.generateFirstSet = function (ilabel) {
 	return aset;
 }
 
-Sk.find = {};
-
-// Returns true/false depending on whether there is an unterminated string
-Sk.find.unfinishedString = function (line) {
-	var insideQuote = false;
+Sk.help.splitToLines = function (input) {
+	var tripleQuote = false;
+	var lines = [""];
+	var lineNum = 0;
 	var escaped = false;
-	var lastQuote;
 	
-	for (var i = 0; i < line.length; i++) {
-		var c = line.charAt(i);
+	for (var i = 0; i < input.length; i++) {
+		var c = input.charAt(i);
 		
-		// Check for escaping backslashes
+		// Check for triple quotes
 		if (!escaped && c === "\\") {
 			escaped = true;
 		}
+		
+		// If we find three unescaped quotes then we are in a triplequote!
 		else {
-			// If we find an unescaped quote then flip inside/outside indicator
 			if (!escaped && (c === "\"" || c === "'")) {
-				insideQuote = !insideQuote;
-				lastQuote = i;
+				// if we are inside a triple quote
+				if (input.charAt(i+1) === c && input.charAt(i+2) === c) {
+					tripleQuote = !tripleQuote;
+					i += 2;
+					lines[lineNum] += (c + c + c);
+				}
+				else {
+					lines[lineNum] += c;
+				}
+			}
+			
+			// if we find a newline character
+			else if (c === "\n") {
+				// if we are inside a triple quote, treat it like a normal character
+				if (tripleQuote) {
+					lines[lineNum] += c;
+				}
+				// else start a new line
+				else {
+					lines.push("");
+					lineNum++;
+				}
+			}
+			
+			else {
+				lines[lineNum] += c;
 			}
 			
 			escaped = false;
 		}
 	}
 	
-	if (insideQuote) {
+	return lines;
+}
+
+Sk.find = {};
+
+// If there is an unfinished quote, returns the position of the opening quote
+Sk.find.unfinishedString = function (line) {
+	var insideQuote = false;
+	var tripleQuote = false;
+	var escaped = false;
+	var lastQuote;
+	
+	for (var i = 0; i < line.length; i++) {
+		var c = line.charAt(i);
+		
+		// Check for a newline character
+		if (c === "\n") {
+			// if the character appears within a single quoted string
+			// then return the position of the opening quote
+			if (insideQuote) {
+				return lastQuote;
+			}
+		}
+		
+		// Check for escaping backslashes
+		if (!escaped && c === "\\") {
+			escaped = true;
+		}
+		else {
+			// If we find an unescaped quote then...
+			if (!escaped && (c === "\"" || c === "'")) {
+				// if we are inside a triple quote
+				if (tripleQuote) {
+					// check for a closing triple quote
+					if (line.charAt(i+1) === c && line.charAt(i+2) === c) {
+						tripleQuote = false;
+						i += 2;
+					}
+				}
+				
+				// if we are inside a single quote
+				else if (insideQuote) {
+					// close the quote
+					insideQuote = false;
+				}
+				
+				// else we have found an opening quote
+				else {
+					// check if it is a triple quote
+					if (line.charAt(i+1) === c && line.charAt(i+2) === c) {
+						tripleQuote = true;
+						i += 2;
+					}
+					
+					// else it is an opening single quote
+					else {
+						insideQuote = true;
+					}
+					
+					lastQuote = i;
+				}
+			}
+			
+			escaped = false;
+		}
+	}
+	
+	// If we reach the end of the input and there is an open string
+	// return the position of the opening quote
+	if (insideQuote || tripleQuote) {
 		return lastQuote;
 	}
 }
