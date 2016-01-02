@@ -86,7 +86,6 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
     var tp;
 	var root;
 	
-	// Simply setting this to 2 does not work!!
 	if (fixErrs === undefined) {
 		fixErrs = 2;
 	}
@@ -211,11 +210,20 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 			
 			if (fixErrs) {
 				//Sk.help.printAlts(ilabel, value, alternatives);
-				var token = {t: type, v:value, c:context};
 				
-				// TODO: When should these be run
-				Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
-				throw "Incorrect syntax";
+				// Find a valid token that can be inserted at this point
+				var fixToken = Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
+				
+				// Manually add it, the current token, and return the result
+				this.addtoken(fixToken.type, fixToken.value, fixToken.context, 0);
+				
+				// Getting the corrected context
+				var lineNo = fixToken.context[0][0];
+				var pos = fixToken.context[1][1];
+				var len = value.length;
+				var fixedContext = [[lineNo, pos], [lineNo, pos+len], fixToken.context[2]];
+				
+				return this.addtoken(type, value, fixedContext, 0);
 			}
 			
 			//Sk.help.parseStackDump(this.stack);

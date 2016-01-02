@@ -120,6 +120,9 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		possibleAppends.push.apply(possibleAppends, first);
 	}
 	
+	// This variable is used to store the first ilabel encountered that fixes the problem
+	var fixToken;
+	
 	for (i in possibleAppends) {
 		var ilabel = possibleAppends[i];
 		var meaning = Sk.ilabelMeaning(ilabel);
@@ -146,10 +149,16 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			for (var i = 0; i < prevTokens.length; i++) {
 				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
 			}
-			manualAdd(tokenNum, meaning, genContext(meaning));
-			var a = manualAdd(nextToken.type, nextToken.value, genContext(nextToken.value));
-			parseFunc(stringEnd);
-			var a = manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
+			var c = genContext(meaning);
+			manualAdd(tokenNum, meaning, c);
+			manualAdd(nextToken.type, nextToken.value, genContext(nextToken.value));
+			
+			if (fixToken === undefined) {
+				fixToken = {type:tokenNum, value:meaning, context:c}
+			}
+			
+			//parseFunc(stringEnd);
+			//manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
 			
 			Sk.helpoutCode(stripTrailingNewLine(fixedString))
 			Sk.helpout(' appeared to work<br/>');
@@ -158,6 +167,8 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			Sk.debugout(stripTrailingNewLine(fixedString) + ' was tried and did not work');
 		}
 	}
+	
+	return fixToken;
 };
 
 // Attempts to fix unbalanced brackets by inserting brackets into the line
