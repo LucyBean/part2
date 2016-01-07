@@ -323,6 +323,31 @@ Sk.help.parseStackDump = function (stack) {
 	}
 };
 
+Sk.help.parseTreeCompact = function (n, indent) {
+	var a = Sk.ilabelMeaning(n.type);
+    var i;
+    var ret;
+    indent = indent || "";
+    ret = "";
+    ret += indent;
+    if (n.type >= 256) { // non-term
+		var indentIncrease;
+		if (n.children.length >= 2) {
+			ret += Sk.ParseTables.number2symbol[n.type] + "\n";
+			indentIncrease = "|";
+		} else {
+			ret = "";
+			indentIncrease = "";
+		}
+        for (i = 0; i < n.children.length; ++i) {
+            ret += Sk.help.parseTreeCompact(n.children[i], indent + indentIncrease);
+        }
+    } else {
+        ret += Sk.Tokenizer.tokenNames[n.type] + ": " + new Sk.builtin.str(n.value)["$r"]().v + "\n";
+    }
+    return ret;
+}
+
 // Prints all the first sets of every transition in <alts>
 Sk.help.printAlts = function (ilabel, value, alts) {
 	Sk.debugout("\t\tUnfound alternative symbol for " + Sk.ilabelMeaning(ilabel) + " " + value);

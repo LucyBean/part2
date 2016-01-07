@@ -516,7 +516,7 @@ Sk.parseTreeDump = function parseTreeDump (n, indent) {
     ret = "";
     ret += indent;
     if (n.type >= 256) { // non-term
-        ret += Sk.ParseTables.number2symbol[n.type] + "\n";
+        ret += Sk.ParseTables.number2symbol[n.type] + " " + n.children.length + "\n";
         for (i = 0; i < n.children.length; ++i) {
             ret += Sk.parseTreeDump(n.children[i], indent + "  ");
         }

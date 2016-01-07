@@ -2312,6 +2312,7 @@ Compiler.prototype.cmod = function (mod) {
 Sk.compile = function (source, filename, mode, canSuspend) {
     //print("FILE:", filename);
     var parse = Sk.parse(filename, source);
+	console.log(Sk.help.parseTreeCompact(parse.cst));
     var ast = Sk.astFromParse(parse.cst, filename, parse.flags);
 
     // compilers flags, later we can add other ones too
