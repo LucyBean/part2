@@ -632,13 +632,25 @@ Sk.help.splitToLines = function (input) {
 // Extract the tree to be printed from a parse tree
 // This extracts it in a compact form (with all single child nodes eliminated)
 Sk.extractPrintTree = function (node) {
-	var v = Sk.ilabelMeaning(node.type);
-	if (node.value !== null) {
-		v += ": " + node.value;
+	// Okay so the token type isn't quite an ilabel here so I have to do this?
+	var v;
+	var t = Sk.Tokenizer.tokenNames[node.type];
+	var co;
+	
+	if (t !== undefined) {
+		v = t + ": " + node.value;
+	}
+	else {
+		v = Sk.ilabelMeaning(node.type);
+	}
+	
+	// Dirty hack to make added in nodes a different colour
+	if (t === node.value) {
+		co = "#ff6666";
 	}
 	
 	if (!node.children) {
-		return {val:v};
+		return {val:v, colour:co};
 	}
 	else if (node.children.length === 1) {
 		return Sk.extractPrintTree(node.children[0]);
@@ -648,7 +660,7 @@ Sk.extractPrintTree = function (node) {
 		for (var i = 0; i < node.children.length; i++) {
 			c.push(Sk.extractPrintTree(node.children[i]));
 		}
-		return {val:v, children:c};
+		return {val:v, children:c, colour:co};
 	}
 }
 
@@ -727,14 +739,14 @@ Sk.ilabelMeaning = function (ilabel) {
 	if (ilabel === 256) return 'START';
 	if (ilabel > 256) return Sk.ilabelMeaning.nonterms(ilabel);
 	
-	var keyword = Sk.ilabelMeaning.keywords(ilabel);
-	if (keyword) {
-		return keyword;
-	}
-	
 	var token = Sk.ilabelMeaning.token(ilabel);
 	if (token) {
 		return token;
+	}
+	
+	var keyword = Sk.ilabelMeaning.keywords(ilabel);
+	if (keyword) {
+		return keyword;
 	}
 	
 	var t = Sk.ilabelMeaning.ilabelToNonTerm(ilabel);
@@ -809,9 +821,9 @@ Sk.ilabelMeaning.keywords = function (ilabel) {
 };
 
 Sk.ilabelMeaning.token = function (ilabel) {
-	//var tn = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
-	//return Sk.Tokenizer.tokenNames[tn];
-	return Sk.Tokenizer.tokenNames[ilabel];
+	var tn = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+	return Sk.Tokenizer.tokenNames[tn];
+	//return Sk.Tokenizer.tokenNames[ilabel];
 };
 
 Sk.ilabelMeaning.nonterms = function (ilabel) {

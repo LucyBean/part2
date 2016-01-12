@@ -134,6 +134,12 @@ drawNode = function (ctx, node, info, offset) {
 	var y = node.depth * (cellHeight + padding);
 	var t = info(node);
 	
+	if (node.colour !== undefined) {
+		ctx.fillStyle = node.colour;
+		ctx.fillRect(x, y, cellWidth, cellHeight);
+		ctx.fillStyle = "#000000";
+	}
+	
 	ctx.fillText(t, x+cellWidth/2, y+cellHeight/2);
 	ctx.rect(x, y, cellWidth, cellHeight);
 	ctx.stroke();
