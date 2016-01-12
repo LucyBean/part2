@@ -1,6 +1,16 @@
-var cellWidth = 100;
-var cellHeight = 50;
-var padding = 40;
+var cellWidth = 80;
+var cellHeight = 20;
+var padding = 20;
+var font = "12px Arial";
+var textAlign = "center";
+var textBaseline = "middle";
+
+setStyle = function (width, height, pad, f) {
+	cellWidth = width;
+	cellHeight = height;
+	padding = pad;
+	font = f;
+}
 	
 drawGrid = function (ctx) {
 	var gridSize = 5;
@@ -35,11 +45,32 @@ drawGrid = function (ctx) {
 	ctx.stroke();
 }
 
-drawTree = function (ctx, node) {
-	addDrawingInformation(node);
-	drawNode(ctx, node);
+drawTree = function (ctx, node, canvas, info) {
+	
+	if (info === undefined) {
+		info = function (node) {
+			return node.val;
+		}
+	}
+	
+	var depth = addDrawingInformation(node);
+	
+	if (canvas !== undefined) {
+		var width = node.width;
+		var height = depth* (cellHeight + padding) - padding;
+		
+		canvas.width = width;
+		canvas.height = height;
+		ctx.font = font;
+		ctx.textAlign = textAlign;
+		ctx.textBaseline = textBaseline;
+	}
+	
+	drawNode(ctx, node, info);
 }
 
+// This will return the maximum depth of the tree (as a number of nodes)
+// Can be used to automatically scale the canvas
 addDrawingInformation = function (node, depth) {
 	if (depth === undefined) {
 		depth = 0;
@@ -54,9 +85,13 @@ addDrawingInformation = function (node, depth) {
 		
 		var offset = 0;
 		var childXTotal =0;
+		var maxDepth = depth;
 		
+		// Add drawing information to each child
 		for (var i = 0; i < node.children.length; i++) {
-			addDrawingInformation(node.children[i], depth+1, cellWidth, padding);
+			var childMaxDepth = addDrawingInformation(node.children[i], depth+1, cellWidth, padding);
+			
+			// Calculate the total width needed to display all the ancestors of this node
 			node.width += node.children[i].width;
 			childXTotal += node.children[i].x + offset;
 			
@@ -65,11 +100,18 @@ addDrawingInformation = function (node, depth) {
 			if (i < node.children.length - 1) {
 				node.width += padding;
 			}
+			
+			// Find the maximum depth ancestor
+			if (childMaxDepth > maxDepth) {
+				maxDepth = childMaxDepth;
+			}
 		}
 		
-		// Set 
+		// Set the x position of this node to be the average of the children's absolute x positions
 		node.x = childXTotal / node.children.length;
 		node.depth = depth;
+		
+		return maxDepth;
 	}
 	
 	// For a leaf node
@@ -77,10 +119,12 @@ addDrawingInformation = function (node, depth) {
 		node.width = cellWidth;
 		node.x = 0;
 		node.depth = depth;
+		
+		return depth+1;
 	}
 }
 
-drawNode = function (ctx, node, offset) {
+drawNode = function (ctx, node, info, offset) {
 	if (offset === undefined) {
 		offset = 0;
 	}
@@ -88,8 +132,9 @@ drawNode = function (ctx, node, offset) {
 	//draw this node
 	var x = node.x + offset;
 	var y = node.depth * (cellHeight + padding);
+	var t = info(node);
 	
-	ctx.fillText(node.val, x+cellWidth/2, y+cellHeight/2);
+	ctx.fillText(t, x+cellWidth/2, y+cellHeight/2);
 	ctx.rect(x, y, cellWidth, cellHeight);
 	ctx.stroke();
 	
@@ -99,7 +144,7 @@ drawNode = function (ctx, node, offset) {
 		for (var i = 0; i < node.children.length; i++) {
 			ctx.moveTo(x+cellWidth/2, y+cellHeight);
 			ctx.lineTo(offset+node.children[i].x+cellWidth/2, y+cellHeight+padding);
-			drawNode(ctx, node.children[i], offset);
+			drawNode(ctx, node.children[i], info, offset);
 			
 			offset += node.children[i].width + padding;
 		}

@@ -486,6 +486,9 @@ Sk.parse = function parse (filename, input) {
 		ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
 	}
 	
+	var compact = Sk.extractPrintTree(ret);
+	Sk.drawTree(compact);
+	
 	// ret is the root node of the completed parse tree
 	// Small adjustments here in order to return th flags and the cst
 	return {"cst": ret, "flags": parseFunc.p_flags};

@@ -323,7 +323,8 @@ Sk.help.parseStackDump = function (stack) {
 	}
 };
 
-Sk.help.parseTreeCompact = function (n, indent) {
+// Use to print out a parse tree in a compact form, similar to Sk.parseTreeDump
+Sk.help.parseTreeCompactDump = function (n, indent) {
 	var a = Sk.ilabelMeaning(n.type);
     var i;
     var ret;
@@ -628,6 +629,29 @@ Sk.help.splitToLines = function (input) {
 	return lines;
 }
 
+// Extract the tree to be printed from a parse tree
+// This extracts it in a compact form (with all single child nodes eliminated)
+Sk.extractPrintTree = function (node) {
+	var v = Sk.ilabelMeaning(node.type);
+	if (node.value !== null) {
+		v += ": " + node.value;
+	}
+	
+	if (!node.children) {
+		return {val:v};
+	}
+	else if (node.children.length === 1) {
+		return Sk.extractPrintTree(node.children[0]);
+	}
+	else {
+		var c = [];
+		for (var i = 0; i < node.children.length; i++) {
+			c.push(Sk.extractPrintTree(node.children[i]));
+		}
+		return {val:v, children:c};
+	}
+}
+
 Sk.find = {};
 
 // If there is an unfinished quote, returns the position of the opening quote
@@ -785,8 +809,9 @@ Sk.ilabelMeaning.keywords = function (ilabel) {
 };
 
 Sk.ilabelMeaning.token = function (ilabel) {
-	var tn = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
-	return Sk.Tokenizer.tokenNames[tn];
+	//var tn = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+	//return Sk.Tokenizer.tokenNames[tn];
+	return Sk.Tokenizer.tokenNames[ilabel];
 };
 
 Sk.ilabelMeaning.nonterms = function (ilabel) {

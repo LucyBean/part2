@@ -94,11 +94,34 @@ print(5+1)+(3+2)</textarea><br />
 </div>
 
 <div>
-<canvas id="myCanvas" width="800" height="800" style="border-style: solid; border-width:1px;">
+<canvas id="myCanvas" style="border-style: solid; border-width:1px;">
 </canvas>
 </div>
 
-<script type="text/javascript"> 
+<script type="text/javascript">
+var canvas = document.getElementById("myCanvas");
+var ctx = canvas.getContext("2d");
+ctx.font = "16px Arial";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+
+/*var tree = {val:"a", children:[
+	{val:"b", children:[
+		{val:"d", children:[
+			{val:"f"},
+			{val:"g"},
+			{val:"h"}
+		]}
+	]},
+	{val:"c"}
+]};
+
+drawTree(ctx, tree);*/
+
+function drawtree(node) {		
+	drawTree(ctx, node, canvas);
+}
+
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
 		lineNumbers: true,
 		indentUnit: 4
@@ -137,9 +160,11 @@ function runit() {
    var helparea = document.getElementById("help");
    mypre.innerHTML = ''; 
    helparea.innerHTML = '';
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+   ctx.beginPath();
    
    Sk.pre = "output";
-   Sk.configure({output:outf, read:builtinRead, debugout:debugOut, helpout:help});
+   Sk.configure({output:outf, read:builtinRead, debugout:debugOut, helpout:help, drawTree:drawtree});
    
    try {
 		var result = Sk.importMainWithBody("<stdin>", false, prog, true);
@@ -160,25 +185,6 @@ function runit() {
 		}
 	}
 }
-
-var canvas = document.getElementById("myCanvas");
-var ctx = canvas.getContext("2d");
-ctx.font = "30px Arial";
-ctx.textAlign = "center";
-ctx.textBaseline = "middle";
-
-var tree = {val:"a", children:[
-	{val:"b", children:[
-		{val:"d", children:[
-			{val:"f"},
-			{val:"g"},
-			{val:"h"}
-		]}
-	]},
-	{val:"c"}
-]};
-
-drawTree(ctx, tree);
 </script> 
 
 
