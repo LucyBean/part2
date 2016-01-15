@@ -26,6 +26,9 @@ Sk.configure = function (options) {
 	
 	Sk.helpout = options["helpout"] || Sk.helpout;
 	goog.asserts.assert(typeof Sk.helpout === "function");
+	
+	Sk.drawTree = options["drawTree"] || Sk.drawTree;
+	goog.asserts.assert(typeof Sk.drawTree === "function");
 
     Sk.debugout = options["debugout"] || Sk.debugout;
     goog.asserts.assert(typeof Sk.debugout === "function");

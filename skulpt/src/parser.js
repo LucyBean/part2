@@ -86,7 +86,6 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
     var tp;
 	var root;
 	
-	// Simply setting this to 2 does not work!!
 	if (fixErrs === undefined) {
 		fixErrs = 2;
 	}
@@ -211,10 +210,20 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 			
 			if (fixErrs) {
 				//Sk.help.printAlts(ilabel, value, alternatives);
-				var token = {t: type, v:value, c:context};
 				
-				// TODO: When should these be run
-				Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
+				// Find a valid token that can be inserted at this point
+				var fixToken = Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
+				
+				// Manually add it, the current token, and return the result
+				this.addtoken(fixToken.type, fixToken.value, fixToken.context, 0);
+				
+				// Getting the corrected context
+				var lineNo = fixToken.context[0][0];
+				var pos = fixToken.context[1][1];
+				var len = value.length;
+				var fixedContext = [[lineNo, pos], [lineNo, pos+len], fixToken.context[2]];
+				
+				return this.addtoken(type, value, fixedContext, 0);
 			}
 			
 			//Sk.help.parseStackDump(this.stack);
@@ -407,14 +416,15 @@ function makeParser (filename, style, fixErrs) {
 
     // create parser function
     var parseFunc = function (line) {
-        var ret = tokenizer.generateTokens(line);
-        //print("tok:"+ret);
-        if (ret) {
-            if (ret !== "done") {
-                throw new Sk.builtin.ParseError("incomplete input", this.filename);
-            }
-            return p.rootnode;
-        }
+		var ret = tokenizer.generateTokens(line);
+		//print("tok:"+ret);
+		if (ret) {
+			if (ret !== "done") {
+				throw new Sk.builtin.ParseError("incomplete input", this.filename);
+			}
+			return p.rootnode;
+		}
+		
         return false;
     };
 	
@@ -438,27 +448,67 @@ Sk.parse = function parse (filename, input) {
         input += "\n";
     }
 	
-	var brackets = Sk.help.findUnbalancedBrackets(input);
+	// Check for any unterminated strings on each line
+	// BUT NOT WHEN THE NEWLINE IS IN A STRING
+	var lines = Sk.help.splitToLines(input);
+	
+	// Check each line for an unfinished string and balanced brackets
+	for (var j = 0; j < lines.length; j++) {
+		var errPos = Sk.find.unfinishedString(lines[j]);
+		if (errPos) {
+			Sk.helpout("<br>There's an unterminated string at " + errPos + " on line " + j);
+			var fix = Sk.fix.eolInString(lines[j], errPos);
+			
+			if (fix) {
+				lines[j] = fix;
+			}
+			else {
+				// The error could not be fixed
+			}
+		}
+		
+		var brackets = Sk.help.findUnbalancedBrackets(lines[j]);
+		
+		if (!brackets.isvalid) {
+			Sk.helpout("<br>Line " + j + " has unbalanced brackets");
+			var fix = Sk.fix.unbalancedBrackets(lines[j], brackets);
+			
+			if (fix !== undefined) {
+				lines[j] = fix;
+			}
+			else {
+				// The error could not be fixed
+			}
+		}
+	}
+	
+	for (i = 0; i < lines.length; ++i) {
+		ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
+	}
+	
+	var compact = Sk.extractPrintTree(ret);
+	Sk.drawTree(compact);
+	
+	// ret is the root node of the completed parse tree
+	// Small adjustments here in order to return th flags and the cst
+	return {"cst": ret, "flags": parseFunc.p_flags};
+	
+	/*var brackets = Sk.help.findUnbalancedBrackets(input);
 	
 	if (!brackets.isvalid) {
 		Sk.helpout("Your program has unbalanced brackets");
 		Sk.fix.unbalancedBrackets(input, brackets);
 		// Throw exception
 	} else {
-	
-		//print("input:"+input);
 		lines = input.split("\n");
-		for (i = 0; i < lines.length; ++i) {
-			ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
-		}
-
-		//ret is the root node of the completed parse tree
 		
-		/*
-		 * Small adjustments here in order to return th flags and the cst
-		 */
-		return {"cst": ret, "flags": parseFunc.p_flags};
-	}
+		//print("input:"+input);
+		
+
+		
+		
+		
+	}*/
 };
 
 Sk.parseTreeDump = function parseTreeDump (n, indent) {
@@ -469,7 +519,7 @@ Sk.parseTreeDump = function parseTreeDump (n, indent) {
     ret = "";
     ret += indent;
     if (n.type >= 256) { // non-term
-        ret += Sk.ParseTables.number2symbol[n.type] + "\n";
+        ret += Sk.ParseTables.number2symbol[n.type] + " " + n.children.length + "\n";
         for (i = 0; i < n.children.length; ++i) {
             ret += Sk.parseTreeDump(n.children[i], indent + "  ");
         }

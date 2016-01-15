@@ -1,9 +1,14 @@
 code {
-	font-family: "lucida console";
+	font-family: "consolas";
 	font-size: 16px;
 	background-color: #ffffcc;
 }
 
 body {
 	font-family: "Segoe UI";
+}
+
+.CodeMirror {
+	border-style: solid;
+	border-width: 1px;
 }
