@@ -662,6 +662,12 @@ Sk.extractPrintTree = function (node) {
 		co = "#ff6666";
 	}
 	
+	// Attempting to colour nodes that split the tree
+	// node.type == 320 means the node is a "simple_stmt"
+	if (node.type == 320) {
+		co = "#aaaaff";
+	}
+	
 	if (!node.children) {
 		return {val:v, colour:co};
 	}
@@ -671,6 +677,12 @@ Sk.extractPrintTree = function (node) {
 	else {
 		var c = [];
 		for (var i = 0; i < node.children.length; i++) {
+			// Check whether the node has any "suite" (node.type == 326) children
+			// as this indicates the node should be split
+			if (node.children[i].type == 326) {
+				co = "#aaaaff";
+			}
+			
 			c.push(Sk.extractPrintTree(node.children[i]));
 		}
 		return {val:v, children:c, colour:co};
