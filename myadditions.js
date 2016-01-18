@@ -577,6 +577,7 @@ Sk.help.generateFirstSet = function (ilabel) {
 	return aset;
 }
 
+// Also throws away comments
 Sk.help.splitToLines = function (input) {
 	var tripleQuote = false;
 	var lines = [""];
@@ -586,8 +587,20 @@ Sk.help.splitToLines = function (input) {
 	for (var i = 0; i < input.length; i++) {
 		var c = input.charAt(i);
 		
+		// When a comment (#) is found, skip to end of line
+		if (c === "#") {
+			while (c !== "\n") {
+				//lines[lineNum] += c;
+				i++;
+				c = input.charAt(i);
+			}
+			
+			lines.push("");
+			lineNum++;
+		}
+		
 		// Check for triple quotes
-		if (!escaped && c === "\\") {
+		else if (!escaped && c === "\\") {
 			escaped = true;
 		}
 		
@@ -649,6 +662,12 @@ Sk.extractPrintTree = function (node) {
 		co = "#ff6666";
 	}
 	
+	// Attempting to colour nodes that split the tree
+	// node.type == 320 means the node is a "simple_stmt"
+	if (node.type == 320) {
+		co = "#aaaaff";
+	}
+	
 	if (!node.children) {
 		return {val:v, colour:co};
 	}
@@ -658,6 +677,12 @@ Sk.extractPrintTree = function (node) {
 	else {
 		var c = [];
 		for (var i = 0; i < node.children.length; i++) {
+			// Check whether the node has any "suite" (node.type == 326) children
+			// as this indicates the node should be split
+			if (node.children[i].type == 326) {
+				co = "#aaaaff";
+			}
+			
 			c.push(Sk.extractPrintTree(node.children[i]));
 		}
 		return {val:v, children:c, colour:co};
@@ -670,6 +695,7 @@ Sk.find = {};
 Sk.find.unfinishedString = function (line) {
 	var insideQuote = false;
 	var tripleQuote = false;
+	var quoteChar;
 	var escaped = false;
 	var lastQuote;
 	
@@ -689,26 +715,30 @@ Sk.find.unfinishedString = function (line) {
 		if (!escaped && c === "\\") {
 			escaped = true;
 		}
+		// Check for comments
+		if (c === "#" && !insideQuote && !tripleQuote) {
+			break;
+		}
 		else {
 			// If we find an unescaped quote then...
 			if (!escaped && (c === "\"" || c === "'")) {
 				// if we are inside a triple quote
 				if (tripleQuote) {
 					// check for a closing triple quote
-					if (line.charAt(i+1) === c && line.charAt(i+2) === c) {
+					if (line.charAt(i+1) === c && line.charAt(i+2) === c && c === quoteChar) {
 						tripleQuote = false;
 						i += 2;
 					}
 				}
 				
 				// if we are inside a single quote
-				else if (insideQuote) {
+				else if (insideQuote && c === quoteChar) {
 					// close the quote
 					insideQuote = false;
 				}
 				
-				// else we have found an opening quote
-				else {
+				// else check for an opening quote
+				else if (!insideQuote && !tripleQuote) {
 					// check if it is a triple quote
 					if (line.charAt(i+1) === c && line.charAt(i+2) === c) {
 						tripleQuote = true;
@@ -720,6 +750,7 @@ Sk.find.unfinishedString = function (line) {
 						insideQuote = true;
 					}
 					
+					quoteChar = c;
 					lastQuote = i;
 				}
 			}

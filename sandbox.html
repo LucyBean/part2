@@ -1,0 +1,71 @@
+<html>
+<head>
+<style>
+	   body {
+	   		font-family:"Arial";
+	    }
+
+	   table, tr, td {
+	   		  vertical-align:top;
+	    }
+</style>
+<script src="./part2/drawing.js" type="text/javascript"></script>
+</head>
+
+<body>
+<table style="height:600px">
+	<tr>
+		<td style="width:400px; background-color:#aacccc">
+			<h1>Your code</h1>
+			<div id="code">
+			</div>
+		</td>
+		<td style="width:500px">
+			<canvas id="can" style="border-style:solid; border-width:1px"></canvas>
+		</td>
+	</tr>
+</table>
+
+<script>
+var canvas = document.getElementById("can");
+var ctx = canvas.getContext("2d");
+var codearea = document.getElementById("code");
+var abc = "caterpillar";
+
+var t0 = {val:"a", children:[
+		{val:"b", children:[
+			{val:"c"}
+		]},
+		{val:"d", children:[
+			{val:"e"},
+			{val:"f"},
+			{val:"g"}
+		]}
+	]};
+
+var t1 = {val:"a", children:[
+		{val:"b", children:[
+			{val:"c"},
+			{val:"d"},
+			{val:"e"}
+		]},
+		{val:"f"}
+	]};
+	
+var trees = [t0,t1];
+	
+codearea.innerHTML += "<a onclick=\"dt(trees[0])\">I love you</a><br>";
+codearea.innerHTML += "<a onclick=\"dt(trees[1])\">Do you love me</a>";
+
+clearCanvas = function () {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.beginPath();
+}
+
+function dt(tree) {
+	drawTree(ctx, tree, canvas);
+}
+
+</script>
+</body>
+</html>
