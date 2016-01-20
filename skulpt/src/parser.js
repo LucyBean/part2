@@ -54,6 +54,7 @@ Parser.prototype.setup = function (start) {
         state: 0,
         node : newnode
     };
+	this.treeLines = [];
     this.stack = [stackentry];
     this.used_names = {};
 };
@@ -138,6 +139,25 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
                 state = newstate;
                 //console.log("before:"+JSON.stringify(states[state]) + ":state:"+state+":"+JSON.stringify(states[state]));
                 /* jshint ignore:start */
+				
+				
+				// If we encounter a newline, we need will copy the parse tree for the line completed
+				if (type === 4) {
+					var rootNode;
+					
+					// If this newline starts a "suite" (indented block) then we need to take
+					// the second top entry, as the top entry will be representing the "suite"
+					if (this.stack.length > 2 && this.stack[this.stack.length-1].node.type === 326) {
+						rootNode = this.stack[this.stack.length-2].node;
+					}
+					else {
+						rootNode = this.stack[this.stack.length-1].node;
+					}
+					var tr = Sk.extractPrintTree(rootNode);
+					
+					this.treeLines.push({tree:tr, line:context[2]});
+				}
+				
                 while (states[state].length === 1
                     && states[state][0][0] === 0
                     && states[state][0][1] === state) {
@@ -148,6 +168,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
                     if (this.stack.length === 0) {
                         // done!
 						//Sk.debugout(Sk.parseTreeDump(this.rootnode));
+						
 						Sk.debugout("Finished parsing");
                         return true;
                     }

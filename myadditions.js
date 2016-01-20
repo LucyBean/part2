@@ -671,7 +671,9 @@ Sk.extractPrintTree = function (node) {
 	if (!node.children) {
 		return {val:v, colour:co};
 	}
-	else if (node.children.length === 1) {
+	// If this node has only one child, ignore this node
+	// If this node is a "simple_stmt" then ignore the trailing newline character
+	else if (node.children.length === 1 || node.type === 320) {
 		return Sk.extractPrintTree(node.children[0]);
 	}
 	else {
