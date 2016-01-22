@@ -510,7 +510,7 @@ Sk.parse = function parse (filename, input) {
 	}
 	
 	var compact = Sk.extractPrintTree(ret);
-	Sk.drawTree(compact, undefined, true);
+	Sk.drawTree(compact, true);
 	
 	// ret is the root node of the completed parse tree
 	// Small adjustments here in order to return th flags and the cst

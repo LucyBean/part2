@@ -1,6 +1,7 @@
 var cellWidth = 80;
 var cellHeight = 20;
 var padding = 20;
+var margin = 5;
 var font = "12px Arial";
 var textAlign = "center";
 var textBaseline = "middle";
@@ -10,63 +11,6 @@ setStyle = function (width, height, pad, f) {
 	cellHeight = height;
 	padding = pad;
 	font = f;
-}
-	
-drawGrid = function (ctx) {
-	var gridSize = 5;
-	var width = 100;
-	var height = 100;
-	var padding = 20;
-
-	var x = 0;
-	var y = 0;
-
-	for (var j = 0; j < gridSize; j++) {
-		for (var i = 0; i < gridSize; i++) {
-			ctx.rect(x, y, width, height);
-			ctx.fillText(i+j*gridSize, x+width/2, y+height/2);
-			
-			// Draw connecting lines if not the last in the grid
-			if (i < gridSize - 1) {
-				ctx.moveTo(x+width,y+height/2);
-				ctx.lineTo(x+width+padding, y+height/2);
-			}
-			if (j < gridSize - 1) {
-				ctx.moveTo(x+width/2,y+height);
-				ctx.lineTo(x+width/2, y+height+padding);
-			}
-			
-			x += width + padding;
-		}
-		x = 0;
-		y += height + padding;
-	}
-
-	ctx.stroke();
-}
-
-drawTree = function (ctx, node, canvas, info) {
-	
-	if (info === undefined) {
-		info = function (node) {
-			return node.val;
-		}
-	}
-	
-	var depth = addDrawingInformation(node);
-	
-	if (canvas !== undefined) {
-		var width = node.width;
-		var height = depth* (cellHeight + padding) - padding;
-		
-		canvas.width = width;
-		canvas.height = height;
-		ctx.font = font;
-		ctx.textAlign = textAlign;
-		ctx.textBaseline = textBaseline;
-	}
-	
-	drawNode(ctx, node, info);
 }
 
 // This will return the maximum depth of the tree (as a number of nodes)
@@ -124,37 +68,59 @@ addDrawingInformation = function (node, depth) {
 	}
 }
 
-drawNode = function (ctx, node, info, offset) {
+drawTreeFabric = function (canvas, node, scaleCanvas, info) {
+	if (info === undefined) {
+		info = function (node) {
+			return node.val;
+		}
+	}
+	
+	canvas.clear();
+	
+	var depth = addDrawingInformation(node);
+	
+	if (scaleCanvas){
+		var width = node.width;
+		var height = depth* (cellHeight + padding) - padding;
+		
+		canvas.setWidth(width+2*margin);
+		canvas.setHeight(height+2*margin);
+	}
+	
+	drawNodeFabric(canvas, node, info);
+}
+
+drawNodeFabric = function (canvas, node, info, offset) {
 	if (offset === undefined) {
-		offset = 0;
+		offset = margin;
 	}
 	
 	//draw this node
 	var x = node.x + offset;
-	var y = node.depth * (cellHeight + padding);
+	var y = node.depth * (cellHeight + padding) + margin;
 	var t = info(node);
+	var colour = node.colour || "#ffffff";
 	
-	if (node.colour !== undefined) {
-		ctx.fillStyle = node.colour;
-		ctx.fillRect(x, y, cellWidth, cellHeight);
-		ctx.fillStyle = "#000000";
-	}
-	
-	ctx.fillText(t, x+cellWidth/2, y+cellHeight/2);
-	ctx.rect(x, y, cellWidth, cellHeight);
-	ctx.stroke();
+	var rect = new fabric.Rect({left:x, top:y, fill:node.colour, width:cellWidth, height:cellHeight, stroke:'black'});
+	rect.hasControls = false;
+	canvas.add(rect);
 	
 	
 	// Draw the children
 	if (node.children) {
 		for (var i = 0; i < node.children.length; i++) {
-			ctx.moveTo(x+cellWidth/2, y+cellHeight);
-			ctx.lineTo(offset+node.children[i].x+cellWidth/2, y+cellHeight+padding);
-			drawNode(ctx, node.children[i], info, offset);
+			var x1 = x+cellWidth/2;
+			var y1 = y+cellHeight;
+			var x2 = offset+node.children[i].x+cellWidth/2;
+			var y2 = y+cellHeight+padding;
+			
+			var line = new fabric.Line([x1,y1,x2,y2], {stroke: 'black'});
+			canvas.add(line);
+			line.selectable = false;
+			drawNodeFabric(canvas, node.children[i], info, offset);
 			
 			offset += node.children[i].width + padding;
 		}
 	}	
 	
 }
-
