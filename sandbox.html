@@ -9,7 +9,7 @@
 	   		  vertical-align:top;
 	    }
 </style>
-<script src="./part2/drawing.js" type="text/javascript"></script>
+<script src="./drawing.js" type="text/javascript"></script>
 </head>
 
 <body>
@@ -54,8 +54,8 @@ var t1 = {val:"a", children:[
 	
 var trees = [t0,t1];
 	
-codearea.innerHTML += "<a onclick=\"dt(trees[0])\">I love you</a><br>";
-codearea.innerHTML += "<a onclick=\"dt(trees[1])\">Do you love me</a>";
+codearea.innerHTML += "<tag onclick=\"dt(trees[0])\">I love you</tag><br>";
+codearea.innerHTML += "<tag onclick=\"dt(trees[1])\">Do you love me</tag>";
 
 clearCanvas = function () {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);

@@ -29,6 +29,9 @@ Sk.configure = function (options) {
 	
 	Sk.drawTree = options["drawTree"] || Sk.drawTree;
 	goog.asserts.assert(typeof Sk.drawTree === "function");
+	
+	Sk.outputTreeByLine = options["treeByLine"] || Sk.outputTreeByLine;
+	goog.asserts.assert(typeof Sk.outputTreeByLine === "function");
 
     Sk.debugout = options["debugout"] || Sk.debugout;
     goog.asserts.assert(typeof Sk.debugout === "function");

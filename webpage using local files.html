@@ -74,6 +74,24 @@
 
 -->
 
+<style>
+table, tr, td {
+	vertical-align:top;
+}
+
+canvas {
+	border-style:solid;
+	border-width:1px;
+	background-color:#ffffff;
+}
+
+diva div {
+	width:1000px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+</style>
+
 </head> 
 
 <body> 
@@ -89,43 +107,51 @@ hello("Lilly")</textarea><br />
 <button type="button" onclick="runit()">Run</button> 
 </form>
 
-<div style = "background-color: #ccffcc">
+<diva>
+<div style="background-color:#ccffcc">
 <h2>Output</h2>
 <pre id="output"></pre> 
 </div>
 
-<div style = "background-color: #ff99cc">
+<div style="background-color:#ff99cc">
 <h2>Help</h2>
 <div id="help"></div>
 </div>
 
 <div>
-<canvas id="myCanvas" style="border-style: solid; border-width:1px;">
+<canvas id="myCanvas">
 </canvas>
 </div>
+
+<div style="background-color:#ccaaff;">
+<table>
+	<tr>
+		<td style="width:500px">	
+			<h2>Your code</h2>
+			<pre id="codeParsed" style="background-color:#ffddff">Code</pre>
+		</td>
+		<td>
+			<canvas id="parseTree" style="width:500px">
+			</canvas>
+		</td>
+	</tr>
+</table>
+</div>
+</diva>
 
 <script type="text/javascript">
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
+var treeLineCanvas = document.getElementById("parseTree");
+var treeLineCtx = treeLineCanvas.getContext("2d");
 ctx.font = "16px Arial";
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
 
-/*var tree = {val:"a", children:[
-	{val:"b", children:[
-		{val:"d", children:[
-			{val:"f"},
-			{val:"g"},
-			{val:"h"}
-		]}
-	]},
-	{val:"c"}
-]};
+var treeByLine = [];
 
-drawTree(ctx, tree);*/
-
-function drawtree(node, info) {		
-	drawTree(ctx, node, canvas, info);
+function drawtree(node, info, scaleCanvas) {   
+	drawTree(ctx, node, canvas, info, scaleCanvas);
 }
 
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
@@ -150,6 +176,14 @@ function debugOut(arg) {
 		console.log(arg);
 	}
 }
+function addLineParseTree(treeLine) {	
+	var index = treeByLine.length;
+	treeByLine.push(treeLine.tree);
+	var taggedLine = "<tag onclick=\"drawTree(treeLineCtx, treeByLine[" + index + "], treeLineCanvas)\">" + treeLine.line + "</tag>";
+	
+	var codeDisplay = document.getElementById("codeParsed");
+	codeDisplay.innerHTML = codeDisplay.innerHTML + taggedLine;
+}
 function help(text) {
 	var helparea = document.getElementById("help");
 	helparea.innerHTML = helparea.innerHTML + text;
@@ -164,13 +198,15 @@ function runit() {
    var prog = document.getElementById("yourcode").value; 
    var mypre = document.getElementById("output"); 
    var helparea = document.getElementById("help");
+   var codeDisplay = document.getElementById("codeParsed");
    mypre.innerHTML = ''; 
    helparea.innerHTML = '';
+   codeDisplay.innerHTML = '';
    ctx.clearRect(0, 0, canvas.width, canvas.height);
    ctx.beginPath();
    
    Sk.pre = "output";
-   Sk.configure({output:outf, read:builtinRead, debugout:debugOut, helpout:help, drawTree:drawtree});
+   Sk.configure({output:outf, read:builtinRead, debugout:debugOut, helpout:help, drawTree:drawtree, treeByLine:addLineParseTree});
    
    try {
 		var result = Sk.importMainWithBody("<stdin>", false, prog, true);
