@@ -1,0 +1,43 @@
+<html>
+<head>
+</head>
+
+<body>
+<div id="foo">
+</div>
+
+<div>
+<canvas id="canvas" style="border-style:solid; border-width:1px" onmouseenter="drawSquare('#ffaaaa')" onmouseleave="drawSquare('#aaaaff')"></canvas>
+</div>
+
+<script>
+var foo = document.getElementById("foo");
+var canvas = document.getElementById("canvas").getContext("2d");
+
+var timeRefreshID;
+
+var drawSquare = function (colour) {
+	canvas.fillStyle=colour;
+	canvas.fillRect(10,10,50,50);
+	
+	resetTimeRefresh();
+}
+
+var setTime = function() {
+	var d = new Date();
+	var n = d.getTime();
+	foo.innerHTML = n;
+	
+	resetTimeRefresh();
+}
+
+var resetTimeRefresh = function() {
+	clearTimeout(timeRefreshID);
+	timeRefreshID = setTimeout(setTime, 1000);
+}
+
+setTime();
+</script>
+
+</body>
+</html>
