@@ -153,6 +153,8 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 					else {
 						rootNode = this.stack[this.stack.length-1].node;
 					}
+					rootNode.flags = rootNode.flags || [];
+					rootNode.flags.push("SOL");
 					var tr = Sk.extractPrintTree(rootNode);
 					var trli = {tree:tr, line:context[2]};
 					

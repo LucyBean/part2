@@ -671,9 +671,8 @@ Sk.extractPrintTree = function (node) {
 		co = "#ff6666";
 	}
 	
-	// Attempting to colour nodes that split the tree
-	// node.type == 320 means the node is a "simple_stmt"
-	if (node.type == 320) {
+	// Colouring nodes that indicate a Start Of Line.
+	if (node.flags && node.flags.indexOf("SOL") !== -1) {
 		co = "#aaaaff";
 	}
 	
@@ -682,18 +681,19 @@ Sk.extractPrintTree = function (node) {
 	}
 	// If this node has only one child, ignore this node
 	// If this node is a "simple_stmt" then ignore the trailing newline character
+	// Any Start Of Line flags need to be passed down in this case
 	else if (node.children.length === 1 || node.type === 320) {
-		return Sk.extractPrintTree(node.children[0]);
+		var child = node.children[0];
+		if (node.flags && node.flags.indexOf("SOL") !== -1) {
+			child.flags = child.flags || [];
+			child.flags.push("SOL");
+		}
+		
+		return Sk.extractPrintTree(child);
 	}
 	else {
 		var c = [];
 		for (var i = 0; i < node.children.length; i++) {
-			// Check whether the node has any "suite" (node.type == 326) children
-			// as this indicates the node should be split
-			if (node.children[i].type == 326) {
-				co = "#aaaaff";
-			}
-			
 			c.push(Sk.extractPrintTree(node.children[i]));
 		}
 		return {val:v, children:c, colour:co};
