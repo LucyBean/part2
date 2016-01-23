@@ -650,8 +650,17 @@ Sk.extractPrintTree = function (node) {
 	var t = Sk.Tokenizer.tokenNames[node.type];
 	var co;
 	
+	// In the parse tree, do not display the value of
+	// 0-endmarker, 4-newline, 5-indent, 6-dedent, 53-NL
+	var ignoreTokens = [0, 4, 5, 6, 53];
+	
+	// If the token represents a value (that is not to be ignored) then
+	// add it to the print tree
 	if (t !== undefined) {
-		v = t + ": " + node.value;
+		v = t;
+		if (ignoreTokens.indexOf(node.type) === -1) {
+			v += "\n" + node.value;
+		}
 	}
 	else {
 		v = Sk.ilabelMeaning(node.type);

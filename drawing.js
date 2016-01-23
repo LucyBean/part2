@@ -1,10 +1,7 @@
-var cellWidth = 80;
-var cellHeight = 20;
+var cellWidth = 120;
+var cellHeight = 40;
 var padding = 20;
 var margin = 5;
-var font = "12px Arial";
-var textAlign = "center";
-var textBaseline = "middle";
 
 setStyle = function (width, height, pad, f) {
 	cellWidth = width;
@@ -105,6 +102,10 @@ drawNodeFabric = function (canvas, node, info, offset) {
 	rect.hasControls = false;
 	canvas.add(rect);
 	
+	//var text = new fabric.Text(t, {left:x, top:y, fontSize:20, fontFamily:'Arial', textAlign:'center'});
+	var text = new fabric.Text(t, {fontSize:20, fontFamily:'Arial', textAlign:'center'});
+	text.set({left:x+(cellWidth-text.getWidth())/2, top:y+(cellHeight-text.getHeight())/2});
+	canvas.add(text);
 	
 	// Draw the children
 	if (node.children) {
