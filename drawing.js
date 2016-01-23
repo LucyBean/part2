@@ -2,6 +2,7 @@ var cellWidth = 120;
 var cellHeight = 40;
 var padding = 20;
 var margin = 5;
+var textSize = 14;
 
 setStyle = function (width, height, pad, f) {
 	cellWidth = width;
@@ -98,14 +99,16 @@ drawNodeFabric = function (canvas, node, info, offset) {
 	var t = info(node);
 	var colour = node.colour || "#ffffff";
 	
-	var rect = new fabric.Rect({left:x, top:y, fill:node.colour, width:cellWidth, height:cellHeight, stroke:'black'});
-	rect.hasControls = false;
-	canvas.add(rect);
+	var rect = new fabric.Rect({fill:node.colour, width:cellWidth, height:cellHeight, stroke:'black'});
 	
 	//var text = new fabric.Text(t, {left:x, top:y, fontSize:20, fontFamily:'Arial', textAlign:'center'});
-	var text = new fabric.Text(t, {fontSize:20, fontFamily:'Arial', textAlign:'center'});
-	text.set({left:x+(cellWidth-text.getWidth())/2, top:y+(cellHeight-text.getHeight())/2});
-	canvas.add(text);
+	var text = new fabric.Text(t, {fontSize:textSize, fontFamily:'Arial', textAlign:'center'});
+	text.set({left:(cellWidth-text.getWidth())/2, top:(cellHeight-text.getHeight())/2});
+	
+	var group = new fabric.Group([rect, text], {left:x, top:y});
+	group.hasControls = false;
+	
+	canvas.add(group);
 	
 	// Draw the children
 	if (node.children) {
