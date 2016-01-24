@@ -149,6 +149,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		var p = makeParser(undefined, undefined, fixErrs);
 		var parseFunc = p[0];
 		var manualAdd = p[1];
+		var parser = p[2];
 		
 		try {
 			var pos = 0;
@@ -194,7 +195,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 };
 
 // Attempts to fix unbalanced brackets by inserting brackets into the line
-// Brackets should be the object returned from Sk.help.findUnbalancedBrackets
+// Brackets should be the object returned from Sk.find.unbalancedBrackets
 Sk.fix.unbalancedBrackets = function (input, brackets) {
 	var b = "()[]{}";
 	
@@ -204,7 +205,7 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 	var offset = 0;
 	
 	if (brackets === undefined) {
-		brackets = Sk.help.findUnbalancedBrackets(input);
+		brackets = Sk.find.ubalancedBrackets(input);
 	}
 	
 	var extractedBrackets = brackets.brackets;
@@ -255,7 +256,7 @@ Sk.fix.eolInString = function (line, errPosition) {
 	
 	// Find the unbalanced brackets within the line and check whether
 	// these have accidentally been included in the string
-	var unbalanced = Sk.help.findUnbalancedBrackets(line).brackets;
+	var unbalanced = Sk.find.unbalancedBrackets(line).brackets;
 	var brackets = "()[]{}";
 	var string = line.slice(errPosition);
 	
@@ -327,70 +328,6 @@ Sk.help.checkParse = function (string, checkErrs) {
 		Sk.debugout(stripTrailingNewLine(string) + " does not parse");
 		return false;
 	}
-};
-
-// Given a parse stack, this will dump the parse tree for each node currently
-// on the stack
-Sk.help.parseStackDump = function (stack) {
-	for (var i = 0; i < stack.length; i++) {
-		var node = stack[i].node;
-		
-		Sk.debugout('Level ' + i);
-		Sk.debugout(Sk.parseTreeDump(node));
-		Sk.debugout('\n-----------------------');
-	}
-};
-
-// Use to print out a parse tree in a compact form, similar to Sk.parseTreeDump
-Sk.help.parseTreeCompactDump = function (n, indent) {
-	var a = Sk.ilabelMeaning(n.type);
-    var i;
-    var ret;
-    indent = indent || "";
-    ret = "";
-    ret += indent;
-    if (n.type >= 256) { // non-term
-		var indentIncrease;
-		if (n.children.length >= 2) {
-			ret += Sk.ParseTables.number2symbol[n.type] + "\n";
-			indentIncrease = "|";
-		} else {
-			ret = "";
-			indentIncrease = "";
-		}
-        for (i = 0; i < n.children.length; ++i) {
-            ret += Sk.help.parseTreeCompact(n.children[i], indent + indentIncrease);
-        }
-    } else {
-        ret += Sk.Tokenizer.tokenNames[n.type] + ": " + new Sk.builtin.str(n.value)["$r"]().v + "\n";
-    }
-    return ret;
-}
-
-// Prints all the first sets of every transition in <alts>
-Sk.help.printAlts = function (ilabel, value, alts) {
-	Sk.debugout("\t\tUnfound alternative symbol for " + Sk.ilabelMeaning(ilabel) + " " + value);
-			
-			for (i in alts) {
-				var a = alts[i];
-				var meaning = Sk.ilabelMeaning(a);
-				
-				if (meaning !== undefined) {
-					var print = meaning;
-					
-					if (meaning === 'terminal') {
-						print = Sk.ilabelMeaning(Sk.ilabelMeaning.ilabelToNonTerm(a));
-					}
-					Sk.debugout("\t\t" + a + " " + print);
-				}
-				
-				// non-terminal production expected
-				// print first set
-				// only if t > 256?
-				if (meaning === 'terminal') {
-					Sk.help.printFirstSet(a);
-				}
-			}
 };
 
 // Strips all characters within a string and replaces them with <replacement> char
@@ -487,87 +424,6 @@ Sk.help.tokensToString = function (tokens) {
 	return s;
 };
 
-// Detects whether the set of brackets within the program is balanced
-// Not the most efficient way of doing it but it works
-// I'm almost certain some of these loops can be combined
-Sk.help.findUnbalancedBrackets = function (input) {
-	var lines = Sk.help.stripStringCharacters(input);
-	
-	var brackets = "()[]{}";
-	var extractedBrackets = [];
-	
-	// Extract all the brackets and their positions in the string
-	for (var k = 0; k < lines.length; k++) {
-		var index = brackets.indexOf(lines.charAt(k));
-		
-		if (index !== -1) {
-			extractedBrackets.push({type:brackets.charAt(index), pos:k, matched:false});
-		}
-	}
-	
-	// Remove matching pairs of brackets
-	var i = 0;
-	while (i < extractedBrackets.length - 1) {
-		if (extractedBrackets[i].matched) {
-			// The current bracket we are checking has been matched
-			i++;
-		} else {
-			// The bracket has been unmatched
-			var current = extractedBrackets[i];
-			
-			// Find the next unmatched bracket
-			while (i < extractedBrackets.length - 1 && extractedBrackets[i+1].matched) {
-				i++;
-			}
-			if (i === extractedBrackets.length - 1) {
-				break;
-			}
-			var next = extractedBrackets[i+1];
-			
-			// Check if they can be matched up
-			var cn = brackets.indexOf(current.type);
-			var nn = brackets.indexOf(next.type);
-			
-			// If they are a matching pair of brackets, mark them as matched
-			// and start from the beginning
-			if (cn%2 == 0 && nn === cn + 1) {
-				current.matched = true;
-				next.matched = true;
-				i = 0;
-			}
-			// Else move on to next bracket
-			else {
-				i++;
-			}
-		}
-	}
-	
-	var balanced = true;
-	
-	for (j in extractedBrackets) {
-		var b = extractedBrackets[j];
-		if (!b.matched) {
-			Sk.debugout('Unmatched bracket ' + b.type + ' at ' + b.pos);
-			balanced = false;
-		}
-	}
-	
-	return {isvalid:balanced, brackets:extractedBrackets};
-};
-
-Sk.help.printFirstSet = function (ilabel) {
-	var set = Sk.help.generateFirstSet(ilabel);
-	
-	for (i in set) {
-		var s = set[i];
-		var sM = Sk.ilabelMeaning(s);
-		
-		if (sM !== undefined) {
-			Sk.debugout("\t\t\t" + s + " " + sM);
-		}
-	}
-};
-
 Sk.help.generateFirstSet = function (ilabel) {
 	var aset = [];
 	
@@ -662,7 +518,7 @@ Sk.help.splitToLines = function (input) {
 
 // Extract the tree to be printed from a parse tree
 // This extracts it in a compact form (with all single child nodes eliminated)
-Sk.extractPrintTree = function (node) {
+Sk.help.extractPrintTree = function (node) {
 	// Okay so the token type isn't quite an ilabel here so I have to do this?
 	var v;
 	var t = Sk.Tokenizer.tokenNames[node.type];
@@ -707,15 +563,31 @@ Sk.extractPrintTree = function (node) {
 			child.flags.push("SOL");
 		}
 		
-		return Sk.extractPrintTree(child);
+		return Sk.help.extractPrintTree(child);
 	}
 	else {
 		var c = [];
 		for (var i = 0; i < node.children.length; i++) {
-			c.push(Sk.extractPrintTree(node.children[i]));
+			c.push(Sk.help.extractPrintTree(node.children[i]));
 		}
 		return {val:v, children:c, colour:co};
 	}
+}
+
+Sk.help.parseStackToTree = function (stack) {
+	if (!stack || stack.length === 0) {
+		return;
+	}
+	
+	var stackTrees = [];
+	
+	// Convert each node in the stack to its print tree
+	for (var i = 0; i < stack.length; i++) {
+		var node = stack[i].node;
+		stackTrees.push(Sk.help.extractPrintTree(node));
+	}
+	
+	return stackTrees;
 }
 
 Sk.find = {};
@@ -795,115 +667,70 @@ Sk.find.unfinishedString = function (line) {
 	}
 }
 
-Sk.ilabelMeaning = function (ilabel) {
-	if (ilabel === 256) return 'START';
-	if (ilabel > 256) return Sk.ilabelMeaning.nonterms(ilabel);
+// Detects whether the set of brackets within the program is balanced
+// Not the most efficient way of doing it but it works
+// I'm almost certain some of these loops can be combined
+Sk.find.unbalancedBrackets = function (input) {
+	var lines = Sk.help.stripStringCharacters(input);
 	
-	var token = Sk.ilabelMeaning.token(ilabel);
-	if (token) {
-		return token;
-	}
+	var brackets = "()[]{}";
+	var extractedBrackets = [];
 	
-	var keyword = Sk.ilabelMeaning.keywords(ilabel);
-	if (keyword) {
-		return keyword;
-	}
-	
-	var t = Sk.ilabelMeaning.ilabelToNonTerm(ilabel);
-	if (t) {
-		return 'terminal';
-	}
-};
-
-Sk.ilabelMeaning.ilabelToNonTerm = function (ilabel) {
-	var table = Sk.ParseTables.labels[ilabel];
-	if (table !== undefined) {
-		return table[0];
-	}
-}
-
-Sk.ilabelMeaning.keywords = function (ilabel) {
-	var map = {
-		4: 'def',
-		5: 'raise',
+	// Extract all the brackets and their positions in the string
+	for (var k = 0; k < lines.length; k++) {
+		var index = brackets.indexOf(lines.charAt(k));
 		
-		7: 'not',
-		
-		10: 'class',
-		11: 'lambda',
-		12: 'print',
-		
-		13: 'debugger',
-		
-		16: 'try',
-		17: 'exec',
-		18: 'while',
-		
-		20: 'return',
-		21: 'assert',
-		22: 'T_NAME',
-		23: 'del',
-		24: 'pass',
-		
-		25: 'import',
-		
-		27: 'yield',
-		28: 'global',
-		29: 'for',
-		
-		31: 'from',
-		32: 'if',	
-		33: 'break',
-		34: 'continue',
-		
-		36: 'with',
-		
-		41: 'and',
-		
-		74: 'in',
-		
-		83: 'is',
-		
-		100: 'as',
-		
-		104: 'except',
-		
-		116: 'else',
-		
-		120: 'elif',
-		
-		134: 'or',
-		
-		162: 'finally',
-	};
-	
-	return map[ilabel];
-};
-
-Sk.ilabelMeaning.token = function (ilabel) {
-	var tn = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
-	return Sk.Tokenizer.tokenNames[tn];
-	//return Sk.Tokenizer.tokenNames[ilabel];
-};
-
-Sk.ilabelMeaning.nonterms = function (ilabel) {
-	return Sk.ParseTables.number2symbol[ilabel];
-	/*ilabel -= 257;
-	
-	if (ilabel >= 0) {
-		return Object.keys(Sk.ParseTables.sym)[ilabel];
-	}*/
-};
-
-Sk.ilabelMeaning.ilabelToTokenNumber = function (ilabel) {
-	// tti is a token# -> ilabel table
-	var tti = Sk.ParseTables.tokens;
-	
-	// check each token within the table to see whether it has
-	// the required ilabel
-	for (i = 0; i < Object.keys(tti).length; i++) {
-		if (ilabel == tti[i]) {
-			return i;
+		if (index !== -1) {
+			extractedBrackets.push({type:brackets.charAt(index), pos:k, matched:false});
 		}
 	}
-}
+	
+	// Remove matching pairs of brackets
+	var i = 0;
+	while (i < extractedBrackets.length - 1) {
+		if (extractedBrackets[i].matched) {
+			// The current bracket we are checking has been matched
+			i++;
+		} else {
+			// The bracket has been unmatched
+			var current = extractedBrackets[i];
+			
+			// Find the next unmatched bracket
+			while (i < extractedBrackets.length - 1 && extractedBrackets[i+1].matched) {
+				i++;
+			}
+			if (i === extractedBrackets.length - 1) {
+				break;
+			}
+			var next = extractedBrackets[i+1];
+			
+			// Check if they can be matched up
+			var cn = brackets.indexOf(current.type);
+			var nn = brackets.indexOf(next.type);
+			
+			// If they are a matching pair of brackets, mark them as matched
+			// and start from the beginning
+			if (cn%2 == 0 && nn === cn + 1) {
+				current.matched = true;
+				next.matched = true;
+				i = 0;
+			}
+			// Else move on to next bracket
+			else {
+				i++;
+			}
+		}
+	}
+	
+	var balanced = true;
+	
+	for (j in extractedBrackets) {
+		var b = extractedBrackets[j];
+		if (!b.matched) {
+			Sk.debugout('Unmatched bracket ' + b.type + ' at ' + b.pos);
+			balanced = false;
+		}
+	}
+	
+	return {isvalid:balanced, brackets:extractedBrackets};
+};

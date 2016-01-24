@@ -155,7 +155,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 					}
 					rootNode.flags = rootNode.flags || [];
 					rootNode.flags.push("SOL");
-					var tr = Sk.extractPrintTree(rootNode);
+					var tr = Sk.help.extractPrintTree(rootNode);
 					var trli = {tree:tr, line:context[2]};
 					
 					this.treeLines.push(trli);
@@ -461,7 +461,7 @@ function makeParser (filename, style, fixErrs) {
 
     // set flags, and return
     parseFunc.p_flags = p.p_flags;
-    return [parseFunc, addToken];
+    return [parseFunc, addToken, p];
 }
 
 Sk.parse = function parse (filename, input) {
@@ -492,7 +492,7 @@ Sk.parse = function parse (filename, input) {
 			}
 		}
 		
-		var brackets = Sk.help.findUnbalancedBrackets(lines[j]);
+		var brackets = Sk.find.unbalancedBrackets(lines[j]);
 		
 		if (!brackets.isvalid) {
 			Sk.helpout("<br>Line " + j + " has unbalanced brackets");
@@ -511,29 +511,12 @@ Sk.parse = function parse (filename, input) {
 		ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
 	}
 	
-	var compact = Sk.extractPrintTree(ret);
+	var compact = Sk.help.extractPrintTree(ret);
 	Sk.drawTree(compact, true);
 	
 	// ret is the root node of the completed parse tree
 	// Small adjustments here in order to return th flags and the cst
 	return {"cst": ret, "flags": parseFunc.p_flags};
-	
-	/*var brackets = Sk.help.findUnbalancedBrackets(input);
-	
-	if (!brackets.isvalid) {
-		Sk.helpout("Your program has unbalanced brackets");
-		Sk.fix.unbalancedBrackets(input, brackets);
-		// Throw exception
-	} else {
-		lines = input.split("\n");
-		
-		//print("input:"+input);
-		
-
-		
-		
-		
-	}*/
 };
 
 Sk.parseTreeDump = function parseTreeDump (n, indent) {
