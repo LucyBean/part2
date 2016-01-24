@@ -114,6 +114,13 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var nextToken = Sk.Tokenizer.extractOneToken(stringEnd);
 	stringEnd = stringEnd.slice(nextToken.value.length);
 	
+	// This seems to get confused when the error is happening right at the
+	// end of the line and gives the newline token a type of 53 rather
+	// than 4
+	if (string.length === end) {
+		nextToken.type = 4;
+	}
+	
 	// possibleAppends holds the ilabels of tokens that may work. It is populated
 	// by checking all the first sets of the alternative symbols
 	var possibleAppends = [];
@@ -133,6 +140,8 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		// Converting back to a token number
 		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
 		
+		// fixedString represents the WHOLE PROGRAM
+		// fixedLine represents ONLY THE LINE.
 		var fixedString = stringStart + meaning  + nextToken.value + stringEnd;
 		var fixedLine = currentLine + meaning + nextToken.value + stringEnd;
 		
@@ -145,7 +154,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			var pos = 0;
 			var genContext = function (tokenVal) {
 				var len = tokenVal.length;
-				var context = [[lineNo, pos], [lineNo, pos+len], fixedString];
+				var context = [[lineNo, pos], [lineNo, pos+len], fixedLine];
 				pos += len;
 				return context;
 			}
@@ -165,12 +174,12 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			//parseFunc(stringEnd);
 			//manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
 			
-			var reportLine;
+			var reportLine = stripTrailingNewLine(fixedLine);
 			
-			if (c2[1][1] === fixedString.length) {
-				reportLine = fixedString;
-			} else {
-				reportLine = fixedString.substring(0,c2[1][1]) + "...";
+			// If the token we have just add is NOT the last in the line then
+			// report back only the fragment we have parsed
+			if (c2[1][1] !== reportLine.length && nextToken.type !== 4) {
+				reportLine = reportLine.substring(0,c2[1][1]) + "...";
 			}
 			
 			Sk.helpoutCode(stripTrailingNewLine(reportLine))
