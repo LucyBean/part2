@@ -153,18 +153,27 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			for (var i = 0; i < prevTokens.length; i++) {
 				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
 			}
-			var c = genContext(meaning);
-			manualAdd(tokenNum, meaning, c);
-			manualAdd(nextToken.type, nextToken.value, genContext(nextToken.value));
+			var c1 = genContext(meaning);
+			var c2 = genContext(nextToken.value);
+			manualAdd(tokenNum, meaning, c1);
+			manualAdd(nextToken.type, nextToken.value, c2);
 			
 			if (fixToken === undefined) {
-				fixToken = {type:tokenNum, value:meaning, context:c}
+				fixToken = {type:tokenNum, value:meaning, context:c1}
 			}
 			
 			//parseFunc(stringEnd);
 			//manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
 			
-			Sk.helpoutCode(stripTrailingNewLine(fixedLine))
+			var reportLine;
+			
+			if (c2[1][1] === fixedString.length) {
+				reportLine = fixedString;
+			} else {
+				reportLine = fixedString.substring(0,c2[1][1]) + "...";
+			}
+			
+			Sk.helpoutCode(stripTrailingNewLine(reportLine))
 			Sk.helpout(' appeared to work<br/>');
 		}
 		catch (err) {
