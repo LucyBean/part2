@@ -155,7 +155,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 					}
 					rootNode.flags = rootNode.flags || [];
 					rootNode.flags.push("SOL");
-					var tr = Sk.help.extractPrintTree(rootNode);
+					var tr = Sk.parseTrees.extractPrintTree(rootNode);
 					var trli = {tree:tr, line:context[2]};
 					
 					this.treeLines.push(trli);
@@ -511,7 +511,7 @@ Sk.parse = function parse (filename, input) {
 		ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
 	}
 	
-	var compact = Sk.help.extractPrintTree(ret);
+	var compact = Sk.parseTrees.extractPrintTree(ret);
 	Sk.drawTree(compact, true);
 	
 	// ret is the root node of the completed parse tree

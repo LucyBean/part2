@@ -22,7 +22,7 @@ addDrawingInformation = function (node, depth) {
 	// within its width box
 	
 	// For a branch node
-	if (node.children) {
+	if (node.children && node.children.length > 0) {
 		node.width = 0;
 		
 		var offset = 0;

@@ -168,6 +168,8 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			manualAdd(tokenNum, meaning, c1);
 			manualAdd(nextToken.type, nextToken.value, c2);
 			
+			var a = Sk.parseTrees.parseStackToTree(parser.stack);
+			
 			if (fixToken === undefined) {
 				fixToken = {type:tokenNum, value:meaning, context:c1}
 			}
@@ -516,9 +518,11 @@ Sk.help.splitToLines = function (input) {
 	return lines;
 }
 
+Sk.parseTrees = Sk.parseTrees || {};
+
 // Extract the tree to be printed from a parse tree
 // This extracts it in a compact form (with all single child nodes eliminated)
-Sk.help.extractPrintTree = function (node) {
+Sk.parseTrees.extractPrintTree = function (node) {
 	// Okay so the token type isn't quite an ilabel here so I have to do this?
 	var v;
 	var t = Sk.Tokenizer.tokenNames[node.type];
@@ -563,18 +567,20 @@ Sk.help.extractPrintTree = function (node) {
 			child.flags.push("SOL");
 		}
 		
-		return Sk.help.extractPrintTree(child);
+		return Sk.parseTrees.extractPrintTree(child);
 	}
 	else {
 		var c = [];
 		for (var i = 0; i < node.children.length; i++) {
-			c.push(Sk.help.extractPrintTree(node.children[i]));
+			c.push(Sk.parseTrees.extractPrintTree(node.children[i]));
 		}
 		return {val:v, children:c, colour:co};
 	}
 }
 
-Sk.help.parseStackToTree = function (stack) {
+// Produces a parse tree, representing a partially parsed line
+// from the state of the current parse stack
+Sk.parseTrees.parseStackToTree = function (stack) {
 	if (!stack || stack.length === 0) {
 		return;
 	}
@@ -584,13 +590,52 @@ Sk.help.parseStackToTree = function (stack) {
 	// Convert each node in the stack to its print tree
 	for (var i = 0; i < stack.length; i++) {
 		var node = stack[i].node;
-		stackTrees.push(Sk.help.extractPrintTree(node));
+		
+		// Ignore all nodes that have no children
+		// Unless it is the first node
+		if (i == 0 || (node.children && node.children.length > 0)) {
+			var tree = Sk.parseTrees.extractPrintTree(node);
+			
+			// All trees, except the first, will be appended to the
+			// previous tree
+			if (i > 0) {
+				tree.tags = tree.tags || [];
+				tree.tags.push("Appended");
+			}
+		
+			stackTrees.push(tree);
+		}
+		
+		
 	}
 	
-	return stackTrees;
+	// Append the trees, working from the bottom up
+	for (var i = 1; i < stackTrees.length; i++) {
+		var j = stackTrees.length - i - 1;
+		Sk.parseTrees.appendTree(stackTrees[j], stackTrees[j+1]);
+	}
+	
+	return stackTrees[0];
 }
 
-Sk.find = {};
+// Appends the child tree as the right-most child at the lowest level.
+// (The child tree will appear as the last element in an infix tree traversal)
+Sk.parseTrees.appendTree = function (parent, child) {
+	// If the parent has children then append the child to
+	// the right-most subtree
+	if (parent.children && parent.children.length > 0) {
+		var newParent = parent.children[parent.children.length-1];
+		Sk.parseTrees.appendTree(newParent, child);
+	}
+	// Else add it as the right-most child
+	else {
+		parent.children = parent.children || [];
+		parent.children.push(child);
+		parent.children.push({val:"???", flags:["???"]});
+	}
+}
+
+Sk.find = Sk.find || {};
 
 // If there is an unfinished quote, returns the position of the opening quote
 Sk.find.unfinishedString = function (line) {
