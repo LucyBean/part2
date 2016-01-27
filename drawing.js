@@ -97,9 +97,18 @@ drawNodeFabric = function (canvas, node, info, offset) {
 	var x = node.x + offset;
 	var y = node.depth * (cellHeight + padding) + margin;
 	var t = info(node);
-	var colour = node.colour || "#ffffff";
+	var colour = "#ffffff";
 	
-	var rect = new fabric.Rect({fill:node.colour, width:cellWidth, height:cellHeight, stroke:'black'});
+	if (node.tags) {
+		if (node.tags.indexOf("Appended") !== -1) {
+			colour = "#ffaaaa";
+		}
+		else if (node.tags.indexOf("SOL") !== -1) {
+			colour = "#aaaaff";
+		}
+	}
+	
+	var rect = new fabric.Rect({fill:colour, width:cellWidth, height:cellHeight, stroke:'black'});
 	
 	//var text = new fabric.Text(t, {left:x, top:y, fontSize:20, fontFamily:'Arial', textAlign:'center'});
 	var text = new fabric.Text(t, {fontSize:textSize, fontFamily:'Arial', textAlign:'center'});

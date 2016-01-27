@@ -165,10 +165,10 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			}
 			var c1 = genContext(meaning);
 			var c2 = genContext(nextToken.value);
+			
 			manualAdd(tokenNum, meaning, c1);
 			manualAdd(nextToken.type, nextToken.value, c2);
 			
-			var a = Sk.parseTrees.parseStackToTree(parser.stack);
 			
 			if (fixToken === undefined) {
 				fixToken = {type:tokenNum, value:meaning, context:c1}
@@ -544,16 +544,6 @@ Sk.parseTrees.extractPrintTree = function (node) {
 		v = Sk.ilabelMeaning(node.type);
 	}
 	
-	// Dirty hack to make added in nodes a different colour
-	if (t === node.value) {
-		co = "#ff6666";
-	}
-	
-	// Colouring nodes that indicate a Start Of Line.
-	if (node.flags && node.flags.indexOf("SOL") !== -1) {
-		co = "#aaaaff";
-	}
-	
 	if (!node.children) {
 		return {val:v, colour:co};
 	}
@@ -602,7 +592,6 @@ Sk.parseTrees.parseStackToTree = function (stack) {
 				tree.tags = tree.tags || [];
 				tree.tags.push("Appended");
 			}
-		
 			stackTrees.push(tree);
 		}
 		
@@ -631,7 +620,6 @@ Sk.parseTrees.appendTree = function (parent, child) {
 	else {
 		parent.children = parent.children || [];
 		parent.children.push(child);
-		parent.children.push({val:"???", flags:["???"]});
 	}
 }
 

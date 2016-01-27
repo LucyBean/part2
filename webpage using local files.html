@@ -103,7 +103,9 @@ canvas {
 <form>
 
 <textarea id="yourcode">
-print(5+)</textarea><br /> 
+print(5+3)
+if (3 > 2):
+	print("HI!")</textarea><br /> 
 <button type="button" onclick="runit()">Run</button> 
 </form>
 
@@ -140,20 +142,11 @@ print(5+)</textarea><br />
 </div>
 
 <script>
-var treeLineCanvas = document.getElementById("parseTree");
-var treeLineCtx = treeLineCanvas.getContext("2d");
-
 var canvasF = new fabric.Canvas("myCanvas");
-var rect = new fabric.Rect({left:20, top:20, fill:'red', width:100, height:100});
-canvasF.add(rect);
-
 var treeLineCanvasF = new fabric.Canvas("parseTree");
 
 var treeByLine = [];
 
-function drawtree(node, scaleCanvas, info) {
-	drawTreeFabric(canvasF, node, scaleCanvas, info);
-}
 
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
 		lineNumbers: true,
@@ -179,7 +172,10 @@ function debugOut(arg) {
 		console.log(arg);
 	}
 }
-function addLineParseTree(treeLine) {	
+
+var specialOutput = {};
+
+specialOutput.addLineParseTree = function (treeLine) {	
 	var index = treeByLine.length;
 	treeByLine.push(treeLine.tree);
 	var taggedLine = "<tag onclick=\"drawTreeFabric(treeLineCanvasF, treeByLine[" + index + "], true)\">" + treeLine.line + "</tag>";
@@ -187,12 +183,23 @@ function addLineParseTree(treeLine) {
 	var codeDisplay = document.getElementById("codeParsed");
 	codeDisplay.innerHTML = codeDisplay.innerHTML + taggedLine;
 }
-function help(text) {
+
+specialOutput.drawTreeMain = function(node, scaleCanvas, info) {
+	drawTreeFabric(canvasF, node, scaleCanvas, info);
+}
+
+specialOutput.help = function (text) {
 	var helpArea = document.getElementById("help");
 	var helpAreaAll = document.getElementById("helpAreaAll");
 	
 	helpArea.innerHTML = helpArea.innerHTML + text;
 }
+
+specialOutput.addHelpTree = function (tree) {
+	
+}
+
+
 // Here's everything you need to run a python program in skulpt
 // grab the code from your textarea
 // get a reference to your pre element for output
@@ -213,7 +220,7 @@ function runit() {
    treeLineCanvasF.clear();
    
    Sk.pre = "output";
-   Sk.configure({output:outf, read:builtinRead, debugout:debugOut, helpout:help, drawTree:drawtree, treeByLine:addLineParseTree});
+   Sk.configure({output:outf, read:builtinRead, debugout:debugOut, specialOutput:specialOutput});
    
    try {
 		var result = Sk.importMainWithBody("<stdin>", false, prog, true);

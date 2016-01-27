@@ -24,14 +24,7 @@ Sk.configure = function (options) {
     Sk.output = options["output"] || Sk.output;
     goog.asserts.assert(typeof Sk.output === "function");
 	
-	Sk.helpout = options["helpout"] || Sk.helpout;
-	goog.asserts.assert(typeof Sk.helpout === "function");
-	
-	Sk.drawTree = options["drawTree"] || Sk.drawTree;
-	goog.asserts.assert(typeof Sk.drawTree === "function");
-	
-	Sk.outputTreeByLine = options["treeByLine"] || Sk.outputTreeByLine;
-	goog.asserts.assert(typeof Sk.outputTreeByLine === "function");
+	Sk.specialOutput = options["specialOutput"] || Sk.specialOutput;
 
     Sk.debugout = options["debugout"] || Sk.debugout;
     goog.asserts.assert(typeof Sk.debugout === "function");

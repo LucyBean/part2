@@ -159,7 +159,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 					var trli = {tree:tr, line:context[2]};
 					
 					this.treeLines.push(trli);
-					Sk.outputTreeByLine(trli);
+					Sk.specialOutput.addLineParseTree(trli);
 				}
 				
                 while (states[state].length === 1
@@ -235,7 +235,8 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 			
 			if (fixErrs) {
 				//Sk.help.printAlts(ilabel, value, alternatives);
-				
+				var a = Sk.parseTrees.parseStackToTree(this.stack);
+				Sk.specialOutput.drawTreeMain(a, true);
 				// Find a valid token that can be inserted at this point
 				var fixToken = Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
 				
@@ -512,7 +513,7 @@ Sk.parse = function parse (filename, input) {
 	}
 	
 	var compact = Sk.parseTrees.extractPrintTree(ret);
-	Sk.drawTree(compact, true);
+	Sk.specialOutput.drawTreeMain(compact, true);
 	
 	// ret is the root node of the completed parse tree
 	// Small adjustments here in order to return th flags and the cst
