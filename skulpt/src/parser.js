@@ -183,6 +183,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
                     //print(JSON.stringify(states), JSON.stringify(first));
                     //print("bottom:"+JSON.stringify(states[state]) + ":state:"+state+":"+JSON.stringify(states[state]));
                 }
+				
                 /* jshint ignore:end */
                 // done with this token
                 

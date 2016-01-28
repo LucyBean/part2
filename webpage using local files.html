@@ -116,6 +116,7 @@ print(5+)</textarea><br />
 <div id="helpParent" style="background-color:#ff99cc">
 <h2>Help</h2>
 <div id="help"></div>
+<canvas id="helpTree"></canvas>
 </div>
 
 <div>
@@ -131,17 +132,18 @@ print(5+)</textarea><br />
 			<pre id="codeParsed" style="background-color:#ffddff">Code</pre>
 		</td>
 		<td>
-			<canvas id="parseTree" style="width:500px">
-			</canvas>
+			<canvas id="parseTree"></canvas>
 		</td>
 	</tr>
 </table>
+<br>
 </div>
 </div>
 
 <script>
 var canvasF = new fabric.Canvas("myCanvas");
 var treeLineCanvasF = new fabric.Canvas("parseTree");
+var helpCanvas = new fabric.Canvas("helpTree");
 
 var treeByLine = [];
 
