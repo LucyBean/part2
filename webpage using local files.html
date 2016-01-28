@@ -103,9 +103,7 @@ canvas {
 <form>
 
 <textarea id="yourcode">
-print(5+3)
-if (3 > 2):
-	print("HI!")</textarea><br /> 
+print(5+)</textarea><br /> 
 <button type="button" onclick="runit()">Run</button> 
 </form>
 
@@ -193,6 +191,10 @@ specialOutput.help = function (text) {
 	var helpAreaAll = document.getElementById("helpAreaAll");
 	
 	helpArea.innerHTML = helpArea.innerHTML + text;
+}
+
+specialOutput.helpCode = function (text) {
+	specialOutput.help("<code>" + text + "</code>");
 }
 
 specialOutput.addHelpTree = function (tree) {

@@ -16,10 +16,6 @@ stripTrailingNewLine = function (string) {
 	}*/
 };
 
-Sk.helpoutCode = function (string) {
-	Sk.helpout("<code>" + string + "</code>");
-}
-
 /*
  * Check fix will return true or false on whether the lexer can successfully
  * parse the tokens. Need to prevent infinite loops.
@@ -104,8 +100,8 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	// starting from the position of the last error.
 	// So we can only show this message if <stringStart> is a prefix of <string>
 	if (string.startsWith(currentLine)) {
-		Sk.helpoutCode(stripTrailingNewLine(string));
-		Sk.helpout(" is an <b>invalid expression</b> on line " + lineNo + "<br/>");
+		Sk.specialOutput.helpCode(stripTrailingNewLine(string));
+		Sk.specialOutput.help(" is an <b>invalid expression</b> on line " + lineNo + "<br/>");
 	}
 	
 	
@@ -167,7 +163,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			var c2 = genContext(nextToken.value);
 			
 			manualAdd(tokenNum, meaning, c1);
-			manualAdd(nextToken.type, nextToken.value, c2);
+			manualAdd(nextToken.type, nextToken.value, c2, fixErrs);
 			
 			
 			if (fixToken === undefined) {
@@ -185,8 +181,8 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 				reportLine = reportLine.substring(0,c2[1][1]) + "...";
 			}
 			
-			Sk.helpoutCode(stripTrailingNewLine(reportLine))
-			Sk.helpout(' appeared to work<br/>');
+			Sk.specialOutput.helpCode(stripTrailingNewLine(reportLine))
+			Sk.specialOutput.help(' appeared to work<br/>');
 		}
 		catch (err) {
 			Sk.debugout(stripTrailingNewLine(fixedLine) + ' was tried and did not work');
@@ -241,8 +237,8 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 		}
 	}
 	
-	Sk.helpout("<br>Try: ");
-	Sk.helpoutCode(input);
+	Sk.specialOutput.help("<br>Try: ");
+	Sk.specialOutput.helpCode(input);
 	if (Sk.help.checkParse(input)) {
 		return input;
 	}
@@ -252,8 +248,8 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
  *	Returns feedback on an eolInString error.
  */
 Sk.fix.eolInString = function (line, errPosition) {	
-	Sk.helpoutCode("<br>" + line);
-	Sk.helpout(" has a string that contains a newline character\n");
+	Sk.specialOutput.helpCode("<br>" + line);
+	Sk.specialOutput.help(" has a string that contains a newline character\n");
 	
 	
 	// Find the unbalanced brackets within the line and check whether
@@ -301,9 +297,9 @@ Sk.fix.eolInString = function (line, errPosition) {
 	
 	var fixed = Sk.Tokenizer.checkLex(fix);
 	if (fixed) {
-		Sk.helpout("<br>");
-		Sk.helpoutCode(fix);
-		Sk.helpout(" is an alternative that may work.");
+		Sk.specialOutput.help("<br>");
+		Sk.specialOutput.helpCode(fix);
+		Sk.specialOutput.help(" is an alternative that may work.");
 		return fix;
 	}
 };
@@ -522,15 +518,22 @@ Sk.parseTrees = Sk.parseTrees || {};
 
 // Extract the tree to be printed from a parse tree
 // This extracts it in a compact form (with all single child nodes eliminated)
-Sk.parseTrees.extractPrintTree = function (node) {
+Sk.parseTrees.extractPrintTree = function (node, f) {
 	// Okay so the token type isn't quite an ilabel here so I have to do this?
 	var v;
 	var t = Sk.Tokenizer.tokenNames[node.type];
-	var co;
+	
+	if (f === undefined) {
+		f = [];
+	}
 	
 	// In the parse tree, do not display the value of
 	// 0-endmarker, 4-newline, 5-indent, 6-dedent, 53-NL
 	var ignoreTokens = [0, 4, 5, 6, 53];
+	
+	if (node.type === 323 || node.type === 320) {
+		f.push("SOL");
+	}
 	
 	// If the token represents a value (that is not to be ignored) then
 	// add it to the print tree
@@ -545,18 +548,16 @@ Sk.parseTrees.extractPrintTree = function (node) {
 	}
 	
 	if (!node.children) {
-		return {val:v, colour:co};
+		return {val:v, tags:f};
 	}
 	// If this node has only one child, ignore this node
 	// If this node is a "simple_stmt" then ignore the trailing newline character
 	// Any Start Of Line flags need to be passed down in this case
 	else if (node.children.length === 1 || node.type === 320) {
 		var child = node.children[0];
-		if (node.flags && node.flags.indexOf("SOL") !== -1) {
-			child.flags = child.flags || [];
-			child.flags.push("SOL");
+		if (f && f.indexOf("SOL") !== -1) {
+			return Sk.parseTrees.extractPrintTree(child, ["SOL"]);
 		}
-		
 		return Sk.parseTrees.extractPrintTree(child);
 	}
 	else {
@@ -564,7 +565,7 @@ Sk.parseTrees.extractPrintTree = function (node) {
 		for (var i = 0; i < node.children.length; i++) {
 			c.push(Sk.parseTrees.extractPrintTree(node.children[i]));
 		}
-		return {val:v, children:c, colour:co};
+		return {val:v, children:c, tags:f};
 	}
 }
 
