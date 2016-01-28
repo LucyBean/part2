@@ -132,9 +132,16 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	for (i in possibleAppends) {
 		var ilabel = possibleAppends[i];
 		var meaning = Sk.ilabelMeaning(ilabel);
-		
 		// Converting back to a token number
 		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+		
+		// Prevent trying to insert a token that is the same type
+		// as the token that just came before it.
+		var prevToken = prevTokens[prevTokens.length-1];
+		if (prevToken.type === tokenNum) {
+			continue;
+		}
+		
 		
 		// fixedString represents the WHOLE PROGRAM
 		// fixedLine represents ONLY THE LINE.
@@ -163,12 +170,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			var c2 = genContext(nextToken.value);
 			
 			manualAdd(tokenNum, meaning, c1);
-			manualAdd(nextToken.type, nextToken.value, c2, fixErrs);
-			
-			
-			if (fixToken === undefined) {
-				fixToken = {type:tokenNum, value:meaning, context:c1}
-			}
+			manualAdd(nextToken.type, nextToken.value, c2, fixErrs-1);
 			
 			//parseFunc(stringEnd);
 			//manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
@@ -183,6 +185,10 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			
 			Sk.specialOutput.helpCode(stripTrailingNewLine(reportLine))
 			Sk.specialOutput.help(' appeared to work<br/>');
+			
+			if (fixToken === undefined) {
+				fixToken = {type:tokenNum, value:meaning, context:c1}
+			}
 		}
 		catch (err) {
 			Sk.debugout(stripTrailingNewLine(fixedLine) + ' was tried and did not work');

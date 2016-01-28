@@ -88,7 +88,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 	var root;
 	
 	if (fixErrs === undefined) {
-		fixErrs = 2;
+		fixErrs = 1;
 	}
 	
 	if (fixErrs < 0) {
