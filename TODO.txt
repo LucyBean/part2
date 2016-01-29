@@ -1,9 +1,0 @@
-split up tree - check parser tree objects
-fabric.js integration????
-parsing as the user types to check
-	prevent parsing twice at the same time
-	demon
-
-tealight integration???
-canvas drawing games maybe
-python google docs API to save work on my google drive

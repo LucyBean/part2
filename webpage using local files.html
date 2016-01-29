@@ -143,10 +143,10 @@ print(5+)</textarea><br />
 <script>
 var canvasF = new fabric.Canvas("myCanvas");
 var treeLineCanvasF = new fabric.Canvas("parseTree");
-var helpCanvasF = new fabric.Canvas("helpTree");
+var helpCanvas = new fabric.Canvas("helpTree");
 
 var treeByLine = [];
-var helpTrees = [];
+
 
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
 		lineNumbers: true,
@@ -195,16 +195,8 @@ specialOutput.help = function (text) {
 	helpArea.innerHTML = helpArea.innerHTML + text;
 }
 
-specialOutput.helpCode = function (text, tree) {
-	var line = text;
-	
-	// If a tree has been provided, allow it to be shown when the text is clicked
-	if (tree) {
-		var index = helpTrees.length;
-		helpTrees.push(tree);
-		line = "<tag onclick=\"drawTreeFabric(helpCanvasF, helpTrees[" + index + "], true)\">" + line + "</tag>";
-	}
-	specialOutput.help("<code>" + line + "</code>");
+specialOutput.helpCode = function (text) {
+	specialOutput.help("<code>" + text + "</code>");
 }
 
 specialOutput.addHelpTree = function (tree) {

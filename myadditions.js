@@ -92,14 +92,6 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var lines = Sk.help.splitToLines(stringStart);
 	var currentLine = lines[lineNo-1];
 	
-	var pos = 0;
-	var genContext = function (tokenVal) {
-		var len = tokenVal.length;
-		var context = [[lineNo, pos], [lineNo, pos+len], fixedLine];
-		pos += len;
-		return context;
-	}
-	
 	// Display the message to the user. I am using a filthy hack to make sure
 	// that this is only shown once per line.
 	// If this is the first time that an error has been shown then <string> will
@@ -108,10 +100,10 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	// starting from the position of the last error.
 	// So we can only show this message if <stringStart> is a prefix of <string>
 	if (string.startsWith(currentLine)) {
-		var tree = Sk.parseTrees.parseStackToTree(stack);
-		Sk.specialOutput.helpCode(stripTrailingNewLine(string), tree);
+		Sk.specialOutput.helpCode(stripTrailingNewLine(string));
 		Sk.specialOutput.help(" is an <b>invalid expression</b> on line " + lineNo + "<br/>");
 	}
+	
 	
 	// Extract the next token from the unparsed stringEnd
 	var stringEnd = string.substring(end-1);
@@ -132,36 +124,6 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		var a = alts[i];
 		var first = Sk.help.generateFirstSet(a);
 		possibleAppends.push.apply(possibleAppends, first);
-	}
-	
-	// Try to ignore the token before the error
-	try {
-		// Make new parser
-		var p = makeParser(undefined, undefined, fixErrs);
-		var parseFunc = p[0];
-		var manualAdd = p[1];
-		var parser = p[2];
-		
-		// Used for genContext
-		pos = 0;
-		
-		// Add all tokens except for the one immediately before the error
-		for (var i = 0; i < prevTokens.length-1; i++) {
-			manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
-		}
-		
-		// Add the token immediately after the error
-		manualAdd(nextToken.type, nextToken.value, genContext(nextToken.value), fixErrs-1);
-		
-		var tokens = Sk.help.extractTokensFromStack(parser.stack);
-		var reportLine = Sk.help.tokensToString(tokens);
-		var tree = Sk.parseTrees.parseStackToTree(parser.stack);
-		
-		Sk.specialOutput.helpCode(stripTrailingNewLine(reportLine), tree);
-		Sk.specialOutput.help(' appeared to work<br/>');
-	}
-	catch (err) {
-		Sk.debugout("Removing " + prevTokens[prevTokens.length-1] + " did not work.");
 	}
 	
 	// This variable is used to store the first ilabel encountered that fixes the problem
@@ -193,8 +155,13 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		var parser = p[2];
 		
 		try {
-			// Used for genContext
-			pos = 0;
+			var pos = 0;
+			var genContext = function (tokenVal) {
+				var len = tokenVal.length;
+				var context = [[lineNo, pos], [lineNo, pos+len], fixedLine];
+				pos += len;
+				return context;
+			}
 			
 			for (var i = 0; i < prevTokens.length; i++) {
 				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
@@ -205,8 +172,10 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			manualAdd(tokenNum, meaning, c1);
 			manualAdd(nextToken.type, nextToken.value, c2, fixErrs-1);
 			
+			//parseFunc(stringEnd);
+			//manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
+			
 			var reportLine = stripTrailingNewLine(fixedLine);
-			var tree = Sk.parseTrees.parseStackToTree(parser.stack);
 			
 			// If the token we have just add is NOT the last in the line then
 			// report back only the fragment we have parsed
@@ -214,7 +183,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 				reportLine = reportLine.substring(0,c2[1][1]) + "...";
 			}
 			
-			Sk.specialOutput.helpCode(stripTrailingNewLine(reportLine), tree);
+			Sk.specialOutput.helpCode(stripTrailingNewLine(reportLine))
 			Sk.specialOutput.help(' appeared to work<br/>');
 			
 			if (fixToken === undefined) {
