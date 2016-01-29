@@ -127,7 +127,7 @@ print(5+)</textarea><br />
 <div style="background-color:#ccaaff;">
 <table>
 	<tr>
-		<td style="width:500px">	
+		<td style="width:300px">	
 			<h2>Your code</h2>
 			<pre id="codeParsed" style="background-color:#ffddff">Code</pre>
 		</td>
@@ -143,9 +143,12 @@ print(5+)</textarea><br />
 <script>
 var canvasF = new fabric.Canvas("myCanvas");
 var treeLineCanvasF = new fabric.Canvas("parseTree");
-var helpCanvas = new fabric.Canvas("helpTree");
+var helpCanvasF = new fabric.Canvas("helpTree");
+treeLineCanvasF.setWidth(700);
+helpCanvasF.setWidth(700);
 
 var treeByLine = [];
+var helpTrees = [];
 
 
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
@@ -199,8 +202,12 @@ specialOutput.helpCode = function (text) {
 	specialOutput.help("<code>" + text + "</code>");
 }
 
-specialOutput.addHelpTree = function (tree) {
+specialOutput.suggestedReplacement = function (text, tree, context) {
+	var index = helpTrees.length;
+	helpTrees.push(tree);
+	var line = "<tag onclick = \"drawTreeFabric(helpCanvasF, helpTrees[" + index + "], true)\">" + text + "</tag>";
 	
+	specialOutput.helpCode(line);
 }
 
 

@@ -131,7 +131,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	
 	for (i in possibleAppends) {
 		var ilabel = possibleAppends[i];
-		var meaning = Sk.ilabelMeaning(ilabel);
+		var meaning = Sk.ilabelMeaning.niceToken(ilabel);
 		// Converting back to a token number
 		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
 		
@@ -142,10 +142,12 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			continue;
 		}
 		
+		// Do not bother trying to add in any opening brackets
+		// 30-(  14-[  9-{
+		if (["30","14","9"].indexOf(ilabel) !== -1) {
+			continue;
+		}
 		
-		// fixedString represents the WHOLE PROGRAM
-		// fixedLine represents ONLY THE LINE.
-		var fixedString = stringStart + meaning + nextToken.value + stringEnd;
 		var fixedLine = currentLine + meaning + nextToken.value + stringEnd;
 		
 		// Creates a new parser to check the parsing of this line
@@ -167,14 +169,13 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
 			}
 			var c1 = genContext(meaning);
-			var c2 = genContext(nextToken.value);
 			
 			manualAdd(tokenNum, meaning, c1);
-			manualAdd(nextToken.type, nextToken.value, c2, fixErrs-1);
 			
-			//parseFunc(stringEnd);
-			//manualAdd(4, Sk.Tokenizer.tokenNames[4], genContext('\n'));
+			var c2 = genContext(nextToken.value);
+			manualAdd(nextToken.type, nextToken.value, c2, 0);
 			
+			var tree = Sk.parseTrees.parseStackToTree(parser.stack);			
 			var reportLine = stripTrailingNewLine(fixedLine);
 			
 			// If the token we have just add is NOT the last in the line then
@@ -183,7 +184,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 				reportLine = reportLine.substring(0,c2[1][1]) + "...";
 			}
 			
-			Sk.specialOutput.helpCode(stripTrailingNewLine(reportLine))
+			Sk.specialOutput.suggestedReplacement(stripTrailingNewLine(reportLine), tree, c1);
 			Sk.specialOutput.help(' appeared to work<br/>');
 			
 			if (fixToken === undefined) {

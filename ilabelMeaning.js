@@ -86,16 +86,31 @@ Sk.ilabelMeaning.keywords = function (ilabel) {
 Sk.ilabelMeaning.token = function (ilabel) {
 	var tn = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
 	return Sk.Tokenizer.tokenNames[tn];
-	//return Sk.Tokenizer.tokenNames[ilabel];
 };
+
+Sk.ilabelMeaning.niceToken = function (ilabel) {
+	var tn = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+	
+	niceNames = {
+		0:"END",	1:"Name",	2:"Number",	3:"String",	4:"NEWLINE",
+		5:"INDENT",	6:"DEDENT",	7:"(",		8:")",		9:"[",
+		10:"]",		11:":",		12:",",		13:";",		14:"+",
+		15:"-",		16:"*",		17:"/",		18:"|",		19:"&",
+		20:"<",		21:">",		22:"=",		23:".",		24:"%",
+		25:"\\",	26:"{",		27:"}",		28:"==",	29:"!=",
+		30:"<=",	31:">=",	32:"~",		33:"^",		34:"<<",
+		35:">>",	36:"**",	37:"+=",	38:"-=",	39:"*=",
+		40:"/=",	41:"%=",	42:"&=",	43:"|=",	44:"^=",
+		45:"<<=",	46:">>=",	47:"**=",	48:"//",	49:"//=",
+		50:"@",		51:"OP",	52:"COMMENT",			53:"NL",
+		54:"->",	55:"ERR",	56:"N_TOKENS",			57:"NT_OFFSET"
+	}
+	
+	return niceNames[tn];
+}
 
 Sk.ilabelMeaning.nonterms = function (ilabel) {
 	return Sk.ParseTables.number2symbol[ilabel];
-	/*ilabel -= 257;
-	
-	if (ilabel >= 0) {
-		return Object.keys(Sk.ParseTables.sym)[ilabel];
-	}*/
 };
 
 Sk.ilabelMeaning.ilabelToTokenNumber = function (ilabel) {
