@@ -145,7 +145,7 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		
 		// fixedString represents the WHOLE PROGRAM
 		// fixedLine represents ONLY THE LINE.
-		var fixedString = stringStart + meaning  + nextToken.value + stringEnd;
+		var fixedString = stringStart + meaning + nextToken.value + stringEnd;
 		var fixedLine = currentLine + meaning + nextToken.value + stringEnd;
 		
 		// Creates a new parser to check the parsing of this line
