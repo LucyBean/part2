@@ -239,21 +239,8 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 				var a = Sk.parseTrees.parseStackToTree(this.stack);
 				Sk.specialOutput.drawTreeMain(a, true);
 				// Find a valid token that can be inserted at this point
-				var fixToken = Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
-				
-				// Manually add it, the current token, and return the result
-				this.addtoken(fixToken.type, fixToken.value, fixToken.context, 0);
-				
-				// Getting the corrected context
-				var lineNo = fixToken.context[0][0];
-				var pos = fixToken.context[1][1];
-				var len = value.length;
-				var fixedContext = [[lineNo, pos], [lineNo, pos+len], fixToken.context[2]];
-				
-				return this.addtoken(type, value, fixedContext, 0);
+				Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
 			}
-			
-			//Sk.help.parseStackDump(this.stack);
 			
             // no transition
 			console.log("Parsing error: " + context[2]);

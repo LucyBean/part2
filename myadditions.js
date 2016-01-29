@@ -92,19 +92,6 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var lines = Sk.help.splitToLines(stringStart);
 	var currentLine = lines[lineNo-1];
 	
-	// Display the message to the user. I am using a filthy hack to make sure
-	// that this is only shown once per line.
-	// If this is the first time that an error has been shown then <string> will
-	// hold the actual string attempting to be parsed. If this is the second error
-	// fix being attempted for the line then <string> will hold the text in the line
-	// starting from the position of the last error.
-	// So we can only show this message if <stringStart> is a prefix of <string>
-	if (string.startsWith(currentLine)) {
-		Sk.specialOutput.helpCode(stripTrailingNewLine(string));
-		Sk.specialOutput.help(" is an <b>invalid expression</b> on line " + lineNo + "<br/>");
-	}
-	
-	
 	// Extract the next token from the unparsed stringEnd
 	var stringEnd = string.substring(end-1);
 	var nextToken = Sk.Tokenizer.extractOneToken(stringEnd);
@@ -126,9 +113,28 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		possibleAppends.push.apply(possibleAppends, first);
 	}
 	
-	// This variable is used to store the first ilabel encountered that fixes the problem
-	var fixToken;
+	var alts = [];
 	
+	// Try to remove the top token in the stack
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// Try to insert a single token
 	for (i in possibleAppends) {
 		var ilabel = possibleAppends[i];
 		var meaning = Sk.ilabelMeaning.niceToken(ilabel);
@@ -184,19 +190,22 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 				reportLine = reportLine.substring(0,c2[1][1]) + "...";
 			}
 			
-			Sk.specialOutput.suggestedReplacement(stripTrailingNewLine(reportLine), tree, c1);
-			Sk.specialOutput.help(' appeared to work<br/>');
-			
-			if (fixToken === undefined) {
-				fixToken = {type:tokenNum, value:meaning, context:c1}
-			}
+			var alt = {text:reportLine, tree:tree, context:c1};
+			alts.push(alt);
 		}
 		catch (err) {
 			Sk.debugout(stripTrailingNewLine(fixedLine) + ' was tried and did not work');
 		}
 	}
-	
-	return fixToken;
+	var otext = stringStart + nextToken.value
+	// If there were unparsed characters then add a "...";
+	if (otext.length !== stripTrailingNewLine(string).length) {
+		otext += "...";
+	}
+	var otree = Sk.parseTrees.parseStackToTree(stack);
+	var org = {text:otext, tree:otree, context:context};
+
+	Sk.specialOutput.displayAlternatives(org, alts);	
 };
 
 // Attempts to fix unbalanced brackets by inserting brackets into the line

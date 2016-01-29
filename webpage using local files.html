@@ -115,8 +115,16 @@ print(5+)</textarea><br />
 
 <div id="helpParent" style="background-color:#ff99cc">
 <h2>Help</h2>
-<div id="help"></div>
-<canvas id="helpTree"></canvas>
+<table>
+	<tr>
+		<td style="width:300px">
+			<div id="help"></div>
+		</td>
+		<td>
+			<canvas id="helpTree"></canvas>
+		</td>
+	</tr>
+</table>
 </div>
 
 <div>
@@ -202,14 +210,25 @@ specialOutput.helpCode = function (text) {
 	specialOutput.help("<code>" + text + "</code>");
 }
 
-specialOutput.suggestedReplacement = function (text, tree, context) {
+specialOutput.suggestedReplacement = function (alt) {
 	var index = helpTrees.length;
-	helpTrees.push(tree);
-	var line = "<tag onclick = \"drawTreeFabric(helpCanvasF, helpTrees[" + index + "], true)\">" + text + "</tag>";
+	helpTrees.push(alt.tree);
+	var line = "<tag onclick = \"drawTreeFabric(helpCanvasF, helpTrees[" + index + "], true)\">" + alt.text + "</tag>";
 	
 	specialOutput.helpCode(line);
 }
 
+specialOutput.displayAlternatives = function (original, alts) {
+	var out = specialOutput;
+	
+	out.help("Original: ") + out.suggestedReplacement(original) + out.help(" did not work<br>");
+	
+	for (i in alts) {
+		out.suggestedReplacement(alts[i]) + out.help(" may work.<br>");
+	}
+	
+	drawTreeFabric(helpCanvasF, original.tree, true);
+}
 
 // Here's everything you need to run a python program in skulpt
 // grab the code from your textarea
