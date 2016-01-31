@@ -73,6 +73,8 @@ Sk.Tokenizer.extractOneToken = function (string) {
 	return token;
 }
 
+Sk.fix = {};
+
 Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
@@ -723,49 +725,102 @@ Sk.find.unbalancedBrackets = function (input) {
 	
 	var brackets = "()[]{}";
 	var extractedBrackets = [];
+	var unmatchedBrackets = [];
 	
 	// Extract all the brackets and their positions in the string
 	for (var k = 0; k < lines.length; k++) {
 		var index = brackets.indexOf(lines.charAt(k));
 		
 		if (index !== -1) {
-			extractedBrackets.push({type:brackets.charAt(index), pos:k, matched:false});
+			var b = {type:brackets.charAt(index), pos:k, matched:false};
+			extractedBrackets.push(b);
+			unmatchedBrackets.push(b);
 		}
 	}
 	
-	// Remove matching pairs of brackets
-	var i = 0;
-	while (i < extractedBrackets.length - 1) {
-		if (extractedBrackets[i].matched) {
-			// The current bracket we are checking has been matched
-			i++;
-		} else {
-			// The bracket has been unmatched
-			var current = extractedBrackets[i];
+	var changed = true;
+	
+	// Repeatedly remove adjacent brackets until nothing happens
+	OUTERWHILE:
+	while (changed) {
+		changed = false;
+		
+		// Remove adjacent pairs of unmatched brackets
+		for (var i = 0; i < unmatchedBrackets.length-1; i++) {
+			var now = unmatchedBrackets[i];
+			var next = unmatchedBrackets[i+1];
 			
-			// Find the next unmatched bracket
-			while (i < extractedBrackets.length - 1 && extractedBrackets[i+1].matched) {
-				i++;
-			}
-			if (i === extractedBrackets.length - 1) {
-				break;
-			}
-			var next = extractedBrackets[i+1];
+			var nown = brackets.indexOf(now.type);
+			var nexn = brackets.indexOf(next.type);
 			
-			// Check if they can be matched up
-			var cn = brackets.indexOf(current.type);
-			var nn = brackets.indexOf(next.type);
-			
-			// If they are a matching pair of brackets, mark them as matched
-			// and start from the beginning
-			if (cn%2 == 0 && nn === cn + 1) {
-				current.matched = true;
+			// If they match, mark them as matched and remove them
+			if (nown%2 === 0 && nexn === nown + 1) {
+				now.matched = true;
 				next.matched = true;
-				i = 0;
+				unmatchedBrackets.splice(i,2);
+				changed = true;
+				continue OUTERWHILE;
 			}
-			// Else move on to next bracket
-			else {
-				i++;
+			// If they're an adjacent open/close pair that do not match
+			// then one needs to be removed
+			else if (nown%2 === 0 && nexn%2 === 1) {
+				// <now> is an opening bracket. Search right to find its
+				// closest closing bracket
+				var nowMatch = i+2;
+				var nowf = false;
+				while (nowMatch < unmatchedBrackets.length && !nowf) {
+					if (brackets.indexOf(unmatchedBrackets[nowMatch].type) === nown+1) {
+						nowf = true;
+					} else {
+						nowMatch++;
+					}
+				}
+				
+				// <next> is a closing bracket. Search left to find its
+				// closest opening bracket
+				var nextMatch = i-1;
+				var nexf = false;
+				
+				while (nextMatch >= 0 && !nexf) {
+					if (nexn == brackets.indexOf(unmatchedBrackets[nextMatch].type)+1) {
+						nexf = true;
+					} else {
+						nextMatch--;
+					}
+				}
+				
+				// Discard one or the other, depending on how far away the match is
+				// Throw away brackets found to have no match
+				if (!nowf && !nexf) {
+					now.matched = false;
+					next.matched = false;
+					unmatchedBrackets.splice(i,2);
+					changed = true;
+					continue OUTERWHILE;
+				}
+				else if (!nowf && nexf) {
+					now.matched = false;
+					unmatchedBrackets.splice(i,1);
+					changed = true;
+					continue OUTERWHILE;
+				}
+				else if (!nexf && nowf) {
+					next.matched = false;
+					unmatchedBrackets.splice(i+1,1);
+					changed = true;
+					continue OUTERWHILE;
+				}
+				else if (nowf && nexf) {
+					if (nowMatch - i > (i+1) - nextMatch) {
+						now.matched = false;
+						unmatchedBrackets.splice(i,1);
+					} else {
+						next.matched = false;
+						unmatchedBrackets.splice(i+1,1);
+					}
+					changed = true;
+					continue OUTERWHILE;
+				}
 			}
 		}
 	}
@@ -775,7 +830,7 @@ Sk.find.unbalancedBrackets = function (input) {
 	for (j in extractedBrackets) {
 		var b = extractedBrackets[j];
 		if (!b.matched) {
-			Sk.debugout('Unmatched bracket ' + b.type + ' at ' + b.pos);
+			console.log('Unmatched bracket ' + b.type + ' at ' + b.pos);
 			balanced = false;
 		}
 	}

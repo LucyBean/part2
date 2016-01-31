@@ -24,7 +24,7 @@ table, tr, td {
 <canvas id="c" style="border-style:solid; border-width:1px;"></canvas>
 </div>
 
-<textarea id="text" style="width:300px"></textarea><br>
+<textarea id="text" style="width:300px">(((])))</textarea><br>
 <button type="button" onclick="drawLine()">Display brackets</button>
 
 <div id="canvasDiv">
@@ -60,13 +60,11 @@ drawExample1 = function () {
 }
 
 drawExample2 = function () {
-	var line = "Hello (world) (((do)))";
+	var line = "(])";
 	var canvas = f;
 	
 	drawBrackets(canvas,line);
 }
-
-drawExample2();
 
 function runit() {
 	var canvasName = "canvas" + canvasIndex;
