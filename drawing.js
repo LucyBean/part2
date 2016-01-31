@@ -4,6 +4,10 @@ var padding = 20;
 var margin = 5;
 var textSize = 14;
 
+var bracketStyle = {};
+bracketStyle.padding = 2;
+bracketStyle.ySpacing = 20;
+
 setStyle = function (width, height, pad, f) {
 	cellWidth = width;
 	cellHeight = height;
@@ -148,21 +152,22 @@ drawBrackets = function (canvas, line) {
 	
 	// Separate the string into sections
 	for (var i = 0; i < brackets.length; i++) {
-		var string;
-		// If it is an opening bracket, extract up to and including the bracket
+		// If it is an opening bracket, extract
 		// Increment the bracket depth
 		if (openB.indexOf(brackets[i].type) !== -1) {
-			string = line.substring(ptr, brackets[i].pos+1);
-			ptr = brackets[i].pos+1;
+			var string = line.substring(ptr, brackets[i].pos);
 			segments.push({text:string, depth:depth});
+			segments.push({text:brackets[i].type, depth:depth, matched:brackets[i].matched});
+			ptr = brackets[i].pos+1;
 			depth++;
 		}
 		// Else, extract up to but excluding the bracket
 		// Decrement the bracket depth
 		else {
-			string = line.substring(ptr, brackets[i].pos);
-			ptr = brackets[i].pos;
+			var string = line.substring(ptr, brackets[i].pos);
 			segments.push({text:string, depth:depth});
+			segments.push({text:brackets[i].type, depth:depth-1, matched:brackets[i].matched});
+			ptr = brackets[i].pos+1;
 			depth--;
 		}
 	}
@@ -181,10 +186,28 @@ drawBrackets = function (canvas, line) {
 	
 	// Add each segment of text
 	for (var i = 0; i < segments.length; i++) {
-		var t = new fabric.Text(segments[i].text, {fontSize:textSize, fontFamily:"Arial", left:xRel+xStart, top:yStart + 40*segments[i].depth});
-		xRel += t.getWidth();
+		var group = new fabric.Group([],{left:xRel+xStart, top:yStart + bracketStyle.ySpacing*segments[i].depth});
+		var t = new fabric.Text(segments[i].text, {fontSize:textSize, fontFamily:"Arial"});
+		group.add(t);
 		
-		canvas.add(t);
+		// Highlight brackets according to matched label
+		if (segments[i].matched !== undefined) {
+			var rect = new fabric.Rect({width:t.getWidth()+bracketStyle.padding, height:t.getHeight(), left:-bracketStyle.padding/2});
+			t.set({fill:'white'});
+			if (segments[i].matched) {
+				rect.set({fill:'green'});
+			}
+			else {
+				rect.set({fill:'red'});
+			}
+			
+			// <t> is added again so it is drawn above the box
+			group.add(rect);
+			group.add(t);
+		}
+		xRel += t.getWidth() + bracketStyle.padding;
+		
+		canvas.add(group);
 	}
 }
 
