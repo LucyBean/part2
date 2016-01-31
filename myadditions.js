@@ -73,8 +73,6 @@ Sk.Tokenizer.extractOneToken = function (string) {
 	return token;
 }
 
-Sk.fix = {};
-
 Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
@@ -219,7 +217,7 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 	var offset = 0;
 	
 	if (brackets === undefined) {
-		brackets = Sk.find.ubalancedBrackets(input);
+		brackets = Sk.find.unbalancedBrackets(input);
 	}
 	
 	var extractedBrackets = brackets.brackets;

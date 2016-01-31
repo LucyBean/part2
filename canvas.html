@@ -1,6 +1,6 @@
 <html>
 <head>
-<script src = "drawing.js" type="text/javascript"></script>
+<script src="drawing.js" type="text/javascript"></script>
 
 <!-- fabric.js-->
 <script src="./fabric/dist/fabric.js" type="text/javascript"></script>
@@ -24,9 +24,13 @@ table, tr, td {
 <canvas id="c" style="border-style:solid; border-width:1px;"></canvas>
 </div>
 
+<textarea id="text" style="width:300px"></textarea><br>
+<button type="button" onclick="drawLine()">Display brackets</button>
+
 <div id="canvasDiv">
 <button type="button" onclick="addSquare()">Draw a box</button> <br>
 </div>
+
 
 <script>
 var f = new fabric.Canvas('c');
@@ -37,13 +41,10 @@ var canvasDiv = document.getElementById("canvasDiv");
 var canvasIndex = 0;
 var canvases = [];
 
-
-drawExample1 = function (canvas) {
-	var ctx = canvas.getContext("2d");
-	ctx.font = "30px Arial";
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-
+drawExample1 = function () {
+	var canvas = f;
+	canvas.clear();
+	
 	var tree = {val:"a", children:[
 		{val:"b", children:[
 			{val:"d", children:[
@@ -55,9 +56,17 @@ drawExample1 = function (canvas) {
 		{val:"c"}
 	]};
 
-	setStyle(100, 40, 10);
-	drawTree(ctx, tree, canvas);
+	drawTreeFabric(canvas, tree, true);
 }
+
+drawExample2 = function () {
+	var line = "Hello (world) (((do)))";
+	var canvas = f;
+	
+	drawBrackets(canvas,line);
+}
+
+drawExample2();
 
 function runit() {
 	var canvasName = "canvas" + canvasIndex;
@@ -70,8 +79,15 @@ function runit() {
 }
 
 function addSquare() {
+	f.clear();
 	var r = new fabric.Rect({left:60, top:40, fill:'#88ccaa', width:90, height:40});
 	f.add(r);
+}
+
+function drawLine() {
+   var box = document.getElementById("text");
+   var line = box.value;
+   drawBrackets(f, line);
 }
 </script>
 
