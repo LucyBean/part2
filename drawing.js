@@ -1,17 +1,21 @@
-var cellWidth = 120;
-var cellHeight = 40;
-var padding = 20;
-var margin = 5;
-var textSize = 14;
+drawing = {};
+treeStyle = {};
+bracketStyle = {};
 
-var bracketStyle = {};
+drawing.textSize = 14;
+
+treeStyle.cellWidth = 120;
+treeStyle.cellHeight = 40;
+treeStyle.padding = 20;
+treeStyle.margin = 5;
+
 bracketStyle.padding = 2;
 bracketStyle.ySpacing = 20;
 
 setStyle = function (width, height, pad, f) {
-	cellWidth = width;
-	cellHeight = height;
-	padding = pad;
+	treeStyle.cellWidth = width;
+	treeStyle.cellHeight = height;
+	treeStyle.padding = pad;
 	font = f;
 }
 
@@ -35,16 +39,16 @@ addDrawingInformation = function (node, depth) {
 		
 		// Add drawing information to each child
 		for (var i = 0; i < node.children.length; i++) {
-			var childMaxDepth = addDrawingInformation(node.children[i], depth+1, cellWidth, padding);
+			var childMaxDepth = addDrawingInformation(node.children[i], depth+1, treeStyle.cellWidth, treeStyle.padding);
 			
 			// Calculate the total width needed to display all the ancestors of this node
 			node.width += node.children[i].width;
 			childXTotal += node.children[i].x + offset;
 			
-			offset += node.children[i].width + padding;
+			offset += node.children[i].width + treeStyle.padding;
 			
 			if (i < node.children.length - 1) {
-				node.width += padding;
+				node.width += treeStyle.padding;
 			}
 			
 			// Find the maximum depth ancestor
@@ -62,7 +66,7 @@ addDrawingInformation = function (node, depth) {
 	
 	// For a leaf node
 	else {
-		node.width = cellWidth;
+		node.width = treeStyle.cellWidth;
 		node.x = 0;
 		node.depth = depth;
 		
@@ -83,10 +87,10 @@ drawTreeFabric = function (canvas, node, scaleCanvas, info) {
 	
 	if (scaleCanvas){
 		var width = node.width;
-		var height = depth* (cellHeight + padding) - padding;
+		var height = depth* (treeStyle.cellHeight + treeStyle.padding) - treeStyle.padding;
 		
-		canvas.setWidth(width+2*margin);
-		canvas.setHeight(height+2*margin);
+		canvas.setWidth(width+2*treeStyle.margin);
+		canvas.setHeight(height+2*treeStyle.margin);
 	}
 	
 	drawNodeFabric(canvas, node, info);
@@ -94,12 +98,12 @@ drawTreeFabric = function (canvas, node, scaleCanvas, info) {
 
 drawNodeFabric = function (canvas, node, info, offset) {
 	if (offset === undefined) {
-		offset = margin;
+		offset = treeStyle.margin;
 	}
 	
 	//draw this node
 	var x = node.x + offset;
-	var y = node.depth * (cellHeight + padding) + margin;
+	var y = node.depth * (treeStyle.cellHeight + treeStyle.padding) + treeStyle.margin;
 	var t = info(node);
 	var colour = "#ffffff";
 	
@@ -112,11 +116,11 @@ drawNodeFabric = function (canvas, node, info, offset) {
 		}
 	}
 	
-	var rect = new fabric.Rect({fill:colour, width:cellWidth, height:cellHeight, stroke:'black'});
+	var rect = new fabric.Rect({fill:colour, width:treeStyle.cellWidth, height:treeStyle.cellHeight, stroke:'black'});
 	
 	//var text = new fabric.Text(t, {left:x, top:y, fontSize:20, fontFamily:'Arial', textAlign:'center'});
-	var text = new fabric.Text(t, {fontSize:textSize, fontFamily:'Arial', textAlign:'center'});
-	text.set({left:(cellWidth-text.getWidth())/2, top:(cellHeight-text.getHeight())/2});
+	var text = new fabric.Text(t, {fontSize:drawing.textSize, fontFamily:'Arial', textAlign:'center'});
+	text.set({left:(treeStyle.cellWidth-text.getWidth())/2, top:(treeStyle.cellHeight-text.getHeight())/2});
 	
 	var group = new fabric.Group([rect, text], {left:x, top:y});
 	group.hasControls = false;
@@ -126,17 +130,17 @@ drawNodeFabric = function (canvas, node, info, offset) {
 	// Draw the children
 	if (node.children) {
 		for (var i = 0; i < node.children.length; i++) {
-			var x1 = x+cellWidth/2;
-			var y1 = y+cellHeight;
-			var x2 = offset+node.children[i].x+cellWidth/2;
-			var y2 = y+cellHeight+padding;
+			var x1 = x+treeStyle.cellWidth/2;
+			var y1 = y+treeStyle.cellHeight;
+			var x2 = offset+node.children[i].x+treeStyle.cellWidth/2;
+			var y2 = y+treeStyle.cellHeight+treeStyle.padding;
 			
 			var line = new fabric.Line([x1,y1,x2,y2], {stroke: 'black'});
 			canvas.add(line);
 			line.selectable = false;
 			drawNodeFabric(canvas, node.children[i], info, offset);
 			
-			offset += node.children[i].width + padding;
+			offset += node.children[i].width + treeStyle.padding;
 		}
 	}
 }
@@ -178,7 +182,7 @@ drawBrackets = function (canvas, line) {
 	// Display the segments of text with the y co-ordinate modified according to the depth
 	
 	// Calculate the total width of the text
-	var text = new fabric.Text(line, {fontSize:textSize, fontFamily:"Arial"});
+	var text = new fabric.Text(line, {fontSize:drawing.textSize, fontFamily:"Arial"});
 	var width = text.getWidth();
 	var xStart = 20;
 	var yStart = 20;
@@ -187,7 +191,7 @@ drawBrackets = function (canvas, line) {
 	// Add each segment of text
 	for (var i = 0; i < segments.length; i++) {
 		var group = new fabric.Group([],{left:xRel+xStart, top:yStart + bracketStyle.ySpacing*segments[i].depth});
-		var t = new fabric.Text(segments[i].text, {fontSize:textSize, fontFamily:"Arial"});
+		var t = new fabric.Text(segments[i].text, {fontSize:drawing.textSize, fontFamily:"Arial"});
 		group.add(t);
 		
 		// Highlight brackets according to matched label
