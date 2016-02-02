@@ -213,51 +213,83 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 Sk.fix.unbalancedBrackets = function (input, brackets) {
 	var b = "()[]{}";
 	
-	// <offset> measures the number of characters inserted and deleted. This is
-	// used to translate between the position of the brackets in the original
-	// string and their position in the edited string
-	var offset = 0;
-	
 	if (brackets === undefined) {
 		brackets = Sk.find.unbalancedBrackets(input);
 	}
-	
 	var extractedBrackets = brackets.brackets;
 	
-	for (var i = 0; i < extractedBrackets.length; i++) {
-		var current = extractedBrackets[i];
+	// For unbalanced opening brackets, we will use three strategies
+	// 0 - Simply remove the offending bracket
+	// 1 - Add a corresponding closing bracket immediately next to the
+	//     offending bracket
+	// 2 - Add a closing bracket immediately before the next closing bracket
+	//
+	// Unmatched closing brackets will always be deleted.
+	var strategies = 3;
+	
+	var fixes = [];
+	
+	for (var j = 0; j < strategies; j++) {
+		var copy = input;
 		
-		if (!current.matched) {
-			var index = b.indexOf(current.type);
+		// <offset> measures the number of characters inserted and deleted. This is
+		// used to translate between the position of the brackets in the original
+		// string and their position in the edited string
+		var offset = 0;
+		var modified = false;
+		
+		for (var i = 0; i < extractedBrackets.length; i++) {
+			var current = extractedBrackets[i];
 			
-			// If it is an unmatched opening bracket
-			if (index % 2 === 0) {
-				var closeBracket = b[index+1];
-				// Insert the corresponding closing bracket before
-				// the next bracket or at EOF
-				var next = extractedBrackets[i+1];
-				if (next === undefined) {
-					input = input + closeBracket;
+			if (!current.matched) {
+				var index = b.indexOf(current.type);
+				
+				// If it is an unmatched opening bracket
+				if (index % 2 === 0) {
+					var closeBracket = b[index+1];
+					// Choose tactic according to strategy
+					if (j === 0) {
+						// Delete the offending bracket from the copy
+						copy = copy.slice(0, current.pos + offset) + copy.slice(current.pos + 1 + offset);
+						offset--;
+						modified = true;
+					} else if (j === 1) {
+						// Insert a closing bracket adjacent
+						copy = copy.slice(0, current.pos + offset + 1) + closeBracket + copy.slice(current.pos + offset + 1);
+						offset++;
+						modified = true;
+					} else if (j === 2) {
+						// Insert the closing bracket before the next bracket
+						// If the next bracket is adjacent then ignore
+						var next = extractedBrackets[i+1];
+						if (next === undefined) {
+							copy = copy + closeBracket;
+							modified = true;
+						} else if (next.pos === current.pos + 1) {
+							continue;
+						} else {
+							copy = copy.slice(0, next.pos + offset) + closeBracket + copy.slice(next.pos + offset);
+							offset++;
+							modified = true;
+						}
+					}
 				}
+				// Else it is an unmatched closing bracket
 				else {
-					input = input.slice(0, next.pos + offset) + closeBracket + input.slice(next.pos + offset);
-					offset++;
+					// Delete the offending bracket from the copy
+					copy = copy.slice(0, current.pos + offset) + copy.slice(current.pos + 1 + offset);
+					offset--;
+					modified = true;
 				}
 			}
-			// Else it is an unmatched closing bracket
-			else {
-				// Delete the offending bracket from the input
-				input = input.slice(0, current.pos + offset) + input.slice(current.pos + 1 + offset);
-				offset--;
-			}
+		}
+		
+		if (modified && Sk.help.checkParse(copy)) {
+			fixes.push(copy);
 		}
 	}
 	
-	Sk.specialOutput.help("<br>Try: ");
-	Sk.specialOutput.helpCode(input);
-	if (Sk.help.checkParse(input)) {
-		return input;
-	}
+	return fixes;
 };
 
 /**

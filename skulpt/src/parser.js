@@ -470,7 +470,7 @@ Sk.parse = function parse (filename, input) {
 	for (var j = 0; j < lines.length; j++) {
 		var errPos = Sk.find.unfinishedString(lines[j]);
 		if (errPos) {
-			Sk.helpout("<br>There's an unterminated string at " + errPos + " on line " + j);
+			Sk.specialOutput.help("<br>There's an unterminated string at " + errPos + " on line " + j);
 			var fix = Sk.fix.eolInString(lines[j], errPos);
 			
 			if (fix) {
@@ -484,15 +484,17 @@ Sk.parse = function parse (filename, input) {
 		var brackets = Sk.find.unbalancedBrackets(lines[j]);
 		
 		if (!brackets.isvalid) {
-			Sk.helpout("<br>Line " + j + " has unbalanced brackets");
+			Sk.specialOutput.suggestedBrackets(lines[j]);
+			Sk.specialOutput.help(" has unbalanced brackets.<br>");
+			
 			var fix = Sk.fix.unbalancedBrackets(lines[j], brackets);
 			
-			if (fix !== undefined) {
-				lines[j] = fix;
+			for (f in fix) {
+				Sk.specialOutput.suggestedBrackets(fix[f]);
+				Sk.specialOutput.help(" may work.<br>");
 			}
-			else {
-				// The error could not be fixed
-			}
+			
+			throw new Sk.builtin.ParseError("Unbalanced brackets.", this.filename);
 		}
 	}
 	

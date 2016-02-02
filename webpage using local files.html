@@ -103,7 +103,7 @@ canvas {
 <form>
 
 <textarea id="yourcode">
-print(5+)</textarea><br /> 
+print((5+2)</textarea><br /> 
 <button type="button" onclick="runit()">Run</button> 
 </form>
 
@@ -157,6 +157,7 @@ helpCanvasF.setWidth(700);
 
 var treeByLine = [];
 var helpTrees = [];
+var helpBrackets = [];
 
 
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
@@ -186,17 +187,20 @@ function debugOut(arg) {
 
 var specialOutput = {};
 
+var drawTree = Sk.drawing.drawTreeFabric;
+var drawBrackets = Sk.drawing.drawBrackets;
+
 specialOutput.addLineParseTree = function (treeLine) {	
 	var index = treeByLine.length;
 	treeByLine.push(treeLine.tree);
-	var taggedLine = "<tag onclick=\"drawTreeFabric(treeLineCanvasF, treeByLine[" + index + "], true)\">" + treeLine.line + "</tag>";
+	var taggedLine = "<tag onclick=\"drawTree(treeLineCanvasF, treeByLine[" + index + "], true)\">" + treeLine.line + "</tag>";
 	
 	var codeDisplay = document.getElementById("codeParsed");
 	codeDisplay.innerHTML = codeDisplay.innerHTML + taggedLine;
 }
 
 specialOutput.drawTreeMain = function(node, scaleCanvas, info) {
-	drawTreeFabric(canvasF, node, scaleCanvas, info);
+	drawTree(canvasF, node, scaleCanvas, info);
 }
 
 specialOutput.help = function (text) {
@@ -213,7 +217,15 @@ specialOutput.helpCode = function (text) {
 specialOutput.suggestedReplacement = function (alt) {
 	var index = helpTrees.length;
 	helpTrees.push(alt.tree);
-	var line = "<tag onclick = \"drawTreeFabric(helpCanvasF, helpTrees[" + index + "], true)\">" + alt.text + "</tag>";
+	var line = "<tag onclick = \"drawTree(helpCanvasF, helpTrees[" + index + "], true)\">" + alt.text + "</tag>";
+	
+	specialOutput.helpCode(line);
+}
+
+specialOutput.suggestedBrackets = function (alt) {
+	var index = helpBrackets.length;
+	helpBrackets.push(alt);
+	var line = "<tag onclick = \"drawBrackets(helpCanvasF, helpBrackets[" + index + "])\">" + alt + "</tag>";
 	
 	specialOutput.helpCode(line);
 }
@@ -227,7 +239,7 @@ specialOutput.displayAlternatives = function (original, alts) {
 		out.suggestedReplacement(alts[i]) + out.help(" may work.<br>");
 	}
 	
-	drawTreeFabric(helpCanvasF, original.tree, true);
+	drawTree(helpCanvasF, original.tree, true);
 }
 
 // Here's everything you need to run a python program in skulpt
@@ -248,6 +260,10 @@ function runit() {
    
    canvasF.clear();
    treeLineCanvasF.clear();
+   
+   helpTrees = [];
+   helpBrackets = [];
+   treeByLine = [];
    
    Sk.pre = "output";
    Sk.configure({output:outf, read:builtinRead, debugout:debugOut, specialOutput:specialOutput});
