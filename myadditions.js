@@ -75,20 +75,78 @@ Sk.Tokenizer.extractOneToken = function (string) {
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
+Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var lineNo = context[0][0];
 	var string = context[2];
 	fixErrs = fixErrs || 0;
 	
-	// Extract the currently parsed string from the stack
-	// By extracting it from the stack rather than the context, we can
-	// use a recursive approach
-	// This is compiled into a string for the context
-	var prevTokens = Sk.help.extractTokensFromStack(stack);
-	var stringStart = Sk.help.tokensToString(prevTokens);
+	var alts = [];
+	var fixedLine;
+	var pos = 0;
+	var genContext = function (tokenVal) {
+		var len = tokenVal.length;
+		var con = [[lineNo, pos], [lineNo, pos+len], fixedLine];
+		pos += len;
+		return con;
+	}
 	
+	var prevTokens = Sk.help.extractTokensFromStack(stack);
+	
+	// Try to remove the previous token
+	{
+		var stringStart = Sk.help.tokensToString(prevTokens.slice(0,prevTokens.length-1));
+		var lines = Sk.help.splitToLines(stringStart);
+		var currentLine = lines[lineNo-1];
+		var stringEnd = string.substring(end-1);
+		var nextToken = Sk.Tokenizer.extractOneToken(stringEnd);
+		stringEnd = stringEnd.slice(nextToken.value.length);
+		
+		if (string.length === end) {
+			nextToken.type = 4;
+		}
+		
+		var p = makeParser(undefined, undefined, fixErrs);
+		var parseFunc = p[0];
+		var manualAdd = p[1];
+		var parser = p[2];
+		
+		try {
+			pos = 0;
+			fixedLine = currentLine + nextToken.value + stringEnd;
+			
+			for (var i = 0; i < prevTokens.length-1; i++) {
+				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
+			}
+			
+			var c2 = genContext(nextToken.value);
+			manualAdd(nextToken.type, nextToken.value, c2, 0);
+			
+			var tree = Sk.parseTrees.parseStackToTree(parser.stack);			
+			var reportLine = stripTrailingNewLine(fixedLine);
+			
+			// If the token we have just add is NOT the last in the line then
+			// report back only the fragment we have parsed
+			if (c2[1][1] !== reportLine.length && nextToken.type !== 4) {
+				reportLine = reportLine.substring(0,c2[1][1]) + "...";
+			}
+			
+			var alt = {text:reportLine, tree:tree, context:c2};
+			alts.push(alt);
+		}
+		catch (err) {
+			Sk.debugout(stripTrailingNewLine(fixedLine) + ' was tried and did not work');
+		}
+	}
+	
+	// Try to add in a token
+	
+	// Extract the currently parsed string from the stack to recover the
+	// string that has actually been parsed. If multiple errors fixes
+	// are corrected per line then <context[2]> may be insufficient
+	// This is compiled into a string for the context
+	var stringStart = Sk.help.tokensToString(prevTokens);
 	var lines = Sk.help.splitToLines(stringStart);
 	var currentLine = lines[lineNo-1];
 	
@@ -107,32 +165,11 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 	// possibleAppends holds the ilabels of tokens that may work. It is populated
 	// by checking all the first sets of the alternative symbols
 	var possibleAppends = [];
-	for (i in alts) {
-		var a = alts[i];
+	for (i in alternativeTokens) {
+		var a = alternativeTokens[i];
 		var first = Sk.help.generateFirstSet(a);
 		possibleAppends.push.apply(possibleAppends, first);
 	}
-	
-	var alts = [];
-	
-	// Try to remove the top token in the stack
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	// Try to insert a single token
 	for (i in possibleAppends) {
@@ -154,8 +191,6 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 			continue;
 		}
 		
-		var fixedLine = currentLine + meaning + nextToken.value + stringEnd;
-		
 		// Creates a new parser to check the parsing of this line
 		var p = makeParser(undefined, undefined, fixErrs);
 		var parseFunc = p[0];
@@ -163,13 +198,8 @@ Sk.fix.unfinishedInfix = function (alts, context, stack, fixErrs) {
 		var parser = p[2];
 		
 		try {
-			var pos = 0;
-			var genContext = function (tokenVal) {
-				var len = tokenVal.length;
-				var context = [[lineNo, pos], [lineNo, pos+len], fixedLine];
-				pos += len;
-				return context;
-			}
+			pos = 0;
+			fixedLine = currentLine + meaning + nextToken.value + stringEnd;
 			
 			for (var i = 0; i < prevTokens.length; i++) {
 				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
