@@ -248,14 +248,15 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 	}
 	var extractedBrackets = brackets.brackets;
 	
-	// For unbalanced opening brackets, we will use three strategies
+	// For unbalanced opening brackets, we will use these strategies:
 	// 0 - Simply remove the offending bracket
 	// 1 - Add a corresponding closing bracket immediately next to the
 	//     offending bracket
-	// 2 - Add a closing bracket immediately before the next closing bracket
-	//
+	// 2 - Add a closing bracket immediately before the next bracket
+	// 3 - Add a closing bracket before the next closing bracket at the correct
+	//     nesting depth
 	// Unmatched closing brackets will always be deleted.
-	var strategies = 3;
+	var strategies = 4;
 	
 	var fixes = [];
 	
@@ -302,7 +303,49 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 							offset++;
 							modified = true;
 						}
-					}
+					} /*
+						This code has problems because it tries to insert a bracket ahead of where
+						the pointer currently is. A simple <offset> variable will not work in this case :(
+					
+						else if (j === 3) {
+						// Insert the closing bracket before the next closing bracket
+						// that is at the correct bracketing depth
+						var ptr = i+1;
+						var next = extractedBrackets[ptr];
+						var depth = 0;
+						
+						// This loop terminates with next pointing to the bracket immediately after where the closing
+						// bracket is to be inserted
+						while (next !== undefined && !(next.matched && b.indexOf(next.type)%2 === 1 && depth === 0)) {
+							// Ignore unmatched brackets
+							if (!next.matched) {
+								// Do nothing
+							}
+							// For opening brackets, increase the depth
+							else if (b.indexOf(next.type)%2 === 0) {
+								depth++;
+							}
+							// For closing brackets, decrease the depth
+							else {
+								depth--;
+							}
+							
+							ptr++;
+							next = extractedBrackets[ptr];
+						}
+						
+						// Insert the bracket before the bracket identified by the above loop
+						if (next === undefined) {
+							copy = copy + closeBracket;
+							modified = true;
+						} else if (next.pos === current.pos + 1) {
+							continue;
+						} else {
+							copy = copy.slice(0, next.pos + offset) + closeBracket + copy.slice(next.pos + offset);
+							offset++;
+							modified = true;
+						}
+					}*/
 				}
 				// Else it is an unmatched closing bracket
 				else {
@@ -314,7 +357,7 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 			}
 		}
 		
-		if (modified && Sk.help.checkParse(copy)) {
+		if (modified) {
 			fixes.push(copy);
 		}
 	}
