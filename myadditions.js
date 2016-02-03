@@ -254,9 +254,9 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 	//     offending bracket
 	// 2 - Add a closing bracket immediately before the next bracket
 	// 3 - Add a closing bracket before the next closing bracket at the correct
-	//     nesting depth
+	//     nesting depth *DOES NOT WORK YET!*
 	// Unmatched closing brackets will always be deleted.
-	var strategies = 4;
+	var strategies = 3;
 	
 	var fixes = [];
 	
@@ -267,7 +267,6 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 		// used to translate between the position of the brackets in the original
 		// string and their position in the edited string
 		var offset = 0;
-		var modified = false;
 		
 		for (var i = 0; i < extractedBrackets.length; i++) {
 			var current = extractedBrackets[i];
@@ -283,25 +282,21 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 						// Delete the offending bracket from the copy
 						copy = copy.slice(0, current.pos + offset) + copy.slice(current.pos + 1 + offset);
 						offset--;
-						modified = true;
 					} else if (j === 1) {
 						// Insert a closing bracket adjacent
 						copy = copy.slice(0, current.pos + offset + 1) + closeBracket + copy.slice(current.pos + offset + 1);
 						offset++;
-						modified = true;
 					} else if (j === 2) {
 						// Insert the closing bracket before the next bracket
-						// If the next bracket is adjacent then ignore
 						var next = extractedBrackets[i+1];
 						if (next === undefined) {
 							copy = copy + closeBracket;
-							modified = true;
 						} else if (next.pos === current.pos + 1) {
-							continue;
+							copy = copy.slice(0, current.pos + offset + 1) + closeBracket + copy.slice(current.pos + offset + 1);
+							offset++;
 						} else {
 							copy = copy.slice(0, next.pos + offset) + closeBracket + copy.slice(next.pos + offset);
 							offset++;
-							modified = true;
 						}
 					} /*
 						This code has problems because it tries to insert a bracket ahead of where
@@ -357,9 +352,7 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 			}
 		}
 		
-		if (modified) {
-			fixes.push(copy);
-		}
+		fixes.push(copy);
 	}
 	
 	return fixes;
