@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta content="en-gb" http-equiv="Content-Language" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+<title>Untitled 1</title>
+<!-- skulpt -->
+<script src="./skulpt/support/closure-library/closure/goog/base.js" type="text/javascript"></script>
+<script src="./skulpt/src/env.js" type="text/javascript"></script>
+<script src="./skulpt/src/parser.js" type="text/javascript"></script>
+<script src="./skulpt/src/tokenize.js" type="text/javascript"></script>
+<script src="./skulpt/src/symtable.js" type="text/javascript"></script>
+<script src="./skulpt/src/compile.js" type="text/javascript"></script>
+<script src="./skulpt/gen/parse_tables.js" type="text/javascript"></script>
+<script src="./skulpt/gen/astnodes.js" type="text/javascript"></script>
+<script src="./skulpt/src/ast.js" type="text/javascript"></script>
+<script src="./skulpt/src/misceval.js" type="text/javascript"></script>
+<script src="./skulpt/src/type.js" type="text/javascript"></script>
+<script src="./skulpt/src/builtin.js" type="text/javascript"></script>
+<script src="./skulpt/src/abstract.js" type="text/javascript"></script>
+<script src="./skulpt/src/object.js" type="text/javascript"></script>
+<script src="./skulpt/src/function.js" type="text/javascript"></script>
+<script src="./skulpt/src/seqtype.js" type="text/javascript"></script>
+<script src="./skulpt/src/numtype.js" type="text/javascript"></script>
+<script src="./skulpt/src/list.js" type="text/javascript"></script>
+<script src="./skulpt/src/tuple.js" type="text/javascript"></script>
+<script src="./skulpt/src/module.js" type="text/javascript"></script>
+<script src="./skulpt/src/int.js" type="text/javascript"></script>
+<script src="./skulpt/src/bool.js" type="text/javascript"></script>
+<script src="./skulpt/src/str.js" type="text/javascript"></script>
+<script src="./skulpt/src/dict.js" type="text/javascript"></script>
+<script src="./skulpt/src/errors.js" type="text/javascript"></script>
+<script src="./skulpt/src/import.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/enumerate.js" type="text/javascript"></script>
+<script src="./skulpt/src/set.js" type="text/javascript"></script>
+<script src="./skulpt/src/slice.js" type="text/javascript"></script>
+<script src="./skulpt/src/method.js" type="text/javascript"></script>
+<script src="./skulpt/src/structseq.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/sorted.js" type="text/javascript"></script>
+<script src="./skulpt/src/timsort.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/file.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/native.js" type="text/javascript"></script>
+<script src="./skulpt/src/ffi.js" type="text/javascript"></script>
+<script src="./skulpt/src/generator.js" type="text/javascript"></script>
+<script src="./skulpt/src/fromcodepoint.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/complex.js" type="text/javascript"></script>
+<script src="./skulpt/src/biginteger.js" type="text/javascript"></script>
+<script src="./skulpt/src/long.js" type="text/javascript"></script>
+<script src="./skulpt/src/float.js" type="text/javascript"></script>
+<script src="./skulpt/src/constants.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/formatting.js" type="text/javascript"></script>
+<script src="./skulpt/src/print.js" type="text/javascript"></script>
+<script src="./skulpt/src/builtindict.js" type="text/javascript"></script>
+
+<!-- My stuff -->
+<script src="./myadditions.js" type="text/javascript"></script>
+<script src="./drawing.js" type="text/javascript"></script>
+<script src="./ilabelMeaning.js" type="text/javascript"></script>
+<script src="./debug.js" type="text/javascript"></script>
+
+<!-- CodeMirror -->
+<script src="codemirror/codemirror.js" type="text/javascript"></script>
+<script src="./codemirror/codemirror-5.9/addon/selection/active-line.js" type="text/javascript"></script>
+<link rel="stylesheet" href="codemirror/codemirror.css"></link>
+<script src="codemirror/python.js" type="text/javascript"></script>
+
+<!-- Fabric.js -->
+<script src="./fabric/dist/fabric.js" type="text/javascript"></script>
+
+<style type="text/css">
+td.newStyle1 {
+	margin: 5px;
+	padding: 10px;
+	background-color: #9999FF;
+	vertical-align: top;
+	text-align: left;
+}
+body {
+	font-family: "Segoe UI";
+}
+h1 {
+	font-size: 18px;
+}
+.rightMenuStyle {
+	background-color:#CDDEFE;
+	width:390px;
+	height:670px;
+	padding:5px;
+}
+.codeStyle {
+	font-family:"Courier New", Courier, monospace;
+	padding:1px;
+	background-color:#CCFFCC;
+}
+</style>
+</head>
+
+<body>
+
+<table style="width: 100%; height:100%">
+	<tr>
+		<td colspan="4">&nbsp</td>
+	</tr>
+	<tr>
+		<td rowspan="2">&nbsp</td>
+		<td class="newStyle1" style="width: 600px; height:600px">
+			<textarea id="yourcode" style="width:600px; height:600px">print((5+2)</textarea>
+		</td>
+		<td class="newStyle1" style="width: 400px" rowspan="2">
+			<div id="welcome" class="rightMenuStyle" style="display:none;">
+				<h1>Welcome to my project.</h1>
+				<p>My project is looking at how syntax errors can be improved in order to help novice programmers.
+				Specifically, I have been looking at how a compiler could automatically suggest fixes according to its grammar.</p>
+			</div>
+			<div id="results" class="rightMenuStyle" style="display:none">
+				<h1>Your code ran!</h1>
+				<div id="resultDisplay">Results</div>
+			</div>
+			<div id="errorDisplay" class="rightMenuStyle">
+				<h1>Oh no! Looks like you had some errors...</h1>
+				<div id="errorDisplay">Error!</div>
+			</div>
+		</td>
+		<td rowspan="2">&nbsp</td>
+	</tr>
+	<tr>
+		<td class="newStyle1" style="width: 600px; height:50px;">
+		<table>
+			<tr style="width:100%;">
+				<td>
+					<img alt="Run code button" height="53" src="img/btn-run-unpressed.png" width="49" onclick="run()" />
+				</td>
+				<td style="width:550px;">
+				</td>
+				<td>
+					<img alt="Help" height="53" src="img/btn-help-unpressed.png" width="49" onclick="displayHelp()"/>
+				</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="4">&nbsp</td>
+	</tr>
+</table>
+
+<script type="text/javascript">
+var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
+		lineNumbers: true,
+		indentUnit: 4,
+		styleActiveLine: true
+	});
+myCodeMirror.setSize(600,600);
+
+var welcomeMessage = document.getElementById("welcome");
+var resultsPage = document.getElementById("results");
+
+var run = function () {
+	welcomeMessage.style.display = "none";
+	resultsPage.style.display = "block";
+}
+
+var displayHelp = function () {
+	welcomeMessage.style.display = "block";
+	resultsPage.style.display = "none";
+}
+</script>
+
+
+</body>
+
+</html>
