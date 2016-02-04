@@ -58,10 +58,10 @@
 
 <!-- My stuff -->
 <script src="./formattedOutput.js" type="text/javascript"></script>
-<script src="./ilabelMeaning.js" type="text/javascript"></script>
-<script src="./debug.js" type="text/javascript"></script>
 <script src="./myadditions.js" type="text/javascript"></script>
 <script src="./drawing.js" type="text/javascript"></script>
+<script src="./ilabelMeaning.js" type="text/javascript"></script>
+<script src="./debug.js" type="text/javascript"></script>
 
 <!-- CodeMirror -->
 <script src="codemirror/codemirror.js" type="text/javascript"></script>
@@ -129,6 +129,11 @@ print((5+2)</textarea><br />
 </table>
 </div>
 
+<div style="display:none;">
+<canvas id="myCanvas">
+</canvas>
+</div>
+
 <div style="background-color:#ccaaff;">
 <table>
 	<tr>
@@ -147,15 +152,17 @@ print((5+2)</textarea><br />
 
 <script>
 var number = 1;
+
+var canvasF = new fabric.Canvas("myCanvas");
 var treeLineCanvasF = new fabric.Canvas("parseTree");
 var helpCanvasF = new fabric.Canvas("helpTree");
 treeLineCanvasF.setWidth(700);
 helpCanvasF.setWidth(700);
 
-var help = document.getElementById("help");
-var byLine = document.getElementById("codeParsed");
+var treeByLine = [];
+var helpTrees = [];
+var helpBrackets = [];
 
-Sk.formattedOutput.setOutputs({err:help, errCanvas:helpCanvasF, byLine:byLine, byLineCanvas:treeLineCanvasF});
 
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourcode"), {
 		lineNumbers: true,
@@ -182,6 +189,63 @@ function debugOut(arg) {
 	}
 }
 
+var specialOutput = {};
+
+var drawTree = Sk.drawing.drawTreeFabric;
+var drawBrackets = Sk.drawing.drawBrackets;
+
+specialOutput.addLineParseTree = function (treeLine) {	
+	var index = treeByLine.length;
+	treeByLine.push(treeLine.tree);
+	var taggedLine = "<tag onclick=\"drawTree(treeLineCanvasF, treeByLine[" + index + "], true)\">" + treeLine.line + "</tag>";
+	
+	var codeDisplay = document.getElementById("codeParsed");
+	codeDisplay.innerHTML = codeDisplay.innerHTML + taggedLine;
+}
+
+specialOutput.drawTreeMain = function(node, scaleCanvas, info) {
+	drawTree(canvasF, node, scaleCanvas, info);
+}
+
+specialOutput.help = function (text) {
+	var helpArea = document.getElementById("help");
+	var helpAreaAll = document.getElementById("helpAreaAll");
+	
+	helpArea.innerHTML = helpArea.innerHTML + text;
+}
+
+specialOutput.helpCode = function (text) {
+	specialOutput.help("<code>" + text + "</code>");
+}
+
+specialOutput.suggestedReplacement = function (alt) {
+	var index = helpTrees.length;
+	helpTrees.push(alt.tree);
+	var line = "<tag onclick = \"drawTree(helpCanvasF, helpTrees[" + index + "], true)\">" + alt.text + "</tag>";
+	
+	specialOutput.helpCode(line);
+}
+
+specialOutput.suggestedBrackets = function (alt) {
+	var index = helpBrackets.length;
+	helpBrackets.push(alt);
+	var line = "<tag onclick = \"drawBrackets(helpCanvasF, helpBrackets[" + index + "])\">" + alt + "</tag>";
+	
+	specialOutput.helpCode(line);
+}
+
+specialOutput.displayAlternatives = function (original, alts) {
+	var out = specialOutput;
+	
+	out.help("Original: ") + out.suggestedReplacement(original) + out.help(" did not work<br>");
+	
+	for (i in alts) {
+		out.suggestedReplacement(alts[i]) + out.help(" may work.<br>");
+	}
+	
+	drawTree(helpCanvasF, original.tree, true);
+}
+
 // Here's everything you need to run a python program in skulpt
 // grab the code from your textarea
 // get a reference to your pre element for output
@@ -198,6 +262,7 @@ function runit() {
    helpArea.innerHTML = '';
    codeDisplay.innerHTML = '';
    
+   canvasF.clear();
    treeLineCanvasF.clear();
    
    helpTrees = [];
@@ -205,7 +270,7 @@ function runit() {
    treeByLine = [];
    
    Sk.pre = "output";
-   Sk.configure({output:outf, read:builtinRead, debugout:debugOut});
+   Sk.configure({output:outf, read:builtinRead, debugout:debugOut, specialOutput:specialOutput});
    
    try {
 		var result = Sk.importMainWithBody("<stdin>", false, prog, true);

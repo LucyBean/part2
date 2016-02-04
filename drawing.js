@@ -2,15 +2,16 @@ Sk.drawing = {};
 Sk.drawing.treeStyle = {};
 Sk.drawing.bracketStyle = {};
 
-Sk.drawing.textSize = 14;
-
 Sk.drawing.treeStyle.cellWidth = 120;
 Sk.drawing.treeStyle.cellHeight = 40;
 Sk.drawing.treeStyle.padding = 20;
 Sk.drawing.treeStyle.margin = 5;
+Sk.drawing.treeStyle.textSize = 14;
 
-Sk.drawing.bracketStyle.padding = 2;
+Sk.drawing.bracketStyle.wordPadding = 4;
+Sk.drawing.bracketStyle.padding = 10;
 Sk.drawing.bracketStyle.ySpacing = 20;
+Sk.drawing.bracketStyle.textSize = 24;
 
 // This will return the maximum depth of the tree (as a number of nodes)
 // Can be used to automatically scale the canvas
@@ -111,8 +112,7 @@ Sk.drawing.drawNodeFabric = function (canvas, node, info, offset) {
 	
 	var rect = new fabric.Rect({fill:colour, width:Sk.drawing.treeStyle.cellWidth, height:Sk.drawing.treeStyle.cellHeight, stroke:'black'});
 	
-	//var text = new fabric.Text(t, {left:x, top:y, fontSize:20, fontFamily:'Arial', textAlign:'center'});
-	var text = new fabric.Text(t, {fontSize:Sk.drawing.textSize, fontFamily:'Arial', textAlign:'center'});
+	var text = new fabric.Text(t, {fontSize:Sk.drawing.treeStyle.textSize, fontFamily:'Segoe UI', textAlign:'center'});
 	text.set({left:(Sk.drawing.treeStyle.cellWidth-text.getWidth())/2, top:(Sk.drawing.treeStyle.cellHeight-text.getHeight())/2});
 	
 	var group = new fabric.Group([rect, text], {left:x, top:y});
@@ -182,21 +182,27 @@ Sk.drawing.drawBrackets = function (canvas, line) {
 	// Display the segments of text with the y co-ordinate modified according to the depth
 	
 	// Calculate the total width of the text
-	var text = new fabric.Text(line, {fontSize:Sk.drawing.textSize, fontFamily:"Arial"});
-	var width = text.getWidth();
-	var xStart = 20;
-	var yStart = 20;
+	var text = new fabric.Text(line, {fontSize:Sk.drawing.bracketStyle.textSize, fontFamily:"Segoe UI"});
+	var xStart = Sk.drawing.bracketStyle.padding;
+	var yStart = Sk.drawing.bracketStyle.padding;
 	var xRel = 0;
 	
 	// Add each segment of text
+	// Track max depth
+	var maxDepth = 0;
+	
 	for (var i = 0; i < segments.length; i++) {
 		var group = new fabric.Group([],{left:xRel+xStart, top:yStart + Sk.drawing.bracketStyle.ySpacing*segments[i].depth});
-		var t = new fabric.Text(segments[i].text, {fontSize:Sk.drawing.textSize, fontFamily:"Arial"});
+		var t = new fabric.Text(segments[i].text, {fontSize:Sk.drawing.bracketStyle.textSize, fontFamily:"Segoe UI"});
 		group.add(t);
+		
+		if (segments[i].text.length > 0 && segments[i].depth > maxDepth) {
+			maxDepth = segments[i].depth;
+		}
 		
 		// Highlight brackets according to matched label
 		if (segments[i].matched !== undefined) {
-			var rect = new fabric.Rect({width:t.getWidth()+Sk.drawing.bracketStyle.padding, height:t.getHeight(), left:-Sk.drawing.bracketStyle.padding/2});
+			var rect = new fabric.Rect({width:t.getWidth()+Sk.drawing.bracketStyle.wordPadding, height:t.getHeight(), left:-Sk.drawing.bracketStyle.wordPadding/2});
 			t.set({fill:'white'});
 			if (segments[i].matched) {
 				rect.set({fill:'green'});
@@ -209,8 +215,14 @@ Sk.drawing.drawBrackets = function (canvas, line) {
 			group.add(rect);
 			group.add(t);
 		}
-		xRel += t.getWidth() + Sk.drawing.bracketStyle.padding;
+		xRel += t.getWidth() + Sk.drawing.bracketStyle.wordPadding;
 		
 		canvas.add(group);
 	}
+	
+	// Scale the canvas
+	var width = text.getWidth() + (segments.length-1) * Sk.drawing.bracketStyle.wordPadding + 2*Sk.drawing.bracketStyle.padding;
+	var height = text.getHeight() + maxDepth * Sk.drawing.bracketStyle.ySpacing + 2*Sk.drawing.bracketStyle.padding;
+	canvas.setWidth(width);
+	canvas.setHeight(height);
 }

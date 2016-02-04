@@ -361,11 +361,7 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 /**
  *	Returns feedback on an eolInString error.
  */
-Sk.fix.eolInString = function (line, errPosition) {	
-	Sk.specialOutput.helpCode("<br>" + line);
-	Sk.specialOutput.help(" has a string that contains a newline character\n");
-	
-	
+Sk.fix.eolInString = function (line, errPosition) {		
 	// Find the unbalanced brackets within the line and check whether
 	// these have accidentally been included in the string
 	var unbalanced = Sk.find.unbalancedBrackets(line).brackets;
@@ -379,27 +375,30 @@ Sk.fix.eolInString = function (line, errPosition) {
 	var ubIndex = 0;
 	var quotePoint = 0;
 	
-	// Attempt to match each unbalanced bracket from the end of the string
-	for (var j = 0; j < string.length; j++) {
-		var i = string.length - 1 - j;
-		// Extract the bracket to be matched and its match
-		var toMatch = unbalanced[ubIndex].type;
-		var index = brackets.indexOf(toMatch);
-		var b;
-		if (index%2 === 0) {
-			b = brackets.charAt(index+1);
-		} else {
-			b = brackets.charAt(index-1);
-		}
-		
-		var c = string.charAt(i);
-		if (c === b) {
-			quotePoint = j+1;
-			ubIndex++;
-		}
-		
-		if (ubIndex >= unbalanced.length) {
-			break;
+	// If there are unbalanced brackets, try to match them with brackets inside the string
+	if (unbalanced.length > 0) {
+		// Attempt to match each unbalanced bracket from the end of the string
+		for (var j = 0; j < string.length; j++) {
+			var i = string.length - 1 - j;
+			// Extract the bracket to be matched and its match
+			var toMatch = unbalanced[ubIndex].type;
+			var index = brackets.indexOf(toMatch);
+			var b;
+			if (index%2 === 0) {
+				b = brackets.charAt(index+1);
+			} else {
+				b = brackets.charAt(index-1);
+			}
+			
+			var c = string.charAt(i);
+			if (c === b) {
+				quotePoint = j+1;
+				ubIndex++;
+			}
+			
+			if (ubIndex >= unbalanced.length) {
+				break;
+			}
 		}
 	}
 	
@@ -411,9 +410,6 @@ Sk.fix.eolInString = function (line, errPosition) {
 	
 	var fixed = Sk.Tokenizer.checkLex(fix);
 	if (fixed) {
-		Sk.specialOutput.help("<br>");
-		Sk.specialOutput.helpCode(fix);
-		Sk.specialOutput.help(" is an alternative that may work.");
 		return fix;
 	}
 };

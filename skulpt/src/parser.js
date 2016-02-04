@@ -467,15 +467,10 @@ Sk.parse = function parse (filename, input) {
 	for (var j = 0; j < lines.length; j++) {
 		var errPos = Sk.find.unfinishedString(lines[j]);
 		if (errPos) {
-			Sk.specialOutput.help("<br>There's an unterminated string at " + errPos + " on line " + j);
 			var fix = Sk.fix.eolInString(lines[j], errPos);
+			Sk.formattedOutput.suggestStringFix(lines[j], fix);
 			
-			if (fix) {
-				lines[j] = fix;
-			}
-			else {
-				// The error could not be fixed
-			}
+			throw new Sk.builtin.ParseError("Unterminated string.", this.filename);
 		}
 		
 		var brackets = Sk.find.unbalancedBrackets(lines[j]);
