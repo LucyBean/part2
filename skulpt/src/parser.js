@@ -159,7 +159,6 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 					var trli = {tree:tr, line:context[2]};
 					
 					this.treeLines.push(trli);
-					Sk.specialOutput.addLineParseTree(trli);
 				}
 				
                 while (states[state].length === 1
@@ -174,6 +173,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 						//Sk.debugout(Sk.parseTreeDump(this.rootnode));
 						
 						Sk.debugout("Finished parsing");
+						Sk.formattedOutput.displayByLine(this.treeLines);
                         return true;
                     }
                     tp = this.stack[this.stack.length - 1];
@@ -235,9 +235,6 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
             errline = context[0][0];
 			
 			if (fixErrs) {
-				//Sk.help.printAlts(ilabel, value, alternatives);
-				var a = Sk.parseTrees.parseStackToTree(this.stack);
-				Sk.specialOutput.drawTreeMain(a, true);
 				// Find a valid token that can be inserted at this point
 				Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
 			}
@@ -484,15 +481,10 @@ Sk.parse = function parse (filename, input) {
 		var brackets = Sk.find.unbalancedBrackets(lines[j]);
 		
 		if (!brackets.isvalid) {
-			Sk.specialOutput.suggestedBrackets(lines[j]);
-			Sk.specialOutput.help(" has unbalanced brackets.<br>");
+			var org = lines[j];
+			var alts = Sk.fix.unbalancedBrackets(lines[j], brackets);
 			
-			var fix = Sk.fix.unbalancedBrackets(lines[j], brackets);
-			
-			for (f in fix) {
-				Sk.specialOutput.suggestedBrackets(fix[f]);
-				Sk.specialOutput.help(" may work.<br>");
-			}
+			Sk.formattedOutput.suggestBrackets(org, alts, j);
 			
 			throw new Sk.builtin.ParseError("Unbalanced brackets.", this.filename);
 		}
@@ -501,9 +493,6 @@ Sk.parse = function parse (filename, input) {
 	for (i = 0; i < lines.length; ++i) {
 		ret = parseFunc(lines[i] + ((i === lines.length - 1) ? "" : "\n"));
 	}
-	
-	var compact = Sk.parseTrees.extractPrintTree(ret);
-	Sk.specialOutput.drawTreeMain(compact, true);
 	
 	// ret is the root node of the completed parse tree
 	// Small adjustments here in order to return th flags and the cst

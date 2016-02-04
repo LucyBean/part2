@@ -23,8 +23,6 @@ Sk.configure = function (options) {
     "use strict";
     Sk.output = options["output"] || Sk.output;
     goog.asserts.assert(typeof Sk.output === "function");
-	
-	Sk.specialOutput = options["specialOutput"] || Sk.specialOutput;
 
     Sk.debugout = options["debugout"] || Sk.debugout;
     goog.asserts.assert(typeof Sk.debugout === "function");

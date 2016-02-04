@@ -235,7 +235,7 @@ Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs) {
 	var otree = Sk.parseTrees.parseStackToTree(stack);
 	var org = {text:otext, tree:otree, context:context};
 
-	Sk.specialOutput.displayAlternatives(org, alts);	
+	Sk.formattedOutput.suggestParseTrees(org, alts);
 };
 
 // Attempts to fix unbalanced brackets by inserting brackets into the line
