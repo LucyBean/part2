@@ -62,7 +62,7 @@ function generateTurtleModule(_target) {
     };
 
     SHAPES.arrow    = [[-10,0],[10,0],[0,10]];
-    SHAPES.square   = [[ 10,-10],[10,10],[-10,10],[-10, -10]];
+    SHAPES.square   = [[ 30,-10],[10,10],[-10,10],[-10, -10]];
     SHAPES.triangle = [[10,-5.77],[0,11.55],[-10,-5.77]];
     SHAPES.classic  = [[0,0],[-5,-9],[0,-7],[5,-9]];
     SHAPES.turtle   = [

@@ -429,7 +429,6 @@ Sk.importModuleInternal_ = function (name, dumpJS, modname, suppliedPyBody, canS
 		}
 		catch (err) {
 			Sk.debugout(err.toString());
-			Sk.helpout("Looks like you've got a run-time error");
 		}
 
         return (function finishLoading(modlocs) {
