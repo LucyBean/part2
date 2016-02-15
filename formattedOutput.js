@@ -39,7 +39,7 @@ Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) 
 	}
 }
 
-Sk.formattedOutput.suggestParseTrees = function (original, alternatives) {
+Sk.formattedOutput.suggestParseTrees = function (original, alternatives, lineNum) {
 	var err = Sk.formattedOutput.err;
 	
 	err.innerHTML = "";

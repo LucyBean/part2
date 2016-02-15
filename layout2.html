@@ -95,7 +95,6 @@ h1 {
 .rightMenuStyle {
 	background-color:#CDDEFE;
 	width:390px;
-	height:670px;
 	padding:5px;
 }
 .codeStyle {
@@ -118,7 +117,8 @@ h1 {
 			<div id="codeWindow" style="width: 600px; height:600px;">
 				<textarea id="yourCode">import turtle
 babbage = turtle.Turtle()
-babbage.shape("square")
+babbage.shape("circle")
+babbage.fillcolor(150,250,200)
 
 n = 4
 angle = 360/n
@@ -130,25 +130,29 @@ for i in range(n):
 				</textarea>
 			</div>
 			<div id="turtleWindow" style="display:none; width:600px; height:295px;">
-				<div id="turtleCanvas" style="width:600px; height:300px; background-color:white;"></div>
+				<div id="errCanvasDiv" style="display:none">
+					<canvas id="errCanvas"></canvas>
+				</div>
+				<div id="turtleCanvas" style="width:600px; height:295px; background-color:white;">
+				</div>
 			</div>
 		</td>
 		<td class="newStyle1" style="width: 400px" rowspan="2">
-			<div id="welcome" class="rightMenuStyle">
+			<div id="welcome" class="rightMenuStyle" style="height:300px">
 				<h1>Welcome to my project.</h1>
 				<p>My project is looking at how syntax errors can be improved in order to help novice programmers.
 				</p>
 			</div>
-			<div id="results" class="rightMenuStyle" style="display:none">
-				<h1>Your code ran!</h1>
-				<div id="resultDisplay" class="codeStyle">Results</div>
-			</div>
-			<div id="errorDisplay" class="rightMenuStyle" style="display:none;">
-				<h1>Oh no! Looks like you had some errors...</h1>
-				<div id="errorOutput" style="height:300px">Error report</div>
-				<div style="width:390px; height:285px; margin:0px; padding:0px; overflow:auto">
-					<canvas id="errCanvas"></canvas>
+			<div style="height:8px"></div>
+			<div id="results" class="rightMenuStyle">
+				<h1>Results</h1>
+				<div id="resultDisplay" class="codeStyle" style="height:300px; overflow-y:scroll;">
+				After you hit the run button, the results of your code will appear here.
 				</div>
+			</div>
+			<div id="errorDisplay" class="rightMenuStyle" style="height:300px; display:none;">
+				<h1>Oh no! Looks like you had some errors...</h1>
+				<div id="errorOutput">Help for errors will appear here.</div>
 			</div>
 		</td>
 		<td rowspan="2">&nbsp;</td>
@@ -158,9 +162,18 @@ for i in range(n):
 		<table>
 			<tr>
 				<td>
-					<img alt="Run code button" height="75" src="img/btn-run-unpressed.png" width="75" onclick="run()">					
-					<img alt="Help" height="75" src="img/btn-help-unpressed.png" width="75" onclick="displayHelpPane()">
+					<img alt="Run code button" height="75" src="img/btn-run-unpressed.png" width="75" onclick="run()">			
 					<img alt="Display Turtle" height="75" src="img/btn-turtle-unpressed.png" width="75" onclick="toggleTurtle()">
+				</td>
+				<td style="width:20px"></td>
+				<td>
+					<img alt="Tasks" height="75" src="img/tasks.png" width="30">
+				</td>
+				<td>
+
+					<img alt="Task 1" height="50" src="img/btn-1-unpressed.png" width="50">
+					<img alt="Task 2" height="50" src="img/btn-2-unpressed.png" width="50">
+					<img alt="Task 3" height="50" src="img/btn-3-unpressed.png" width="50">
 				</td>
 			</tr>
 		</table>
@@ -174,25 +187,22 @@ for i in range(n):
 <script type="text/javascript">
 Sk.turtleTracker.reset();
 
-var welcomeMessage = document.getElementById("welcome");
 var resultsPage = document.getElementById("results");
+var ecd = document.getElementById("errCanvasDiv");
+var tc = document.getElementById("turtleCanvas");
 
 var displayResultsPane = function () {
-	welcomeMessage.style.display = "none";
 	resultsPage.style.display = "block";
 	errorDisplay.style.display = "none";
 }
 
-var displayHelpPane = function () {
-	welcomeMessage.style.display = "block";
-	resultsPage.style.display = "none";
-	errorDisplay.style.display = "none";
-}
-
 var displayErrorPane = function () {
-	welcomeMessage.style.display = "none";
 	resultsPage.style.display = "none";
 	errorDisplay.style.display = "block";
+	
+	// Hide the turtle canvas and show the err canvas
+	ecd.style.display = "block";
+	tc.style.display = "none";
 }
 
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourCode"), {
@@ -200,7 +210,10 @@ var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourCode"), 
 		indentUnit: 4,
 		styleActiveLine: true
 	});
+	
 myCodeMirror.setSize(600, 600);
+
+var turtleDisplayed = false;
 
 var displayTurtle = function () {
 	turtleDisplayed = true;
@@ -220,8 +233,6 @@ var hideTurtle = function () {
 	turtleWindow.style.display = "none";
 }
 
-var turtleDisplayed = false;
-
 var toggleTurtle = function () {
 	if (!turtleDisplayed) {
 		displayTurtle();
@@ -233,11 +244,10 @@ var toggleTurtle = function () {
 }
 
 var errCanvas = new fabric.Canvas("errCanvas");
-errCanvas.setWidth(300);
-errCanvas.setHeight(250);
+errCanvas.setWidth(600);
+errCanvas.setHeight(300);
 errCanvas.backgroundColor = "white";
 errCanvas.renderAll();
-
 
 var output = document.getElementById("resultDisplay");
 var errOut = document.getElementById("errorOutput");
@@ -268,29 +278,35 @@ var run = function () {
 	errOut.innerHTML = "";
 	errCanvas.clear();
 	
+	// Hide the err canvas and show the turtle
+	tc.style.display = "block";
+	ecd.style.display = "none";
+	
 	var turtleCanvas = document.getElementById("turtleCanvas");
 	
 	(Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = "turtleCanvas";
 	Sk.configure({output:codeOutput, read:builtinRead, debugout:debugOut});
 
-	try {
-		var result = Sk.importMainWithBody("<stdin>", false, prog, true);
-	   
-		var myPromise = Sk.misceval.asyncToPromise(function() {
-			return result;
-		});
-	   
-		myPromise.then(function(mod) {console.log('success');},	function(err) {console.log(err.toString());});
-		
-	}
-	catch (err) {
-		displayErrorPane();
-		if (err === "Incorrect syntax")	{
-			console.log("Syntax was incorrect, but a fix was attempted.");
+	if (prog !== "") {
+		try {
+			var result = Sk.importMainWithBody("<stdin>", false, prog, true);
+		   
+			var myPromise = Sk.misceval.asyncToPromise(function() {
+				return result;
+			});
+		   
+			myPromise.then(function(mod) {console.log('success');},	function(err) {console.log(err.toString());});
+			
 		}
-		else {
-			console.log(err);
-			throw err;
+		catch (err) {
+			displayErrorPane();
+			if (err === "Incorrect syntax")	{
+				console.log("Syntax was incorrect, but a fix was attempted.");
+			}
+			else {
+				console.log(err);
+				throw err;
+			}
 		}
 	}
 }
