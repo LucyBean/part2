@@ -81,6 +81,10 @@ Sk.formattedOutput.displayByLine = function (treeLines) {
 	}
 }
 
+Sk.formattedOutput.turtleLocation = function (location) {
+	Sk.output("Turtle visited (" + location.x + ", " + location.y + ")<br/>");
+}
+
 Sk.formattedOutput.suggestStringFix = function (original, fix, lineNum) {
 	var err = Sk.formattedOutput.err;
 	
