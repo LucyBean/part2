@@ -5,6 +5,7 @@ Sk.formattedOutput.setOutputs = function (outputs) {
 	Sk.formattedOutput.errCanvas = outputs["errCanvas"];
 	Sk.formattedOutput.byLine = outputs["byLine"];
 	Sk.formattedOutput.byLineCanvas = outputs["byLineCanvas"];
+	Sk.formattedOutput.taskList = outputs["taskList"];
 }
 
 var errCanvasContents = [];
@@ -83,6 +84,19 @@ Sk.formattedOutput.displayByLine = function (treeLines) {
 
 Sk.formattedOutput.turtleLocation = function (location) {
 	Sk.output("Turtle visited (" + location.x + ", " + location.y + ")<br/>");
+}
+
+Sk.formattedOutput.transcribeTaskList = function (tasks) {
+	if (Sk.formattedOutput.taskList) {
+			var text = "<ol>"
+		for (i in tasks) {
+			var t = tasks[i];
+			text += "<li>" + Sk.turtleTasks.taskNames[t[0]](t[1]) + "</li>";
+		}
+		text += "</ol>";
+		
+		Sk.formattedOutput.taskList.innerHTML = text;
+	}
 }
 
 Sk.formattedOutput.suggestStringFix = function (original, fix, lineNum) {

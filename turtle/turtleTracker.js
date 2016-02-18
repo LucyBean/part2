@@ -1,15 +1,17 @@
 Sk.turtleTracker = {};
 
-Sk.turtleTracker.locations = [];
+Sk.turtleTracker.tracks = [];
 
 Sk.turtleTracker.reset = function () {
-	Sk.turtleTracker.locations = [];
+	Sk.turtleTracker.tracks = [];
 }
 
-Sk.turtleTracker.addLocation = function (loc) {
-	Sk.turtleTracker.locations.push(loc);
+Sk.turtleTracker.addTrack = function (turtle) {
+	Sk.turtleTracker.tracks.push(turtle);
+	console.log(turtle);
 	
 	if (Sk.formattedOutput) {
+		var loc = {x:Math.round(turtle.x), y:Math.round(turtle.y)};
 		Sk.formattedOutput.turtleLocation(loc);
 	}
 }

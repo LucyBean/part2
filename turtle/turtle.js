@@ -916,9 +916,8 @@ function generateTurtleModule(_target) {
         proto.$stamp = function() {
             pushUndo(this);
             return this.addUpdate(function() {
-				console.log(this);
 				if (Sk.turtleTracker) {
-					Sk.turtleTracker.addLocation({x:Math.round(this.x), y:Math.round(this.y)});
+					Sk.turtleTracker.addTrack(this);
 				}
                 drawTurtle(this, this.context());
             }, true);
@@ -1717,6 +1716,7 @@ function generateTurtleModule(_target) {
         context.closePath();
         context.fill();
         context.stroke();
+		
         context.restore();
     }
 
@@ -1829,6 +1829,7 @@ function generateTurtleModule(_target) {
     }
 
     function translate(turtle, startX, startY, dx, dy, beginPath, isCircle) {
+		turtle.$stamp();
         // speed is in pixels per ms
         var speed   = turtle._computed_speed,
             screen  = getScreen(),
@@ -1880,6 +1881,7 @@ function generateTurtleModule(_target) {
     }
 
     function rotate(turtle, startAngle, delta, isCircle) {
+		turtle.$stamp();
         var speed        = turtle._computed_speed,
             degrees    = delta / turtle._fullCircle * 360,
             frames     = speed ? Math.round(Math.max(1, Math.abs(degrees) / speed)) : 1,
