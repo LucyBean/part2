@@ -55,14 +55,14 @@ Sk.formattedOutput.suggestParseTrees = function (original, alternatives, lineNum
 	
 	// Display original
 	errCanvasContents.push(original.tree);
-	err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0])\">" + original.line + "</span><br/>";
+	err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0])\">" + original.text + "</span><br/>";
 	
 	// Display alternatives
 	err.innerHTML += "You could try:<br/>";
 	var listContent = "";
 	for (var i = 0; i < alternatives.length; i++) {
 		errCanvasContents.push(alternatives[i].tree);
-		listContent += "<li><span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + (i+1) + "])\">" + alternatives[i].line + "</span><br/></li>";
+		listContent += "<li><span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + (i+1) + "])\">" + alternatives[i].text + "</span><br/></li>";
 	}
 	err.innerHTML += "<ol>" + listContent + "</ol>";
 }

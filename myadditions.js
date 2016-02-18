@@ -75,165 +75,127 @@ Sk.Tokenizer.extractOneToken = function (string) {
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs) {
+Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs, usedNames) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var lineNo = context[0][0];
 	var string = context[2];
 	fixErrs = fixErrs || 0;
+	var stringEndGlobal = string.substr(start);
 	
 	var alts = [];
-	var fixedLine;
-	var pos = 0;
-	var genContext = function (tokenVal) {
-		var len = tokenVal.length;
-		var con = [[lineNo, pos], [lineNo, pos+len], fixedLine];
-		pos += len;
-		return con;
-	}
 	
 	var prevTokens = Sk.help.extractTokensFromStack(stack);
+	var prevToken = prevTokens[prevTokens.length-1];
+	var nextToken = Sk.Tokenizer.extractOneToken(stringEndGlobal);
+	var stringEnd = stringEndGlobal.slice(nextToken.value.length);
 	
-	// Try to remove the previous token
-	{
-		var stringStart = Sk.help.tokensToString(prevTokens.slice(0,prevTokens.length-1));
-		var lines = Sk.help.splitToLines(stringStart);
-		var currentLine = lines[lineNo-1];
-		var stringEnd = string.substring(end-1);
-		var nextToken = Sk.Tokenizer.extractOneToken(stringEnd);
-		stringEnd = stringEnd.slice(nextToken.value.length);
-		
-		if (string.length === end) {
-			nextToken.type = 4;
-		}
-		
-		var p = makeParser(undefined, undefined, fixErrs);
-		var parseFunc = p[0];
-		var manualAdd = p[1];
-		var parser = p[2];
-		
-		try {
-			pos = 0;
-			fixedLine = currentLine + nextToken.value + stringEnd;
-			
-			for (var i = 0; i < prevTokens.length-1; i++) {
-				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
-			}
-			
-			var c2 = genContext(nextToken.value);
-			manualAdd(nextToken.type, nextToken.value, c2, 0);
-			
-			var tree = Sk.parseTrees.parseStackToTree(parser.stack);			
-			var reportLine = stripTrailingNewLine(fixedLine);
-			
-			// If the token we have just add is NOT the last in the line then
-			// report back only the fragment we have parsed
-			if (c2[1][1] !== reportLine.length && nextToken.type !== 4) {
-				reportLine = reportLine.substring(0,c2[1][1]) + "...";
-			}
-			
-			var alt = {text:reportLine, tree:tree, context:c2};
-			alts.push(alt);
-		}
-		catch (err) {
-			Sk.debugout(stripTrailingNewLine(fixedLine) + ' was tried and did not work');
-		}
-	}
+	var nextNextToken;
+	var stringEndA = stringEnd;
+	do {
+		nextNextToken = Sk.Tokenizer.extractOneToken(stringEndA);
+		stringEndA = stringEndA.slice(nextNextToken.value.length);
+	} while (nextNextToken.type === 5);
 	
-	// Try to add in a token
-	
-	// Extract the currently parsed string from the stack to recover the
-	// string that has actually been parsed. If multiple errors fixes
-	// are corrected per line then <context[2]> may be insufficient
-	// This is compiled into a string for the context
-	var stringStart = Sk.help.tokensToString(prevTokens);
-	var lines = Sk.help.splitToLines(stringStart);
-	var currentLine = lines[lineNo-1];
-	
-	// Extract the next token from the unparsed stringEnd
-	var stringEnd = string.substring(end-1);
-	var nextToken = Sk.Tokenizer.extractOneToken(stringEnd);
-	stringEnd = stringEnd.slice(nextToken.value.length);
-	
-	// This seems to get confused when the error is happening right at the
-	// end of the line and gives the newline token a type of 53 rather
-	// than 4
+	// When the nextToken is a newline, the tokenizer will get a bit
+	// confused and returns the wrong kind of newline. This fixes that.
 	if (string.length === end) {
 		nextToken.type = 4;
 	}
 	
-	// possibleAppends holds the ilabels of tokens that may work. It is populated
-	// by checking all the first sets of the alternative symbols
-	var possibleAppends = [];
-	for (i in alternativeTokens) {
-		var a = alternativeTokens[i];
-		var first = Sk.help.generateFirstSet(a);
-		possibleAppends.push.apply(possibleAppends, first);
+	// Generic strategy
+	// Attempt the parse without the top token in the stack
+	{
+		var a = Sk.fix.testFix(prevTokens.slice(0,prevTokens.length-1), [nextToken], stringEnd);
+		if (a) {
+			alts.push(a);
+		}
 	}
 	
-	// Try to insert a single token
-	for (i in possibleAppends) {
-		var ilabel = possibleAppends[i];
-		var meaning = Sk.ilabelMeaning.niceToken(ilabel);
-		// Converting back to a token number
-		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+	// If there are two adjacent names use special tactics
+	if (prevToken.type === 1 && nextToken.type === 1) {
+		var a = Sk.fix.concatAdjacentNames(prevToken, nextToken, prevTokens, usedNames, stringEnd);
+		alts.push(a);
+	}
+	// For infix keywords, we must check whether the next and nextNext tokens
+	// are names to detect a fix
+	else if (nextToken.type === 1 && nextNextToken.type === 1) {
+		var a = Sk.fix.concatAdjacentNames(nextToken, nextNextToken, prevTokens, usedNames, stringEndA);
+		alts.push(a);
+	}
+	// If there are two adjacent tokens that may be part of a function list
+	// then suggest inserting commas
+	// First check if we are currently in an arglist
+	else if (Sk.help.containsUnfinishedArgList(stack[stack.length-1].node)) {
+		// Check if the next token could actually be accepted
+		// as an argument
+		var possArgs = Sk.help.generateFirstSet(259);
 		
-		// Prevent trying to insert a token that is the same type
-		// as the token that just came before it.
-		var prevToken = prevTokens[prevTokens.length-1];
-		if (prevToken.type === tokenNum) {
-			continue;
-		}
+		// Convert nextToken token type to ilabel
+		var nti = Sk.ParseTables.tokens[nextToken.type].toString();
 		
-		// Do not bother trying to add in any opening brackets
-		// 30-(  14-[  9-{
-		if (["30","14","9"].indexOf(ilabel) !== -1) {
-			continue;
-		}
-		
-		// Creates a new parser to check the parsing of this line
-		var p = makeParser(undefined, undefined, fixErrs);
-		var parseFunc = p[0];
-		var manualAdd = p[1];
-		var parser = p[2];
-		
-		try {
-			pos = 0;
-			fixedLine = currentLine + meaning + nextToken.value + stringEnd;
-			
-			for (var i = 0; i < prevTokens.length; i++) {
-				manualAdd(prevTokens[i].type, prevTokens[i].value, genContext(prevTokens[i].value));
+		if (possArgs.indexOf(nti) !== -1) {
+			var commaToken = {type:12, value:","};
+			var a = Sk.fix.testFix(prevTokens, [commaToken, nextToken], stringEnd);
+			if (a) {
+				alts.push(a);
 			}
-			var c1 = genContext(meaning);
+		}
+		
+		// Check whether they could both possibly be args
+	}
+	
+	// Generic strategy of adding in a token
+	// Try to add in a token
+	// This seems to get confused when the error is happening right at the
+	// end of the line and gives the newline token a type of 53 rather
+	// than 4
+	else {
+		if (string.length === end) {
+			nextToken.type = 4;
+		}
+		
+		// possibleAppends holds the ilabels of tokens that may work. It is populated
+		// by checking all the first sets of the alternative symbols
+		var possibleAppends = [];
+		for (i in alternativeTokens) {
+			var a = alternativeTokens[i];
+			var first = Sk.help.generateFirstSet(a);
+			possibleAppends.push.apply(possibleAppends, first);
+		}
+		
+		// Try to insert a single token
+		for (i in possibleAppends) {
+			var ilabel = possibleAppends[i];
+			var meaning = Sk.ilabelMeaning.niceToken(ilabel);
+			// Converting back to a token number
+			var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+			var newToken = {value:meaning, type:tokenNum};
 			
-			manualAdd(tokenNum, meaning, c1);
-			
-			var c2 = genContext(nextToken.value);
-			manualAdd(nextToken.type, nextToken.value, c2, 0);
-			
-			var tree = Sk.parseTrees.parseStackToTree(parser.stack);			
-			var reportLine = stripTrailingNewLine(fixedLine);
-			
-			// If the token we have just add is NOT the last in the line then
-			// report back only the fragment we have parsed
-			if (c2[1][1] !== reportLine.length && nextToken.type !== 4) {
-				reportLine = reportLine.substring(0,c2[1][1]) + "...";
+			// Prevent trying to insert a token that is the same type
+			// as the token that just came before it.
+			if (prevToken.type === tokenNum) {
+				continue;
 			}
 			
-			var alt = {text:reportLine, tree:tree, context:c1};
-			alts.push(alt);
-		}
-		catch (err) {
-			Sk.debugout(stripTrailingNewLine(fixedLine) + ' was tried and did not work');
+			// Do not bother trying to add in any opening brackets
+			// 30-(  14-[  9-{
+			if (["30","14","9"].indexOf(ilabel) !== -1) {
+				continue;
+			}
+			
+			// Attempt the parse
+			var a = Sk.fix.testFix (prevTokens, [newToken, nextToken], stringEnd);
+			
+			if (a) {
+				alts.push(a);
+			}
 		}
 	}
-	var otext = stringStart + nextToken.value
-	// If there were unparsed characters then add a "...";
-	if (otext.length !== stripTrailingNewLine(string).length) {
-		otext += "...";
-	}
+
+	// Report original
 	var otree = Sk.parseTrees.parseStackToTree(stack);
-	var org = {text:otext, tree:otree, context:context};
+	var org = {text:stripTrailingNewLine(string), tree:otree, context:context};
 
 	Sk.formattedOutput.suggestParseTrees(org, alts);
 };
@@ -536,6 +498,7 @@ Sk.help.generateFirstSet = function (ilabel) {
 	var aset = [];
 	
 	var term = Sk.ilabelMeaning.ilabelToNonTerm(ilabel);
+	term = term || ilabel;
 	
 	if (term > 256) {
 		var firstSet = Object.keys(Sk.ParseTables.dfas[term][1]);
@@ -705,8 +668,6 @@ Sk.parseTrees.parseStackToTree = function (stack) {
 			}
 			stackTrees.push(tree);
 		}
-		
-		
 	}
 	
 	// Append the trees, working from the bottom up
@@ -931,3 +892,18 @@ Sk.find.unbalancedBrackets = function (input) {
 	
 	return {isvalid:balanced, brackets:extractedBrackets};
 };
+
+Sk.help.containsUnfinishedArgList = function(node) {
+	// Check whether this node is an arglist (type=259)
+	if (node.type === 259) {
+		return true;
+	}
+	// Else check whether the rightmost child is
+	// Due to the nature of the compiler, only the last child will be
+	// an unfinished construction
+	else if (node.children) {
+		return Sk.help.containsUnfinishedArgList(node.children[node.children.length-1]);
+	} else {
+		return false;
+	}
+}

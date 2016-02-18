@@ -236,7 +236,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 			
 			if (fixErrs) {
 				// Find a valid token that can be inserted at this point
-				Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1);
+				Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1, this.used_names);
 			}
 			
             // no transition
