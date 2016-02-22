@@ -188,7 +188,7 @@ Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs, u
 				}
 				
 				// Attempt the parse
-				var a = Sk.fix.testFix (prevTokens, [newToken, nextToken], stringEnd);
+				var a = Sk.fix.testFix (prevTokens, [newToken, nextToken], stringEnd, fixErrs);
 				
 				if (a) {
 					alts.push(a);

@@ -1,4 +1,4 @@
-Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd) {
+Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 	// Extract the currently parsed string from the stack to recover the
 	// string that has actually been parsed.
 	// Take the last line from this.
@@ -7,9 +7,13 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd) {
 	var lineNo = lines.length-1;
 	var currentLine = lines[lineNo];
 	
+	if (fixErrs === undefined || fixErrs < 0) {
+		fixErrs = 0;
+	}
+	
 	var fixedLine = currentLine;
 	for (i in manualAddTokens) {
-		fixedLine += " " + manualAddTokens[i].value;
+		fixedLine += manualAddTokens[i].value;
 	}
 	fixedLine += stringEnd;
 	
@@ -33,15 +37,24 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd) {
 		// Parse the tokens using the manual add function
 		for (i in tokens) {
 			context = genContext(tokens[i].value);
-			manualAdd(tokens[i].type, tokens[i].value, context);
+			manualAdd(tokens[i].type, tokens[i].value, context, fixErrs);
 		}
 		
 		// If we have got this far, we know the fix works
-		// Attempt fix for rest of line??
-		parseFunc(stringEnd);
-		
-		var tree = Sk.parseTrees.parseStackToTree(parser.stack);			
+		// Attempt fix for rest of line
+		var tree = Sk.parseTrees.parseStackToTree(parser.stack);
 		var reportLine = stripTrailingNewLine(fixedLine);
+		Sk.debugout("At least partial fix found: " + reportLine);
+		
+		try {
+			parseFunc(stringEnd);
+			console.log("The rest of the line was parsed successfully.");
+			tree = Sk.parseTrees.parseStackToTree(parser.stack);
+			reportLine = Sk.help.tokensToString(Sk.help.extractTokensFromStack(parser.stack));
+		}
+		catch (err) {
+			console.log("There was an error parsing the rest of the line.");
+		}
 		
 		return {text:reportLine, tree:tree, context:context};
 	}
