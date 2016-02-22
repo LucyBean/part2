@@ -6,7 +6,7 @@ Sk.debug.parseStackDump = function (stack) {
 	for (var i = 0; i < stack.length; i++) {
 		var node = stack[i].node;
 		
-		Sk.debugout('Level ' + i);
+		Sk.debugout('Level ' + i + ', State ' + stack[i].state);
 		Sk.debugout(Sk.parseTreeDump(node));
 		Sk.debugout('\n-----------------------');
 	}

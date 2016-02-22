@@ -155,14 +155,9 @@ Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs, u
 			nextToken.type = 4;
 		}
 		
-		// possibleAppends holds the ilabels of tokens that may work. It is populated
-		// by checking all the first sets of the alternative symbols
-		var possibleAppends = [];
-		for (i in alternativeTokens) {
-			var a = alternativeTokens[i];
-			var first = Sk.help.generateFirstSet(a);
-			possibleAppends.push.apply(possibleAppends, first);
-		}
+		// Generate possible alternatives from looking at the grammar
+		var tp = stack[stack.length-1];
+		var possibleAppends = Sk.help.generateAlternatives(tp.node.type, tp.state);
 		
 		// Try to insert a single token
 		for (i in possibleAppends) {
@@ -494,32 +489,71 @@ Sk.help.tokensToString = function (tokens) {
 	return s;
 };
 
+// I think this may be redundant, as Sk.ParseTables.dfas[term][1]
+// appears to be the first set
 Sk.help.generateFirstSet = function (ilabel) {
-	var aset = [];
-	
-	var term = Sk.ilabelMeaning.ilabelToNonTerm(ilabel);
-	term = term || ilabel;
+	var term = Sk.ilabelMeaning.ilabelToNonTerm(ilabel) || ilabel;
 	
 	if (term > 256) {
-		var firstSet = Object.keys(Sk.ParseTables.dfas[term][1]);
-		
-		for (i in firstSet) {
-			var first = firstSet[i];			
-			var tset = Sk.help.generateFirstSet(first);
-			
-			for (t in tset) {
-				aset.push(tset[t]);
-			}
-		}
+		return Object.keys(Sk.ParseTables.dfas[term][1]);
 		
 	} else {
-		var meaning = Sk.ilabelMeaning(ilabel);
-		if (meaning !== undefined) {
-			aset.push(ilabel);
+		return ilabel;
+	}
+}
+
+// Generates groups of alternatives according to the state they cause the
+// compiler to transition to and their first sets
+Sk.help.generateAlternatives = function (ilabel, state, firstSet, endState) {
+	var term = Sk.ilabelMeaning.ilabelToNonTerm(ilabel) || ilabel;
+	var buckets = {};
+	
+	if (term > 256) {
+		if (firstSet === undefined) {
+			firstSet = Object.keys(Sk.ParseTables.dfas[term][1]);
+		}
+		var states = Sk.ParseTables.dfas[term][0];
+		var s = states[state];
+		
+		for (j in s) {
+			var arc = s[j];
+			var val = arc[0].toString();
+			if (endState === undefined) {
+				endState = arc[1];
+			}
+			
+			// If <val> appears in first set, push it into respective bucket
+			// according to the state it causes the top parent to transition to <endState>
+			// and the resulting first set
+			if (firstSet.indexOf(val) !== -1) {
+				var itsFirst = Object.keys(Sk.ParseTables.dfas[term][1]);
+				buckets[endState] = buckets[endState] || {};
+				buckets[endState][itsFirst] = buckets[endState][itsFirst] || {};
+				buckets[endState][itsFirst][val] = 1;
+			}
+			else {
+				var childBuckets = Sk.help.generateAlternatives(arc[0], state, firstSet, endState);
+				
+				// Copy all the possible symbols according to their <endState> and <itsFirst>
+				for (b in childBuckets) {
+					var cb = childBuckets[b];
+					buckets[b] = buckets[b] || {};
+					for (c in cb) {
+						buckets[b][c] = buckets[b][c] || {};
+						var keys = Object.keys(cb[c]);
+						for (d in keys) {
+							buckets[b][c][keys[d]] = 1;
+						}
+					}
+				}
+				
+				console.log(arc);
+				console.log(buckets);
+			}
 		}
 	}
 	
-	return aset;
+	return buckets;
 }
 
 // Also throws away comments

@@ -442,6 +442,9 @@ function makeParser (filename, style, fixErrs) {
 	// manually add a token
 	// never attempt to fix errors when manually adding
 	var addToken = function (type, value, context, fixErrs) {
+		if (fixErrs === undefined) {
+			fixErrs = 0;
+		}
 		return p.addtoken(type, value, context, fixErrs);
 	}
 
