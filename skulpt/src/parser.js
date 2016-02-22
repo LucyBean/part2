@@ -125,10 +125,8 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 			// t - ilabel of the state we are looking for if we are going to push a non-terminal
 			// v - ???
             i = arcs[a][0];
-			var istate = Sk.ilabelMeaning(i);
             newstate = arcs[a][1];
             t = this.grammar.labels[i][0];
-			var tstate = Sk.ilabelMeaning(t);
             v = this.grammar.labels[i][1];
             if (ilabel === i) {
                 // look it up in the list of labels
@@ -444,6 +442,9 @@ function makeParser (filename, style, fixErrs) {
 	var addToken = function (type, value, context, fixErrs) {
 		if (fixErrs === undefined) {
 			fixErrs = 0;
+		}
+		if (context === undefined) {
+			context = [[],[]];
 		}
 		return p.addtoken(type, value, context, fixErrs);
 	}

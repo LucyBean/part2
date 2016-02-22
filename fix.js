@@ -22,7 +22,7 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd) {
 	}
 	
 	try {
-		var p = makeParser(undefined, undefined, 0);
+		var p = makeParser(undefined, undefined, 1);
 		var parseFunc = p[0];
 		var manualAdd = p[1];
 		var parser = p[2];
@@ -37,6 +37,9 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd) {
 		}
 		
 		// If we have got this far, we know the fix works
+		// Attempt fix for rest of line??
+		parseFunc(stringEnd);
+		
 		var tree = Sk.parseTrees.parseStackToTree(parser.stack);			
 		var reportLine = stripTrailingNewLine(fixedLine);
 		

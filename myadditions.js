@@ -157,33 +157,42 @@ Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs, u
 		
 		// Generate possible alternatives from looking at the grammar
 		var tp = stack[stack.length-1];
-		var possibleAppends = Sk.help.generateAlternatives(tp.node.type, tp.state);
+		var possibleTokens = Sk.help.generateAlternatives(tp.node.type, tp.state);
 		
-		// Try to insert a single token
-		for (i in possibleAppends) {
-			var ilabel = possibleAppends[i];
-			var meaning = Sk.ilabelMeaning.niceToken(ilabel);
-			// Converting back to a token number
-			var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
-			var newToken = {value:meaning, type:tokenNum};
-			
-			// Prevent trying to insert a token that is the same type
-			// as the token that just came before it.
-			if (prevToken.type === tokenNum) {
-				continue;
-			}
-			
-			// Do not bother trying to add in any opening brackets
-			// 30-(  14-[  9-{
-			if (["30","14","9"].indexOf(ilabel) !== -1) {
-				continue;
-			}
-			
-			// Attempt the parse
-			var a = Sk.fix.testFix (prevTokens, [newToken, nextToken], stringEnd);
-			
-			if (a) {
-				alts.push(a);
+		// Try to insert a single token group
+		for (m in possibleTokens) {
+			for (n in possibleTokens[m]) {
+				var tokenGroup = possibleTokens[m][n];
+				var tokens = Object.keys(tokenGroup);
+				
+				// Take the first symbol in the group as the representative
+				var rep = tokens[0];
+				
+				// Build a string that represents the whole group
+				var meaning = "[";
+				for (var k = 0; k < tokens.length; k++) {
+					meaning += Sk.ilabelMeaning.niceToken(tokens[k]);
+					if (k !== tokens.length-1) {
+						meaning += ", ";
+					}
+				}
+				meaning += "]";
+				
+				var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(rep);
+				var newToken = {value:meaning, type:tokenNum};
+				
+				// Prevent trying to insert a token that is the same type
+				// as the token that just came before it.
+				if (prevToken.type === tokenNum) {
+					continue;
+				}
+				
+				// Attempt the parse
+				var a = Sk.fix.testFix (prevTokens, [newToken, nextToken], stringEnd);
+				
+				if (a) {
+					alts.push(a);
+				}
 			}
 		}
 	}
@@ -502,58 +511,45 @@ Sk.help.generateFirstSet = function (ilabel) {
 	}
 }
 
-// Generates groups of alternatives according to the state they cause the
-// compiler to transition to and their first sets
-Sk.help.generateAlternatives = function (ilabel, state, firstSet, endState) {
-	var term = Sk.ilabelMeaning.ilabelToNonTerm(ilabel) || ilabel;
-	var buckets = {};
+// Generates groups of alternatives
+Sk.help.generateAlternatives = function (term, state) {
+	// Contains token numbers
+	var firstSet = Object.keys(Sk.ParseTables.dfas[term][1]);
+	var alts = {};
 	
-	if (term > 256) {
-		if (firstSet === undefined) {
-			firstSet = Object.keys(Sk.ParseTables.dfas[term][1]);
+	for (f in firstSet) {
+		var ilabel = firstSet[f];
+		var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(ilabel);
+		// Ignore brackets and backquote
+		if (["9","14","15","30"].indexOf(ilabel) !== -1) {
+			continue;
 		}
-		var states = Sk.ParseTables.dfas[term][0];
-		var s = states[state];
 		
-		for (j in s) {
-			var arc = s[j];
-			var val = arc[0].toString();
-			if (endState === undefined) {
-				endState = arc[1];
-			}
-			
-			// If <val> appears in first set, push it into respective bucket
-			// according to the state it causes the top parent to transition to <endState>
-			// and the resulting first set
-			if (firstSet.indexOf(val) !== -1) {
-				var itsFirst = Object.keys(Sk.ParseTables.dfas[term][1]);
-				buckets[endState] = buckets[endState] || {};
-				buckets[endState][itsFirst] = buckets[endState][itsFirst] || {};
-				buckets[endState][itsFirst][val] = 1;
-			}
-			else {
-				var childBuckets = Sk.help.generateAlternatives(arc[0], state, firstSet, endState);
-				
-				// Copy all the possible symbols according to their <endState> and <itsFirst>
-				for (b in childBuckets) {
-					var cb = childBuckets[b];
-					buckets[b] = buckets[b] || {};
-					for (c in cb) {
-						buckets[b][c] = buckets[b][c] || {};
-						var keys = Object.keys(cb[c]);
-						for (d in keys) {
-							buckets[b][c][keys[d]] = 1;
-						}
-					}
-				}
-				
-				console.log(arc);
-				console.log(buckets);
-			}
-		}
+		// Create a parser with the root as the current term and state
+		var p = makeParser(undefined, undefined, 0);
+		var parseFunc = p[0];
+		var manualAdd = p[1];
+		var parser = p[2];
+		
+		// Manually set the root node to be the current term in the current state
+		var dfa = Sk.ParseTables.dfas[term];
+		var node = {children:[], context:null, type:term, value:null};
+		var newStack = {dfa:dfa, node:node, state:state};
+		
+		parser.stack = [newStack];
+		
+		manualAdd(tokenNum);
+		
+		var tp = parser.stack[parser.stack.length-1];
+		var topState = tp.state;
+		var topType = tp.node.type;
+		
+		alts[topType] = alts[topType] || {};
+		alts[topType][topState] = alts[topType][topState] || {};
+		alts[topType][topState][ilabel] = 1;
 	}
 	
-	return buckets;
+	return alts;
 }
 
 // Also throws away comments
