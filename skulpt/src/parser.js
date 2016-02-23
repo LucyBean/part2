@@ -88,7 +88,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 	var root;
 	
 	if (fixErrs === undefined) {
-		fixErrs = 2;
+		fixErrs = 3;
 	}
 	
 	if (fixErrs < 0) {
@@ -98,8 +98,6 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 	// Classify is used to turn a token into an 'ilabel'
     var ilabel = this.classify(type, value, context);
     //Sk.debugout("Next symbol ilabel:" + ilabel + " " + Sk.ilabelMeaning(ilabel)	+ "  type:" + type + "  value:" + value);
-		
-	var alternatives = [];
 
 	// This uses a stack based parser
     OUTERWHILE:
@@ -184,14 +182,6 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 				
                 /* jshint ignore:end */
                 // done with this token
-                
-				// Display the alternatives
-				// Store any unconsidered arcs as alternatives
-				for (b = a; b < arcs.length; ++b) {
-					var j = arcs[b][0];
-					alternatives.push(j);
-				}
-				//Sk.help.printAlts(ilabel, value, alternatives);
 				
                 return false;
             }
@@ -209,14 +199,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
                     this.push(t, this.grammar.dfas[t], newstate, context);
                     continue OUTERWHILE;
                 }
-				else {
-					alternatives.push(i);
-				}
             }
-			
-			else {
-				alternatives.push(i);
-			}
         }
 
         //print("findInDfa: " + JSON.stringify(arcs)+" vs. " + tp.state);
@@ -234,7 +217,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 			
 			if (fixErrs) {
 				// Find a valid token that can be inserted at this point
-				Sk.fix.unfinishedInfix(alternatives, context, this.stack, fixErrs - 1, this.used_names);
+				Sk.fix.unfinishedInfix(context, this.stack, fixErrs - 1, this.used_names);
 			}
 			
             // no transition
@@ -359,7 +342,7 @@ Parser.prototype.pop = function () {
  * @param {string} filename
  * @param {string=} style root of parse tree (optional)
  */
-function makeParser (filename, style, fixErrs) {
+function makeParser (filename, style, fixErrs, continued) {
     var tokenizer;
     var T_OP;
     var T_NL;
@@ -389,7 +372,7 @@ function makeParser (filename, style, fixErrs) {
 	// Takes three arguments; filename, interactive and callback function
 	// The callback function is called during tokenizer.generateTokens after the type of token
 	// has been identified.
-    tokenizer = new Sk.Tokenizer(filename, style === "single_input", function (type, value, start, end, line) {
+	var callback = function (type, value, start, end, line) {
 		// This is the callback function that is called when a token has been generated and identified
 		// Extract the start line and column from the start array
         var s_lineno = start[0];
@@ -421,7 +404,9 @@ function makeParser (filename, style, fixErrs) {
         if (p.addtoken(type, value, [start, end, line], fixErrs)) {
             return true;
         }
-    });
+    }
+	
+    tokenizer = new Sk.Tokenizer(filename, style === "single_input", callback, continued);
 
     // create parser function
     var parseFunc = function (line) {

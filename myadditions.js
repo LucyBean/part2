@@ -75,21 +75,18 @@ Sk.Tokenizer.extractOneToken = function (string) {
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs, usedNames) {
+Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var lineNo = context[0][0];
 	var string = context[2];
 	fixErrs = fixErrs || 0;
 	var stringEndGlobal = string.substr(start);
-	
-	var alts = [];
-	
 	var prevTokens = Sk.help.extractTokensFromStack(stack);
 	var prevToken = prevTokens[prevTokens.length-1];
 	var nextToken = Sk.Tokenizer.extractOneToken(stringEndGlobal);
 	var stringEnd = stringEndGlobal.slice(nextToken.value.length);
-	
+
 	var nextNextToken;
 	var stringEndA = stringEnd;
 	do {
@@ -97,31 +94,28 @@ Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs, u
 		stringEndA = stringEndA.slice(nextNextToken.value.length);
 	} while (nextNextToken.type === 5);
 	
+	
+	// Report original
+	var otree = Sk.parseTrees.parseStackToTree(stack);
+	var org = {text:stripTrailingNewLine(string), tree:otree, context:context};
+	Sk.formattedOutput.setOriginalTree(org, lineNo);
+	
 	// When the nextToken is a newline, the tokenizer will get a bit
 	// confused and returns the wrong kind of newline. This fixes that.
 	if (string.length === end) {
 		nextToken.type = 4;
 	}
 	
-	// Generic strategy
-	// Attempt the parse without the top token in the stack
-	{
-		var a = Sk.fix.testFix(prevTokens.slice(0,prevTokens.length-1), [nextToken], stringEnd);
-		if (a) {
-			alts.push(a);
-		}
-	}
-	
 	// If there are two adjacent names use special tactics
 	if (prevToken.type === 1 && nextToken.type === 1) {
 		var a = Sk.fix.concatAdjacentNames(prevToken, nextToken, prevTokens, usedNames, stringEnd);
-		alts.push(a);
+		Sk.formattedOutput.suggestAlternativeTree(a);
 	}
 	// For infix keywords, we must check whether the next and nextNext tokens
 	// are names to detect a fix
 	else if (nextToken.type === 1 && nextNextToken.type === 1) {
 		var a = Sk.fix.concatAdjacentNames(nextToken, nextNextToken, prevTokens, usedNames, stringEndA);
-		alts.push(a);
+		Sk.formattedOutput.suggestAlternativeTree(a);
 	}
 	// If there are two adjacent tokens that may be part of a function list
 	// then suggest inserting commas
@@ -136,21 +130,29 @@ Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs, u
 		
 		if (possArgs.indexOf(nti) !== -1) {
 			var commaToken = {type:12, value:","};
-			var a = Sk.fix.testFix(prevTokens, [commaToken, nextToken], stringEnd);
+			var a = Sk.fix.testFix(prevTokens, [commaToken, nextToken], stringEnd, fixErrs);
 			if (a) {
-				alts.push(a);
+				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
 		}
-		
-		// Check whether they could both possibly be args
 	}
 	
-	// Generic strategy of adding in a token
-	// Try to add in a token
-	// This seems to get confused when the error is happening right at the
-	// end of the line and gives the newline token a type of 53 rather
-	// than 4
+	// Try generic strategies
 	else {
+		// Generic strategy
+		// Attempt the parse without the top token in the stack
+		{
+			var a = Sk.fix.testFix(prevTokens.slice(0,prevTokens.length-1), [nextToken], stringEnd);
+			if (a) {
+				Sk.formattedOutput.suggestAlternativeTree(a);
+			}
+		}
+	
+		// Generic strategy of adding in a token
+		// Try to add in a token
+		// This seems to get confused when the error is happening right at the
+		// end of the line and gives the newline token a type of 53 rather
+		// than 4
 		if (string.length === end) {
 			nextToken.type = 4;
 		}
@@ -191,17 +193,11 @@ Sk.fix.unfinishedInfix = function (alternativeTokens, context, stack, fixErrs, u
 				var a = Sk.fix.testFix (prevTokens, [newToken, nextToken], stringEnd, fixErrs);
 				
 				if (a) {
-					alts.push(a);
+					Sk.formattedOutput.suggestAlternativeTree(a);
 				}
 			}
 		}
 	}
-
-	// Report original
-	var otree = Sk.parseTrees.parseStackToTree(stack);
-	var org = {text:stripTrailingNewLine(string), tree:otree, context:context};
-
-	Sk.formattedOutput.suggestParseTrees(org, alts);
 };
 
 // Attempts to fix unbalanced brackets by inserting brackets into the line
@@ -643,7 +639,7 @@ Sk.parseTrees.extractPrintTree = function (node, f) {
 	if (t !== undefined) {
 		v = t;
 		if (ignoreTokens.indexOf(node.type) === -1) {
-			v += "\n" + node.value;
+			v = node.value;
 		}
 	}
 	else {

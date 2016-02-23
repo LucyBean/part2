@@ -24,7 +24,6 @@ Sk.Tokenizer = function (filename, interactive, callback) {
 	// The callback function is called by the tokenizer during generateTokens after the type of
 	// the token has been determined. Arguments are: (type, value, start, end, lineNo)
 	
-	
     this.lnum = 0;
     this.parenlev = 0;
     this.continued = false;

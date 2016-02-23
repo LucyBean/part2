@@ -1,4 +1,7 @@
 Sk.formattedOutput = Sk.formattedOutput || {};
+Sk.formattedOutput.original = {};
+var errCanvasContents = [];
+var byLineCanvasContents = [];
 
 Sk.formattedOutput.setOutputs = function (outputs) {
 	Sk.formattedOutput.err = outputs["err"];
@@ -8,8 +11,13 @@ Sk.formattedOutput.setOutputs = function (outputs) {
 	Sk.formattedOutput.taskList = outputs["taskList"];
 }
 
-var errCanvasContents = [];
-var byLineCanvasContents = [];
+Sk.formattedOutput.reset = function () {
+	Sk.formattedOutput.original = undefined;
+	Sk.formattedOutput.err.innerHTML = "";
+	errCanvasContents = [];
+	byLineCanvasContents = [];
+}
+
 
 Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) {
 	var err = Sk.formattedOutput.err;
@@ -40,31 +48,36 @@ Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) 
 	}
 }
 
-Sk.formattedOutput.suggestParseTrees = function (original, alternatives, lineNum) {
+Sk.formattedOutput.setOriginalTree = function (original, lineNum) {
+	if (!Sk.formattedOutput.original) {
+		Sk.formattedOutput.original = original;
+		var err = Sk.formattedOutput.err;
+		
+		// Display explanation
+		if (lineNum) {
+			err.innerHTML += "There is a syntax error on line " + lineNum + ".<br/>";
+		} else {
+			err.innerHTML += "You have a syntax error.<br/>";
+		}
+		
+		// Display original
+		errCanvasContents.push(original.tree);
+		err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0])\">" + original.text + "</span><br/>";
+	}
+}
+
+Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	var err = Sk.formattedOutput.err;
 	
-	err.innerHTML = "";
-	errCanvasContents = [];
-	
-	// Display explanation
-	if (lineNum) {
-		err.innerHTML += "There is a syntax error on line " + lineNum + ".<br/>";
-	} else {
-		err.innerHTML += "You have a syntax error.<br/>";
+	// Add a suggestion message if the canvas has length 1 or less
+	// indicates only the original is on the page.
+	if (errCanvasContents.length <= 1) {
+		err.innerHTML += "You could try:<br/>";
 	}
-	
-	// Display original
-	errCanvasContents.push(original.tree);
-	err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0])\">" + original.text + "</span><br/>";
-	
-	// Display alternatives
-	err.innerHTML += "You could try:<br/>";
-	var listContent = "";
-	for (var i = 0; i < alternatives.length; i++) {
-		errCanvasContents.push(alternatives[i].tree);
-		listContent += "<li><span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + (i+1) + "])\">" + alternatives[i].text + "</span><br/></li>";
-	}
-	err.innerHTML += "<ol>" + listContent + "</ol>";
+	var index = errCanvasContents.length;
+	errCanvasContents.push(alt.tree);
+	err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "])\">" + alt.text + "</span><br/>";
+
 }
 
 Sk.formattedOutput.displayByLine = function (treeLines) {

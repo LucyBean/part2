@@ -12,10 +12,13 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 	}
 	
 	var fixedLine = currentLine;
+	var reportLine = currentLine;
 	for (i in manualAddTokens) {
 		fixedLine += manualAddTokens[i].value;
+		reportLine += manualAddTokens[i].value;
 	}
 	fixedLine += stringEnd;
+	reportLine += "...";
 	
 	var pos = 0;
 	var genContext = function (tokenVal) {
@@ -26,7 +29,7 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 	}
 	
 	try {
-		var p = makeParser(undefined, undefined, 1);
+		var p = makeParser(undefined, undefined, fixErrs);
 		var parseFunc = p[0];
 		var manualAdd = p[1];
 		var parser = p[2];
@@ -35,6 +38,8 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		
 		var context;
 		// Parse the tokens using the manual add function
+		// <manualAdd> has <fixErrs> set to 1. This will mean inserting up to two
+		// adjacent symbols will be tried
 		for (i in tokens) {
 			context = genContext(tokens[i].value);
 			manualAdd(tokens[i].type, tokens[i].value, context, fixErrs);
@@ -43,11 +48,23 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		// If we have got this far, we know the fix works
 		// Attempt fix for rest of line
 		var tree = Sk.parseTrees.parseStackToTree(parser.stack);
-		var reportLine = stripTrailingNewLine(fixedLine);
 		Sk.debugout("At least partial fix found: " + reportLine);
 		
 		try {
-			parseFunc(stringEnd);
+			// Remove the next token
+			var nextToken;
+			var stringEndA = stringEnd;
+			var context;
+			do {
+				nextToken = Sk.Tokenizer.extractOneToken(stringEndA);
+				stringEndA = stringEndA.slice(nextToken.value.length);
+				context = genContext(nextToken.value);
+			} while (nextToken.type === 5);
+			if (stringEndA.length === 0) {
+				nextToken.type = 4;
+			}
+			manualAdd(nextToken.type, nextToken.value, context, fixErrs);
+			
 			console.log("The rest of the line was parsed successfully.");
 			tree = Sk.parseTrees.parseStackToTree(parser.stack);
 			reportLine = Sk.help.tokensToString(Sk.help.extractTokensFromStack(parser.stack));
@@ -63,7 +80,7 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 	}
 }
 
-Sk.fix.concatAdjacentNames = function (prevToken, nextToken, prevTokens, usedNames, stringEnd) {	
+Sk.fix.concatAdjacentNames = function (prevToken, nextToken, prevTokens, usedNames, stringEnd, fixErrs) {	
 	// Form a new token consisting of the concatenated names and check
 	// whether it is a previous used name or is a keyword.
 	// If so, suggest that as a fix.
@@ -77,7 +94,7 @@ Sk.fix.concatAdjacentNames = function (prevToken, nextToken, prevTokens, usedNam
 		if (prevTokensA[prevTokensA.length-1] == prevToken) {
 			prevTokensA = prevTokensA.slice(0, prevTokensA.length-1);
 		}
-		var a = Sk.fix.testFix(prevTokensA, [newToken], stringEnd);
+		var a = Sk.fix.testFix(prevTokensA, [newToken], stringEnd, fixErrs);
 		if (a) {
 			return a;
 		}
