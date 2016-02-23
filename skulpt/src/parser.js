@@ -342,7 +342,7 @@ Parser.prototype.pop = function () {
  * @param {string} filename
  * @param {string=} style root of parse tree (optional)
  */
-function makeParser (filename, style, fixErrs, continued) {
+function makeParser (filename, style, fixErrs) {
     var tokenizer;
     var T_OP;
     var T_NL;
@@ -406,7 +406,7 @@ function makeParser (filename, style, fixErrs, continued) {
         }
     }
 	
-    tokenizer = new Sk.Tokenizer(filename, style === "single_input", callback, continued);
+    tokenizer = new Sk.Tokenizer(filename, style === "single_input", callback);
 
     // create parser function
     var parseFunc = function (line) {

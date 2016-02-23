@@ -18,7 +18,6 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		reportLine += manualAddTokens[i].value;
 	}
 	fixedLine += stringEnd;
-	reportLine += "...";
 	
 	var pos = 0;
 	var genContext = function (tokenVal) {
@@ -51,26 +50,28 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		Sk.debugout("At least partial fix found: " + reportLine);
 		
 		try {
-			// Remove the next token
+			// Add in the next tokens.
 			var nextToken;
 			var stringEndA = stringEnd;
 			var context;
 			do {
-				nextToken = Sk.Tokenizer.extractOneToken(stringEndA);
-				stringEndA = stringEndA.slice(nextToken.value.length);
-				context = genContext(nextToken.value);
-			} while (nextToken.type === 5);
-			if (stringEndA.length === 0) {
-				nextToken.type = 4;
-			}
-			manualAdd(nextToken.type, nextToken.value, context, fixErrs);
-			
+				do {
+					nextToken = Sk.Tokenizer.extractOneToken(stringEndA);
+					stringEndA = stringEndA.slice(nextToken.value.length);
+					context = genContext(nextToken.value);
+				} while (nextToken.type === 5);
+				if (stringEndA.length === 0) {
+					nextToken.type = 4;
+				}
+				manualAdd(nextToken.type, nextToken.value, context, fixErrs);
+				reportLine += nextToken.value;
+			} while (stringEndA.length > 0);			
 			console.log("The rest of the line was parsed successfully.");
 			tree = Sk.parseTrees.parseStackToTree(parser.stack);
-			reportLine = Sk.help.tokensToString(Sk.help.extractTokensFromStack(parser.stack));
 		}
 		catch (err) {
 			console.log("There was an error parsing the rest of the line.");
+			reportLine += "...";
 		}
 		
 		return {text:reportLine, tree:tree, context:context};
@@ -100,31 +101,3 @@ Sk.fix.concatAdjacentNames = function (prevToken, nextToken, prevTokens, usedNam
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

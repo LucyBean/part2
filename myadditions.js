@@ -86,6 +86,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 	var prevToken = prevTokens[prevTokens.length-1];
 	var nextToken = Sk.Tokenizer.extractOneToken(stringEndGlobal);
 	var stringEnd = stringEndGlobal.slice(nextToken.value.length);
+	var tryGeneric = true;
 
 	var nextNextToken;
 	var stringEndA = stringEnd;
@@ -108,14 +109,20 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 	
 	// If there are two adjacent names use special tactics
 	if (prevToken.type === 1 && nextToken.type === 1) {
-		var a = Sk.fix.concatAdjacentNames(prevToken, nextToken, prevTokens, usedNames, stringEnd);
-		Sk.formattedOutput.suggestAlternativeTree(a);
+		var a = Sk.fix.concatAdjacentNames(prevToken, nextToken, prevTokens, usedNames, stringEnd, fixErrs);
+		if (a) {
+			tryGeneric = false;
+			Sk.formattedOutput.suggestAlternativeTree(a);
+		}
 	}
 	// For infix keywords, we must check whether the next and nextNext tokens
 	// are names to detect a fix
 	else if (nextToken.type === 1 && nextNextToken.type === 1) {
-		var a = Sk.fix.concatAdjacentNames(nextToken, nextNextToken, prevTokens, usedNames, stringEndA);
-		Sk.formattedOutput.suggestAlternativeTree(a);
+		var a = Sk.fix.concatAdjacentNames(nextToken, nextNextToken, prevTokens, usedNames, stringEndA, fixErrs);
+		if (a) {
+			tryGeneric = false;
+			Sk.formattedOutput.suggestAlternativeTree(a);
+		}
 	}
 	// If there are two adjacent tokens that may be part of a function list
 	// then suggest inserting commas
@@ -132,30 +139,34 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 			var commaToken = {type:12, value:","};
 			var a = Sk.fix.testFix(prevTokens, [commaToken, nextToken], stringEnd, fixErrs);
 			if (a) {
+				tryGeneric = false;
 				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
 		}
 	}
 	
 	// Try generic strategies
-	else {
+	if (tryGeneric) {
 		// Generic strategy
 		// Attempt the parse without the top token in the stack
-		{
-			var a = Sk.fix.testFix(prevTokens.slice(0,prevTokens.length-1), [nextToken], stringEnd);
+		// Don't try this if we are throwing out a bracket
+		if ([7,8,9,10,26,27].indexOf(prevToken.type) === -1) {
+			var a = Sk.fix.testFix(prevTokens.slice(0,prevTokens.length-1), [nextToken], stringEnd, fixErrs);
 			if (a) {
 				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
 		}
+		
+		// Generic strategy
+		// Attempt the parse without the next token
+		if ([7,8,9,10,26,27].indexOf(nextToken.type) === -1) {
+			var a = Sk.fix.testFix(prevTokens, [nextNextToken], stringEndA, fixErrs);
+			if (a) {
+				Sk.formattedOUtput.suggestAlternativeTree(a);
+			}
+		}
 	
 		// Generic strategy of adding in a token
-		// Try to add in a token
-		// This seems to get confused when the error is happening right at the
-		// end of the line and gives the newline token a type of 53 rather
-		// than 4
-		if (string.length === end) {
-			nextToken.type = 4;
-		}
 		
 		// Generate possible alternatives from looking at the grammar
 		var tp = stack[stack.length-1];
