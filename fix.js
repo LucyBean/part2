@@ -13,18 +13,18 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 	}
 	
 	var fixedLine = currentLine;
-	var reportLine = currentLine;
+	var reportLine;
 	for (i in manualAddTokens) {
-		fixedLine += manualAddTokens[i].value;
-		reportLine += manualAddTokens[i].value;
+		fixedLine += manualAddTokens[i].value + " ";
 	}
+	reportLine = fixedLine;
 	fixedLine += stringEnd;
 	
 	var pos = 0;
 	var genContext = function (tokenVal) {
 		var len = tokenVal.length;
 		var con = [[lineNo, pos], [lineNo, pos+len], fixedLine];
-		pos += len;
+		pos += len+1;
 		return con;
 	}
 	

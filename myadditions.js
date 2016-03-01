@@ -119,7 +119,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 	}
 	// For infix keywords, we must check whether the next and nextNext tokens
 	// are names to detect a fix
-	else if (nextToken.type === 1 && nextNextToken.type === 1) {
+	if (nextToken.type === 1 && nextNextToken.type === 1) {
 		var a = Sk.fix.concatAdjacentNames(nextToken, nextNextToken, prevTokens, usedNames, stringEndA, fixErrs);
 		if (a) {
 			tryGeneric = false;
@@ -127,10 +127,11 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 			Sk.formattedOutput.suggestAlternativeTree(a);
 		}
 	}
+	
 	// If there are two adjacent tokens that may be part of a function list
 	// then suggest inserting commas
 	// First check if we are currently in an arglist
-	else if (Sk.help.containsUnfinishedArgList(stack[stack.length-1].node)) {
+	if (Sk.help.containsUnfinishedArgList(stack[stack.length-1].node)) {
 		// Check if the next token could actually be accepted
 		// as an argument
 		var possArgs = Sk.help.generateFirstSet(259);
@@ -149,6 +150,17 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		}
 	}
 	
+	// If the next token is a newline, try inserting a colon
+	if (nextToken.type === 4) {
+		var colonToken = {type:11, value:":"};
+		var a = Sk.fix.testFix(prevTokens, [colonToken, nextToken], stringEnd, fixErrs);
+		if (a) {
+				tryGeneric = false;
+				a.explanation = "This is the start of a block, so a colon is required at the end.";
+				Sk.formattedOutput.suggestAlternativeTree(a);
+			}
+	}
+	
 	// Try generic strategies
 	if (tryGeneric) {
 		// Generic strategy
@@ -163,7 +175,8 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		
 		// Generic strategy
 		// Attempt the parse without the next token
-		if ([7,8,9,10,26,27].indexOf(nextToken.type) === -1) {
+		// Ignore if throwing out a bracket or newline
+		if ([4,7,8,9,10,26,27].indexOf(nextToken.type) === -1) {
 			var a = Sk.fix.testFix(prevTokens, [nextNextToken], stringEndA, fixErrs);
 			if (a) {
 				Sk.formattedOutput.suggestAlternativeTree(a);
@@ -503,7 +516,7 @@ Sk.help.tokensToString = function (tokens) {
 	var s = "";
 	
 	for (var i = 0; i < tokens.length; i++) {
-		s += tokens[i].value;
+		s += tokens[i].value + " ";
 	}
 	
 	return s;

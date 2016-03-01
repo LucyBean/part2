@@ -122,7 +122,13 @@ h1 {
 		<td rowspan="2">&nbsp;</td>
 		<td class="newStyle1" style="width: 600px; height:600px;">
 			<div id="codeWindow" style="width: 600px; height:600px;">
-				<textarea id="yourCode">myFun(3; 4 5)</textarea>
+				<textarea id="yourCode">import turtle
+t = turtle.Turtle()
+t.shape("circle")
+t.fillcolor(150,250,200)
+
+for i in range(5)
+    t.forward(20)</textarea>
 			</div>
 			<div id="turtleWindow" style="display:none; width:600px; height:295px;">
 				<div id="errCanvasDiv" style="display:none; overflow:auto; overflow-y:auto; width:100%; height:100%; background-color:white;">
@@ -163,15 +169,14 @@ h1 {
 		<table>
 			<tr>
 				<td>
-					<img alt="Run code button" height="75" src="img/btn-run-unpressed.png" width="75" onclick="run()">			
-					<img alt="Display Turtle" height="75" src="img/btn-turtle-unpressed.png" width="75" onclick="toggleTurtle()">
+					<img alt="Run code button" title="Run the code and see results!" height="75" src="img/btn-run-unpressed.png" width="75" onclick="run()">			
+					<img alt="Display Turtle" title="Show/hide the turtle panel." height="75" src="img/btn-turtle-unpressed.png" width="75" onclick="toggleTurtle()">
 				</td>
 				<td style="width:20px"></td>
 				<td>
 					<img alt="Tasks" height="75" src="img/tasks.png" width="30">
 				</td>
-				<td>
-
+				<td title="Load the starting text for each task.">
 					<img alt="Task 1" height="50" src="img/btn-1-unpressed.png" width="50" onclick="loadTask(1)">
 					<img alt="Task 2" height="50" src="img/btn-2-unpressed.png" width="50">
 					<img alt="Task 3" height="50" src="img/btn-3-unpressed.png" width="50">
