@@ -75,10 +75,7 @@ Sk.Tokenizer.extractOneToken = function (string) {
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames, lastNewLine) {
-	// Only care about the current line.
-	stack = stack.slice(lastNewLine-1);
-	
+Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 	var start = context[0][1];
 	var end = context[1][1];
 	var lineNo = context[0][0];
@@ -116,6 +113,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames, lastNewLi
 		var a = Sk.fix.concatAdjacentNames(prevToken, nextToken, prevTokens, usedNames, stringEnd, fixErrs);
 		if (a) {
 			tryGeneric = false;
+			a.explanation = "Two names were concatenated. Names in python cannot contain spaces.";
 			Sk.formattedOutput.suggestAlternativeTree(a);
 		}
 	}
@@ -125,6 +123,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames, lastNewLi
 		var a = Sk.fix.concatAdjacentNames(nextToken, nextNextToken, prevTokens, usedNames, stringEndA, fixErrs);
 		if (a) {
 			tryGeneric = false;
+			a.explanation = "Two names were concatenated. Names in python cannot contain spaces.";
 			Sk.formattedOutput.suggestAlternativeTree(a);
 		}
 	}
@@ -144,6 +143,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames, lastNewLi
 			var a = Sk.fix.testFix(prevTokens, [commaToken, nextToken], stringEnd, fixErrs);
 			if (a) {
 				tryGeneric = false;
+				a.explanation = "This is a function call.";
 				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
 		}

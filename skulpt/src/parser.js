@@ -220,7 +220,8 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 			
 			if (fixErrs) {
 				// Find a valid token that can be inserted at this point
-				Sk.fix.unfinishedInfix(context, this.stack, fixErrs - 1, this.used_names, this.lastNewLine);
+				var stack = this.stack.slice(this.lastNewLine-1);
+				Sk.fix.unfinishedInfix(context, stack, fixErrs - 1, this.used_names);
 			}
 			
             // no transition

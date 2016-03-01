@@ -81,8 +81,20 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	}
 	var index = errCanvasContents.length;
 	errCanvasContents.push(alt.tree);
-	err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\">" + alt.text + "</span><br/>";
+	
+	if (alt.explanation) {
+		err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\" title = \"" + alt.explanation + "\">" + alt.text + "</span>";
+	}
+	else {
+		err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\">" + alt.text + "</span>";
 
+	}
+	
+	if (alt.incomplete) {
+		err.innerHTML += "<span class=\"codeStyle\" title=\"This indicates that the line was incomplete.\">...</span>";
+	}
+	
+	err.innerHTML += "<br/>";
 }
 
 Sk.formattedOutput.displayByLine = function (treeLines) {

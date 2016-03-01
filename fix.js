@@ -6,6 +6,7 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 	var lines = Sk.help.splitToLines(stringStart);
 	var lineNo = lines.length-1;
 	var currentLine = lines[lineNo];
+	var ret = {};
 	
 	if (fixErrs === undefined || fixErrs < 0) {
 		fixErrs = 0;
@@ -71,10 +72,12 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		}
 		catch (err) {
 			console.log("There was an error parsing the rest of the line.");
-			reportLine += "...";
+			ret.incomplete = 1;
 		}
-		
-		return {text:reportLine, tree:tree, context:context};
+		ret.text = reportLine;
+		ret.tree = tree;
+		ret.context = context;
+		return ret;
 	}
 	catch (err) {
 		Sk.debugout(stripTrailingNewLine(fixedLine) + ' was tried and did not work');
