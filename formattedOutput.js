@@ -9,6 +9,7 @@ Sk.formattedOutput.setOutputs = function (outputs) {
 	Sk.formattedOutput.byLine = outputs["byLine"];
 	Sk.formattedOutput.byLineCanvas = outputs["byLineCanvas"];
 	Sk.formattedOutput.taskList = outputs["taskList"];
+	Sk.formattedOutput.codeMirror = outputs["codeMirror"];
 }
 
 Sk.formattedOutput.reset = function () {
@@ -53,8 +54,11 @@ Sk.formattedOutput.setOriginalTree = function (original, lineNum) {
 		Sk.formattedOutput.original = original;
 		var err = Sk.formattedOutput.err;
 		
-		// Display explanation
+		// Display explanation and jump to line if possible
 		if (lineNum) {
+			if (Sk.formattedOutput.codeMirror) {
+				Sk.formattedOutput.codeMirror.setCursor(lineNum-1);
+			}
 			err.innerHTML += "There is a syntax error on line " + lineNum + ".<br/>";
 		} else {
 			err.innerHTML += "You have a syntax error.<br/>";
@@ -62,7 +66,8 @@ Sk.formattedOutput.setOriginalTree = function (original, lineNum) {
 		
 		// Display original
 		errCanvasContents.push(original.tree);
-		err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0])\">" + original.text + "</span><br/>";
+		err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0], true)\">" + original.text + "</span><br/>";
+		Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, original.tree, true);
 	}
 }
 
@@ -76,7 +81,7 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	}
 	var index = errCanvasContents.length;
 	errCanvasContents.push(alt.tree);
-	err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "])\">" + alt.text + "</span><br/>";
+	err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\">" + alt.text + "</span><br/>";
 
 }
 

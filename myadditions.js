@@ -75,7 +75,10 @@ Sk.Tokenizer.extractOneToken = function (string) {
 
 Sk.fix = {};
 
-Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
+Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames, lastNewLine) {
+	// Only care about the current line.
+	stack = stack.slice(lastNewLine-1);
+	
 	var start = context[0][1];
 	var end = context[1][1];
 	var lineNo = context[0][0];
@@ -95,11 +98,12 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		stringEndA = stringEndA.slice(nextNextToken.value.length);
 	} while (nextNextToken.type === 5);
 	
-	
 	// Report original
-	var otree = Sk.parseTrees.parseStackToTree(stack);
-	var org = {text:stripTrailingNewLine(string), tree:otree, context:context};
-	Sk.formattedOutput.setOriginalTree(org, lineNo);
+	{
+		var otree = Sk.parseTrees.parseStackToTree(stack);
+		var org = {text:stripTrailingNewLine(string), tree:otree, context:context};
+		Sk.formattedOutput.setOriginalTree(org, lineNo);
+	}
 	
 	// When the nextToken is a newline, the tokenizer will get a bit
 	// confused and returns the wrong kind of newline. This fixes that.
@@ -162,7 +166,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		if ([7,8,9,10,26,27].indexOf(nextToken.type) === -1) {
 			var a = Sk.fix.testFix(prevTokens, [nextNextToken], stringEndA, fixErrs);
 			if (a) {
-				Sk.formattedOUtput.suggestAlternativeTree(a);
+				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
 		}
 	

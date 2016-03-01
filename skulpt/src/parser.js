@@ -140,14 +140,17 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 				// If we encounter a newline, we need will copy the parse tree for the line completed
 				if (type === 4) {
 					var rootNode;
+					this.lastNewLine;
 					
 					// If this newline starts a "suite" (indented block) then we need to take
 					// the second top entry, as the top entry will be representing the "suite"
 					if (this.stack.length > 2 && this.stack[this.stack.length-1].node.type === 326) {
 						rootNode = this.stack[this.stack.length-2].node;
+						this.lastNewLine = this.stack.length-2;
 					}
 					else {
 						rootNode = this.stack[this.stack.length-1].node;
+						this.lastNewLine = this.stack.length-1;
 					}
 					rootNode.flags = rootNode.flags || [];
 					rootNode.flags.push("SOL");
@@ -217,7 +220,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
 			
 			if (fixErrs) {
 				// Find a valid token that can be inserted at this point
-				Sk.fix.unfinishedInfix(context, this.stack, fixErrs - 1, this.used_names);
+				Sk.fix.unfinishedInfix(context, this.stack, fixErrs - 1, this.used_names, this.lastNewLine);
 			}
 			
             // no transition
