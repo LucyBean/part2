@@ -87,6 +87,7 @@ Sk.drawing.drawTreeFabric = function (canvas, node, scaleCanvas, info) {
 		canvas.setHeight(height+2*Sk.drawing.treeStyle.margin);
 	}
 	
+	// Draw the tree
 	Sk.drawing.drawNodeFabric(canvas, node, info);
 }
 

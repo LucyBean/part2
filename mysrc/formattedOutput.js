@@ -35,7 +35,7 @@ Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) 
 	
 	// Display original
 	errCanvasContents.push(original);
-	err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawBrackets(Sk.formattedOutput.errCanvas, errCanvasContents[0])\">" + original + "</span><br/>";
+	err.innerHTML += "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawBrackets(Sk.formattedOutput.errCanvas, errCanvasContents[0])\">" + original + "</span><br/>";
 	
 	// Display alternatives, if they exist
 	if (alternatives) {
@@ -43,7 +43,7 @@ Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) 
 		var listContent = "";
 		for (var i = 0; i < alternatives.length; i++) {
 			errCanvasContents.push(alternatives[i]);
-			listContent += "<li><span class=\"codeStyle\" onclick=\"Sk.drawing.drawBrackets(Sk.formattedOutput.errCanvas, errCanvasContents[" + (i+1) + "])\">" + alternatives[i] + "</span></li>";
+			listContent += "<li><span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawBrackets(Sk.formattedOutput.errCanvas, errCanvasContents[" + (i+1) + "])\">" + alternatives[i] + "</span></li>";
 		}
 		err.innerHTML += "<ol>" + listContent + "</ol>";
 	}
@@ -66,7 +66,7 @@ Sk.formattedOutput.setOriginalTree = function (original, lineNum) {
 		
 		// Display original
 		errCanvasContents.push(original.tree);
-		err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0], true)\">" + original.text + "</span><br/>";
+		err.innerHTML += "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0], true)\">" + original.text + "</span><br/>";
 		Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, original.tree, true);
 	}
 }
@@ -83,10 +83,10 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	errCanvasContents.push(alt.tree);
 	
 	if (alt.explanation) {
-		err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\" title = \"" + alt.explanation + "\">" + alt.text + "</span>";
+		err.innerHTML += "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\" title = \"" + alt.explanation + "\">" + alt.text + "</span>";
 	}
 	else {
-		err.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\">" + alt.text + "</span>";
+		err.innerHTML += "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\">" + alt.text + "</span>";
 
 	}
 	
@@ -107,7 +107,7 @@ Sk.formattedOutput.displayByLine = function (treeLines) {
 		// Display each line and tree
 		for (var i = 0; i < treeLines.length; i++) {
 			byLineCanvasContents.push(treeLines[i].tree);
-			byLine.innerHTML += "<span class=\"codeStyle\" onclick=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.byLineCanvas, byLineCanvasContents[" + (i+1) + "])\">" + treeLines[i].line + "</span><br/>";
+			byLine.innerHTML += "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.byLineCanvas, byLineCanvasContents[" + (i+1) + "])\">" + treeLines[i].line + "</span><br/>";
 		}
 	}
 }
