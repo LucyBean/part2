@@ -228,7 +228,6 @@ var displayTasks = function () {
 	
 	welcome.style.display = "none";
 	taskWindow.style.display = "block";
-
 }
 
 var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourCode"), {
@@ -240,6 +239,22 @@ var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourCode"), 
 	});
 	
 myCodeMirror.setSize(600, 600);
+
+var replaceLine = function (lineNum, replacement) {
+	var cur = myCodeMirror.getLine();
+	// Extract and replace the required line
+	var text = myCodeMirror.getValue();
+	var lines = Sk.help.splitToLines(text);
+	lines[lineNum-1] = replacement;
+	
+	// Join the lines back again
+	var text = "";
+	for (i in lines) {
+		text += lines[i] + "\n";
+	}
+	myCodeMirror.setValue(text);
+	myCodeMirror.setCursor(cur);
+};
 
 var turtleDisplayed = false;
 
@@ -267,7 +282,6 @@ var toggleTurtle = function () {
 
 	} else {
 		hideTurtle();
-
 	}
 }
 
@@ -292,7 +306,7 @@ errCanvas.renderAll();
 var output = document.getElementById("resultDisplay");
 var errOut = document.getElementById("errorOutput");
 var taskText = document.getElementById("taskText");
-Sk.formattedOutput.setOutputs({err:errOut, errCanvas:errCanvas, taskList:taskText, codeMirror:myCodeMirror});
+Sk.formattedOutput.setOutputs({err:errOut, errCanvas:errCanvas, taskList:taskText, codeMirror:myCodeMirror, lineReplace:replaceLine});
 
 var codeOutput = function (text) {
 	output.innerHTML += text;

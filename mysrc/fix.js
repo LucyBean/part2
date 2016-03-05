@@ -391,11 +391,15 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 					stringEndA = stringEndA.slice(nextToken.value.length);
 					context = genContext(nextToken.value);
 				} while (nextToken.type === 5);
-				if (stringEndA.length === 0) {
-					nextToken.type = 4;
+				
+				// If a token has been extracted, add it
+				if (nextToken.type !== 0) {
+					if (stringEndA.length === 0) {
+						nextToken.type = 4;
+					}
+					manualAdd(nextToken.type, nextToken.value, context, fixErrs);
+					reportLine += nextToken.value;
 				}
-				manualAdd(nextToken.type, nextToken.value, context, fixErrs);
-				reportLine += nextToken.value;
 			} while (stringEndA.length > 0);			
 			console.log("The rest of the line was parsed successfully.");
 			tree = Sk.parseTrees.parseStackToTree(parser.stack);

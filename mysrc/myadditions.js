@@ -1,19 +1,19 @@
 stripTrailingNewLine = function (string) {
-	var lastChar = string.charAt(string.length-1);
+	/*var lastChar = string.charAt(string.length-1);
 	if (lastChar == '\n') {
 		return string.substring(0, string.length-1);
 	}
 	else {
 		return string;
-	}
+	}*/
 	
-	/*var nl = string.indexOf('\n');
+	var nl = string.indexOf('\n');
 	if (nl !== -1) {
 		return string.substring(0, nl);
 	}
 	else {
 		return string;
-	}*/
+	}
 };
 
 /*

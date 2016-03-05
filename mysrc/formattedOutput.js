@@ -10,6 +10,7 @@ Sk.formattedOutput.setOutputs = function (outputs) {
 	Sk.formattedOutput.byLineCanvas = outputs["byLineCanvas"];
 	Sk.formattedOutput.taskList = outputs["taskList"];
 	Sk.formattedOutput.codeMirror = outputs["codeMirror"];
+	Sk.formattedOutput.lineReplace = outputs["lineReplace"];
 }
 
 Sk.formattedOutput.reset = function () {
@@ -51,7 +52,7 @@ Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) 
 
 Sk.formattedOutput.setOriginalTree = function (original, lineNum) {
 	if (!Sk.formattedOutput.original) {
-		Sk.formattedOutput.original = original;
+		Sk.formattedOutput.original = {originial:original, lineNum:lineNum};
 		var err = Sk.formattedOutput.err;
 		
 		// Display explanation and jump to line if possible
@@ -82,19 +83,30 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	var index = errCanvasContents.length;
 	errCanvasContents.push(alt.tree);
 	
+	// Build the HTML that represents the line
+	// show the tree on mouseover
+	var html = "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\""
+	
+	// replace the line on click
+	if (Sk.formattedOutput.lineReplace) {
+		html += " onclick = \"Sk.formattedOutput.lineReplace(" + Sk.formattedOutput.original.lineNum + ", '" + stripTrailingNewLine(alt.context[2]) + "')\"";
+	}
+	
+	// if there is an explanation, add it as a title (tooltip)
 	if (alt.explanation) {
-		err.innerHTML += "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\" title = \"" + alt.explanation + "\">" + alt.text + "</span>";
-	}
-	else {
-		err.innerHTML += "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\">" + alt.text + "</span>";
-
+		html +=  " title = \"" + alt.explanation + "\"";
 	}
 	
+	// close the tag
+	html += ">" + stripTrailingNewLine(alt.text) + "</span>";
+	
+	// if the line is an incomplete fragment then append a "..." with a tooltip
 	if (alt.incomplete) {
-		err.innerHTML += "<span class=\"codeStyle\" title=\"This indicates that the line was incomplete.\">...</span>";
+		html += "<span class=\"codeStyle\" title=\"This indicates that the line was incomplete.\">...</span>";
 	}
+	html += "<br/>";
 	
-	err.innerHTML += "<br/>";
+	err.innerHTML += html;
 }
 
 Sk.formattedOutput.displayByLine = function (treeLines) {
