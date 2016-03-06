@@ -125,13 +125,7 @@ h1 {
 		<td rowspan="2">&nbsp;</td>
 		<td class="newStyle1" style="width: 600px; height:600px;">
 			<div id="codeWindow" style="width: 600px; height:600px;">
-				<textarea id="yourCode">import turtle
-t = turtle.Turtle()
-t.shape("circle")
-t.fillcolor(150,250,200)
-
-for i in range(5)
-    t.forward(20)</textarea>
+				<textarea id="yourCode">print(5+)</textarea>
 			</div>
 			<div id="turtleWindow" style="display:none; width:600px; height:295px;">
 				<div id="errCanvasDiv" style="display:none; overflow:auto; overflow-y:auto; width:100%; height:100%; background-color:white;">
@@ -245,7 +239,20 @@ var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourCode"), 
 	
 myCodeMirror.setSize(600, 600);
 
-var replaceLine = function (lineNum, replacement) {
+var replaceLine = function (lineNum, replacement, tokensToBeReplaced) {
+	// Replace all tokensToBeReplaced using prompts
+	var ttbr = tokensToBeReplaced;
+	var last = 0;
+	var newString = ""
+	for (i in ttbr) {
+		var slice = replacement.slice(last, ttbr[i].start);
+		last = ttbr[i].end;
+		var r = prompt("Please enter a choice from: " + ttbr[i].prompt + ".\nDo not include square brackets.");
+		newString += slice + r;
+	}
+	newString += replacement.slice(last);
+	replacement = newString;
+
 	var cur = myCodeMirror.getLine();
 	// Extract and replace the required line
 	var text = myCodeMirror.getValue();

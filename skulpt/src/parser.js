@@ -71,7 +71,7 @@ function findInDfa (a, obj) {
 
 
 // Add a token; return true if we're done
-Parser.prototype.addtoken = function (type, value, context, fixErrs) {
+Parser.prototype.addtoken = function (type, value, context, fixErrs, requiresReplacement) {
     var errline;
     var itsfirst;
     var itsdfa;
@@ -130,7 +130,7 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs) {
                 // look it up in the list of labels
                 goog.asserts.assert(t < 256);
                 // shift a token; we're done with it
-                this.shift(type, value, newstate, context);
+                this.shift(type, value, newstate, context, requiresReplacement);
                 // pop while we are in an accept-only state
                 state = newstate;
                 //console.log("before:"+JSON.stringify(states[state]) + ":state:"+state+":"+JSON.stringify(states[state]));
@@ -269,17 +269,23 @@ Parser.prototype.classify = function (type, value, context) {
 };
 
 // shift a token
-Parser.prototype.shift = function (type, value, newstate, context) {
+Parser.prototype.shift = function (type, value, newstate, context, requiresReplacement) {
     var dfa = this.stack[this.stack.length - 1].dfa;
     var state = this.stack[this.stack.length - 1].state;
     var node = this.stack[this.stack.length - 1].node;
+	
+	if (requiresReplacement === undefined) {
+		requiresReplacement = 0;
+	}
+	
     //print("context", context);
     var newnode = {
         type      : type,
         value     : value,
         lineno    : context[0][0],         // throwing away end here to match cpython
         col_offset: context[0][1],
-        children  : null
+        children  : null,
+		requiresReplacement:requiresReplacement
     };
     if (newnode) {
         node.children.push(newnode);
@@ -427,15 +433,14 @@ function makeParser (filename, style, fixErrs) {
     };
 	
 	// manually add a token
-	// never attempt to fix errors when manually adding
-	var addToken = function (type, value, context, fixErrs) {
+	var addToken = function (type, value, context, fixErrs, requiresReplacement) {
 		if (fixErrs === undefined) {
 			fixErrs = 0;
 		}
 		if (context === undefined) {
 			context = [[],[]];
 		}
-		return p.addtoken(type, value, context, fixErrs);
+		return p.addtoken(type, value, context, fixErrs, requiresReplacement);
 	}
 
     // set flags, and return

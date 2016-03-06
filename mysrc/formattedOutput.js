@@ -2,6 +2,7 @@ Sk.formattedOutput = Sk.formattedOutput || {};
 Sk.formattedOutput.original = {};
 var errCanvasContents = [];
 var byLineCanvasContents = [];
+var lineReplacements = [];
 
 Sk.formattedOutput.setOutputs = function (outputs) {
 	Sk.formattedOutput.err = outputs["err"];
@@ -18,8 +19,8 @@ Sk.formattedOutput.reset = function () {
 	Sk.formattedOutput.err.innerHTML = "";
 	errCanvasContents = [];
 	byLineCanvasContents = [];
+	lineReplacements = [];
 }
-
 
 Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) {
 	var err = Sk.formattedOutput.err;
@@ -94,6 +95,7 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	}
 	var index = errCanvasContents.length;
 	errCanvasContents.push(alt.tree);
+	lineReplacements.push(alt.replacements);
 	
 	// Build the HTML that represents the line
 	// show the tree on mouseover
@@ -101,7 +103,7 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	
 	// replace the line on click
 	if (Sk.formattedOutput.lineReplace) {
-		html += " onclick = \"Sk.formattedOutput.lineReplace(" + Sk.formattedOutput.original.lineNum + ", '" + stripTrailingNewLine(alt.context[2]) + "')\"";
+		html += " onclick = \"Sk.formattedOutput.lineReplace(" + Sk.formattedOutput.original.lineNum + ", '" + stripTrailingNewLine(alt.context[2]) + "', lineReplacements[" + (index-1) + "])\"";
 	}
 	
 	// if there is an explanation, add it as a title (tooltip)

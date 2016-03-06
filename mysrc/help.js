@@ -87,7 +87,7 @@ Sk.help.stackNodeToTokens = function (node) {
 	
 	// If the node is a leaf it represents a token.
 	if (node.children === null) {
-		var t = {type:node.type, value:node.value, start:node.col_offset};
+		var t = {type:node.type, value:node.value, start:node.col_offset, requiresReplacement:node.requiresReplacement};
 		tokens.push(t);
 	}
 	// Else the node represents a branch and represents a rule rather\

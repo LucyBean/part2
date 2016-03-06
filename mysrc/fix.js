@@ -134,7 +134,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 				meaning += "]";
 				
 				var tokenNum = Sk.ilabelMeaning.ilabelToTokenNumber(rep);
-				var newToken = {value:meaning, type:tokenNum};
+				var newToken = {value:meaning, type:tokenNum, requiresReplacement:1};
 				
 				// Prevent trying to insert a token that is the same type
 				// as the token that just came before it.
@@ -345,7 +345,7 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 	var fixedLine = currentLine;
 	var reportLine;
 	for (i in manualAddTokens) {
-		fixedLine += manualAddTokens[i].value + " ";
+		fixedLine += manualAddTokens[i].value;
 	}
 	reportLine = fixedLine;
 	fixedLine += stringEnd;
@@ -355,7 +355,7 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		var len = tokenVal.length;
 		var con = [[lineNo, pos], [lineNo, pos+len], fixedLine];
 		
-		// Increase pos according to any blank spaces after
+		// Increase pos according to any following blank spaces
 		pos += len;
 		while (fixedLine[pos] === " ") {
 			pos++;
@@ -371,13 +371,19 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		
 		var tokens = prevTokens.concat(manualAddTokens);
 		
+		var replacements = [];		
 		var context;
 		// Parse the tokens using the manual add function
 		// <manualAdd> has <fixErrs> set to 1. This will mean inserting up to two
 		// adjacent symbols will be tried
 		for (i in tokens) {
 			context = genContext(tokens[i].value);
-			manualAdd(tokens[i].type, tokens[i].value, context, fixErrs);
+			manualAdd(tokens[i].type, tokens[i].value, context, fixErrs, tokens[i].requiresReplacement);
+			
+			if(tokens[i].requiresReplacement) {
+				var replacement = {start:context[0][1], end:context[1][1], prompt:tokens[i].value};
+				replacements.push(replacement);
+			}
 		}
 		
 		// If we have got this far, we know the fix works
@@ -391,21 +397,29 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 			var stringEndA = stringEnd;
 			var context;
 			do {
+				// Extract the next non-space token
+				while (stringEndA[0] === " ") {
+					stringEndA = stringEndA.slice(1);
+				}
+				nextToken = Sk.Tokenizer.extractOneToken(stringEndA);
+				stringEndA = stringEndA.slice(nextToken.value.length);
+				
+				/*
 				do {
 					nextToken = Sk.Tokenizer.extractOneToken(stringEndA);
 					stringEndA = stringEndA.slice(nextToken.value.length);
 					context = genContext(nextToken.value);
-				} while (nextToken.type === 5);
+				} while (nextToken.type === 5);*/
 				
 				// If a token has been extracted, add it
 				if (nextToken.type !== 0) {
-					if (stringEndA.length === 0) {
+					if (nextToken.type === 53) {
 						nextToken.type = 4;
 					}
-					manualAdd(nextToken.type, nextToken.value, context, fixErrs);
+					manualAdd(nextToken.type, nextToken.value, context, fixErrs, nextToken.requiresReplacement);
 					reportLine += nextToken.value;
 				}
-			} while (stringEndA.length > 0);			
+			} while (stringEndA.length > 0);	
 			console.log("The rest of the line was parsed successfully.");
 			tree = Sk.parseTrees.parseStackToTree(parser.stack);
 		}
@@ -416,6 +430,7 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		ret.text = reportLine;
 		ret.tree = tree;
 		ret.context = context;
+		ret.replacements = replacements;
 		return ret;
 	}
 	catch (err) {
