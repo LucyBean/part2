@@ -16,6 +16,19 @@ stripTrailingNewLine = function (string) {
 	}
 };
 
+escapeDoubleQuotes = function (line) {
+	for(var i = 0; i < line.length; i++) {
+		if (line[i] === "\"") {
+			var start = line.substring(0,i);
+			var end = line.substring(i+1);
+			
+			line = start + "&quot;" + end;
+			i++;
+		}
+	}
+	return line;
+}
+
 /*
  * Check fix will return true or false on whether the lexer can successfully
  * parse the tokens. Need to prevent infinite loops.

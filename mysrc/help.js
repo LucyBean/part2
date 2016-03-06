@@ -87,7 +87,7 @@ Sk.help.stackNodeToTokens = function (node) {
 	
 	// If the node is a leaf it represents a token.
 	if (node.children === null) {
-		var t = {type:node.type, value:node.value};
+		var t = {type:node.type, value:node.value, start:node.col_offset};
 		tokens.push(t);
 	}
 	// Else the node represents a branch and represents a rule rather\
@@ -109,8 +109,11 @@ Sk.help.stackNodeToTokens = function (node) {
 Sk.help.tokensToString = function (tokens) {
 	var s = "";
 	
+	var lastEnd = 0;
 	for (var i = 0; i < tokens.length; i++) {
-		s += tokens[i].value + " ";
+		var blankSpace = tokens[i].start - lastEnd;
+		s += " ".repeat(blankSpace) + tokens[i].value;
+		lastEnd = tokens[i].start + tokens[i].value.length;
 	}
 	
 	return s;

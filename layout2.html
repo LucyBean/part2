@@ -160,7 +160,7 @@ for i in range(5)
 				After you hit the run button, the results of your code will appear here.
 				</div>
 			</div>
-			<div id="errorDisplay" class="rightMenuStyle" style="height:300px; display:none;">
+			<div id="errorDisplay" class="rightMenuStyle" style="height:300px; display:none; overflow-y:auto;">
 				<h1>Oh no! Looks like you had some errors...</h1>
 				<div id="errorOutput">Help for errors will appear here.</div>
 			</div>
@@ -183,6 +183,11 @@ for i in range(5)
 					<img alt="Task 1" height="50" src="img/btn-1-unpressed.png" width="50" onclick="loadTask(1)">
 					<img alt="Task 2" height="50" src="img/btn-2-unpressed.png" width="50">
 					<img alt="Task 3" height="50" src="img/btn-3-unpressed.png" width="50">
+				</td>
+				<td style="width:20px"></td>
+				<td>
+					<img alt="Undo" height="50" width="50" src="img/btn-undo.png" onclick="myCodeMirror.undo()">
+					<img alt="Redo" height="50" width="50" src="img/btn-redo.png" onclick="myCodeMirror.redo()">
 				</td>
 			</tr>
 		</table>
@@ -249,8 +254,12 @@ var replaceLine = function (lineNum, replacement) {
 	
 	// Join the lines back again
 	var text = "";
-	for (i in lines) {
-		text += lines[i] + "\n";
+	for (var i = 0; i < lines.length; i++) {
+		text += lines[i];
+		
+		if (i !== lines.length-1) {
+			text += "\n";
+		}
 	}
 	myCodeMirror.setValue(text);
 	myCodeMirror.setCursor(cur);

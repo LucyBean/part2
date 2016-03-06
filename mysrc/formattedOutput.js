@@ -23,6 +23,7 @@ Sk.formattedOutput.reset = function () {
 
 Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) {
 	var err = Sk.formattedOutput.err;
+	lineNum++;
 	
 	err.innerHTML = "";
 	errCanvasContents = [];
@@ -44,7 +45,18 @@ Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) 
 		var listContent = "";
 		for (var i = 0; i < alternatives.length; i++) {
 			errCanvasContents.push(alternatives[i]);
-			listContent += "<li><span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawBrackets(Sk.formattedOutput.errCanvas, errCanvasContents[" + (i+1) + "])\">" + alternatives[i] + "</span></li>";
+			
+			// Build the HTML to represent this
+			var html = "<span class = \"codeStyle\"";
+			html += "onmouseover=\"Sk.drawing.drawBrackets(Sk.formattedOutput.errCanvas, errCanvasContents[" + (i+1) + "])\"";
+			if (Sk.formattedOutput.lineReplace) {
+				html += "onclick=\"Sk.formattedOutput.lineReplace(" + lineNum + ", '" + alternatives[i] + "')\"";
+			}
+			html += ">";
+			html += alternatives[i];
+			html += "</span>";
+			
+			listContent += "<li>" + html + "</li>";
 		}
 		err.innerHTML += "<ol>" + listContent + "</ol>";
 	}
@@ -78,7 +90,7 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	// Add a suggestion message if the canvas has length 1 or less
 	// indicates only the original is on the page.
 	if (errCanvasContents.length <= 1) {
-		err.innerHTML += "You could try:<br/>";
+		err.innerHTML += "Here are some alternatives. Click on one to try it. If you are unhappy with the results, click the undo button.<br/>";
 	}
 	var index = errCanvasContents.length;
 	errCanvasContents.push(alt.tree);
@@ -160,6 +172,15 @@ Sk.formattedOutput.suggestStringFix = function (original, fix, lineNum) {
 	// Display fix, if it exists.
 	if (fix) {
 		err.innerHTML += "You could try:<br/>";
-		err.innerHTML += "<span class = \"codeStyle\">" + fix + "</span>";
+		var html = "<span class=\"codeStyle\"";
+		if (Sk.formattedOutput.lineReplace) {
+			var esc = escapeDoubleQuotes(fix);
+			html += " onclick=\"Sk.formattedOutput.lineReplace(" + lineNum + ", '" + esc + "')\"";
+		}
+		html += ">";
+		html += fix;
+		html += "</span>";
+		
+		err.innerHTML += html;
 	}
 }

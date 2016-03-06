@@ -460,8 +460,7 @@ Sk.parse = function parse (filename, input) {
 	for (var j = 0; j < lines.length; j++) {
 		var errPos = Sk.find.unfinishedString(lines[j]);
 		if (errPos) {
-			var fix = Sk.fix.eolInString(lines[j], errPos);
-			Sk.formattedOutput.suggestStringFix(lines[j], fix);
+			var fix = Sk.fix.eolInString(lines[j], j, errPos);
 			
 			throw new Sk.builtin.ParseError("Unterminated string.", this.filename);
 		}

@@ -275,7 +275,7 @@ Sk.fix.unbalancedBrackets = function (input, brackets) {
 /**
  *	Returns feedback on an eolInString error.
  */
-Sk.fix.eolInString = function (line, errPosition) {		
+Sk.fix.eolInString = function (line, lineNum, errPosition) {		
 	// Find the unbalanced brackets within the line and check whether
 	// these have accidentally been included in the string
 	var unbalanced = Sk.find.unbalancedBrackets(line).brackets;
@@ -324,7 +324,7 @@ Sk.fix.eolInString = function (line, errPosition) {
 	
 	var fixed = Sk.Tokenizer.checkLex(fix);
 	if (fixed) {
-		return fix;
+		Sk.formattedOutput.suggestStringFix(line, fix, lineNum+1);
 	}
 };
 
@@ -354,7 +354,12 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 	var genContext = function (tokenVal) {
 		var len = tokenVal.length;
 		var con = [[lineNo, pos], [lineNo, pos+len], fixedLine];
-		pos += len+1;
+		
+		// Increase pos according to any blank spaces after
+		pos += len;
+		while (fixedLine[pos] === " ") {
+			pos++;
+		}
 		return con;
 	}
 	
