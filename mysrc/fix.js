@@ -12,6 +12,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 	var nextToken = Sk.Tokenizer.extractOneToken(stringEndGlobal);
 	var stringEnd = stringEndGlobal.slice(nextToken.value.length);
 	var tryGeneric = true;
+	var altFound = false;
 
 	var nextNextToken;
 	var stringEndA = stringEnd;
@@ -38,6 +39,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		var a = Sk.fix.concatAdjacentNames(prevToken, nextToken, prevTokens, usedNames, stringEnd, fixErrs);
 		if (a) {
 			tryGeneric = false;
+			altFound = true;
 			a.explanation = "Two names were concatenated. Names in python cannot contain spaces.";
 			Sk.formattedOutput.suggestAlternativeTree(a);
 		}
@@ -48,6 +50,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		var a = Sk.fix.concatAdjacentNames(nextToken, nextNextToken, prevTokens, usedNames, stringEndA, fixErrs);
 		if (a) {
 			tryGeneric = false;
+			altFound = true;
 			a.explanation = "Two names were concatenated. Names in python cannot contain spaces.";
 			Sk.formattedOutput.suggestAlternativeTree(a);
 		}
@@ -69,6 +72,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 			var a = Sk.fix.testFix(prevTokens, [commaToken, nextToken], stringEnd, fixErrs);
 			if (a) {
 				tryGeneric = false;
+				altFound = true;
 				a.explanation = "This is a function call.";
 				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
@@ -81,6 +85,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		var a = Sk.fix.testFix(prevTokens, [colonToken, nextToken], stringEnd, fixErrs);
 		if (a) {
 				tryGeneric = false;
+				altFound = true;
 				a.explanation = "This is the start of a block, so a colon is required at the end.";
 				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
@@ -94,6 +99,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		if ([7,8,9,10,26,27].indexOf(prevToken.type) === -1) {
 			var a = Sk.fix.testFix(prevTokens.slice(0,prevTokens.length-1), [nextToken], stringEnd, fixErrs);
 			if (a) {
+				altFound = true;
 				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
 		}
@@ -104,6 +110,7 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 		if ([4,7,8,9,10,26,27].indexOf(nextToken.type) === -1) {
 			var a = Sk.fix.testFix(prevTokens, [nextNextToken], stringEndA, fixErrs);
 			if (a) {
+				altFound = true;
 				Sk.formattedOutput.suggestAlternativeTree(a);
 			}
 		}
@@ -146,11 +153,14 @@ Sk.fix.unfinishedInfix = function (context, stack, fixErrs, usedNames) {
 				var a = Sk.fix.testFix (prevTokens, [newToken, nextToken], stringEnd, fixErrs);
 				
 				if (a) {
+					altFound = true;
 					Sk.formattedOutput.suggestAlternativeTree(a);
 				}
 			}
 		}
 	}
+	
+	return altFound;
 };
 
 // Attempts to fix unbalanced brackets by inserting brackets into the line
@@ -325,7 +335,9 @@ Sk.fix.eolInString = function (line, lineNum, errPosition) {
 	var fixed = Sk.Tokenizer.checkLex(fix);
 	if (fixed) {
 		Sk.formattedOutput.suggestStringFix(line, fix, lineNum+1);
+		return true;
 	}
+	return false;
 };
 
 Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {

@@ -125,7 +125,45 @@ h1 {
 		<td rowspan="2">&nbsp;</td>
 		<td class="newStyle1" style="width: 600px; height:600px;">
 			<div id="codeWindow" style="width: 600px; height:600px;">
-				<textarea id="yourCode">print(5+)</textarea>
+				<textarea id="yourCode">import turtle
+t = turtle.Turtle()
+t.shape("triangle")
+t.fillcolor(150,250,200)
+
+t.penup()
+t.setpos(-200,-100)
+t.pendown()
+
+nt = 5
+anglet = 360 / nt
+
+for i in range(nt):
+    t.forward(100)
+    t.left(anglet)
+    t.stamp()
+    
+s = turtle.Turtle()
+s.shape("circle")
+s.fillcolor(200,150,250)
+
+s.penup()
+s.setpos(150,100)
+s.setheading(180)
+s.pendown()
+
+ns = 8
+angles = 360 / ns
+
+for i in range(ns):
+    s.backward(50)
+    s.right(angles)
+    s.stamp()
+    
+r = turtle.Turtle()
+r.shape("square")
+r.pencolor(255,100,100)
+
+r.circle(50)</textarea>
 			</div>
 			<div id="turtleWindow" style="display:none; width:600px; height:295px;">
 				<div id="errCanvasDiv" style="display:none; overflow:auto; overflow-y:auto; width:100%; height:100%; background-color:white;">
@@ -175,8 +213,8 @@ h1 {
 				</td>
 				<td title="Load the starting text for each task.">
 					<img alt="Task 1" height="50" src="img/btn-1-unpressed.png" width="50" onclick="loadTask(1)">
-					<img alt="Task 2" height="50" src="img/btn-2-unpressed.png" width="50">
-					<img alt="Task 3" height="50" src="img/btn-3-unpressed.png" width="50">
+					<img alt="Task 2" height="50" src="img/btn-2-unpressed.png" width="50" onclick="loadTask(2)">
+					<img alt="Task 3" height="50" src="img/btn-3-unpressed.png" width="50" onclick="loadTask(3)">
 				</td>
 				<td style="width:20px"></td>
 				<td>
@@ -307,8 +345,7 @@ var loadTask = function (n) {
 	var task = Sk.turtleTasks[n];
 	
 	if (task) {
-		Sk.formattedOutput.transcribeTaskList(task.tasks);
-		var yourCode = document.getElementById("yourCode");
+		taskText.innerHTML = task.promptText;
 		myCodeMirror.setValue(task.initCode);
 	}
 }
@@ -367,7 +404,7 @@ var run = function () {
 				return result;
 			});
 		   
-			myPromise.then(function(mod) {console.log('success');},	function(err) {console.log(err.toString());});
+			myPromise.then(function(mod) {console.log('success');},	function(err) {displayErrorPane(); Sk.formattedOutput.unfixableErr(err);});
 			
 		}
 		catch (err) {
@@ -377,7 +414,7 @@ var run = function () {
 			}
 			else {
 				console.log(err);
-				throw err;
+				Sk.formattedOutput.unfixableErr(err);
 			}
 		}
 	}

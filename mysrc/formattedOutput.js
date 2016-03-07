@@ -186,3 +186,19 @@ Sk.formattedOutput.suggestStringFix = function (original, fix, lineNum) {
 		err.innerHTML += html;
 	}
 }
+
+Sk.formattedOutput.unfixableErr = function (err) {
+	var errOut = Sk.formattedOutput.err;
+	errOut.innerHTML = "";
+	errOut.innerHTML += "There was an unfixable error:<br/>";
+	errOut.innerHTML += err.toString() + "<br/>";
+	
+	// Attempt to extract the lineNum
+	var tb = err.traceback[0];
+	if (tb && Sk.formattedOutput.codeMirror) {
+		var lineNum = tb.lineno;
+		var line = Sk.formattedOutput.codeMirror.getLine(lineNum-1);
+		Sk.formattedOutput.codeMirror.setCursor(lineNum-1);
+		errOut.innerHTML += "<span class=\"codeStyle\">" + line + "</span>";
+	}
+}

@@ -221,13 +221,17 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs, requiresRep
 			if (fixErrs) {
 				// Find a valid token that can be inserted at this point
 				var stack = this.stack.slice(this.lastNewLine-1);
-				Sk.fix.unfinishedInfix(context, stack, fixErrs - 1, this.used_names);
+				var success = Sk.fix.unfinishedInfix(context, stack, fixErrs - 1, this.used_names);
 			}
 			
             // no transition
 			console.log("Parsing error: " + context[2]);
-
-            throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
+			
+			if (success) {
+				throw "Incorrect syntax";
+			} else {
+				throw new Sk.builtin.ParseError("bad input", this.filename, errline, context);
+			}
         }
     }
 };
@@ -467,7 +471,12 @@ Sk.parse = function parse (filename, input) {
 		if (errPos) {
 			var fix = Sk.fix.eolInString(lines[j], j, errPos);
 			
-			throw new Sk.builtin.ParseError("Unterminated string.", this.filename);
+			if (fix) {
+				throw "Incorrect syntax";
+			}
+			else {
+				throw new Sk.builtin.ParseError("Unterminated string.", this.filename);
+			}
 		}
 		
 		var brackets = Sk.find.unbalancedBrackets(lines[j]);
@@ -478,7 +487,12 @@ Sk.parse = function parse (filename, input) {
 			
 			Sk.formattedOutput.suggestBrackets(org, alts, j);
 			
-			throw new Sk.builtin.ParseError("Unbalanced brackets.", this.filename);
+			if (alts.length > 0) {
+				throw "Incorrect syntax";
+			}
+			else {
+				throw new Sk.builtin.ParseError("Unbalanced brackets.", this.filename);
+			}
 		}
 	}
 	
