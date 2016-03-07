@@ -15,6 +15,7 @@ t.fillcolor(150,250,200)\n\
 \n\
 t.penup()\n\
 t.setpos(-200,-100)\n\
+t.setheading(30)\n\
 t.pendown()\n\
 \n\
 nt = 5\n\
@@ -30,16 +31,16 @@ s.shape(\"circle\")\n\
 s.fillcolor(200,150,250)\n\
 \n\
 s.penup()\n\
-s.setpos(150,100)\n\
-s.setheading(180)\n\
+s.setpos(100, 0)\n\
 s.pendown()\n\
 \n\
-ns = 8\n\
-angles = 360 / ns\n\
-\n\
-for i in range(ns):\n\
-    s.backward(50)\n\
-    s.right(angles)\n\
+for i in range(10):\n\
+    if (i%2 == 0):\n\
+        s.right(60)\n\
+        s.forward(30)\n\
+    else:\n\
+        s.left(60)\n\
+        s.backward(30)\n\
     s.stamp()\n\
     \n\
 r = turtle.Turtle()\n\

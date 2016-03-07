@@ -142,19 +142,6 @@ Sk.formattedOutput.turtleLocation = function (location) {
 	Sk.output("Turtle visited (" + location.x + ", " + location.y + ")<br/>");
 }
 
-Sk.formattedOutput.transcribeTaskList = function (tasks) {
-	if (Sk.formattedOutput.taskList) {
-			var text = "<ol>"
-		for (i in tasks) {
-			var t = tasks[i];
-			text += "<li>" + Sk.turtleTasks.taskNames[t[0]](t[1]) + "</li>";
-		}
-		text += "</ol>";
-		
-		Sk.formattedOutput.taskList.innerHTML = text;
-	}
-}
-
 Sk.formattedOutput.suggestStringFix = function (original, fix, lineNum) {
 	var err = Sk.formattedOutput.err;
 	
@@ -194,9 +181,9 @@ Sk.formattedOutput.unfixableErr = function (err) {
 	errOut.innerHTML += err.toString() + "<br/>";
 	
 	// Attempt to extract the lineNum
-	var tb = err.traceback[0];
+	var tb = err.traceback;
 	if (tb && Sk.formattedOutput.codeMirror) {
-		var lineNum = tb.lineno;
+		var lineNum = tb[0].lineno;
 		var line = Sk.formattedOutput.codeMirror.getLine(lineNum-1);
 		Sk.formattedOutput.codeMirror.setCursor(lineNum-1);
 		errOut.innerHTML += "<span class=\"codeStyle\">" + line + "</span>";
