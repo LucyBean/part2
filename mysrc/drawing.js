@@ -2,8 +2,8 @@ Sk.drawing = {};
 Sk.drawing.treeStyle = {};
 Sk.drawing.bracketStyle = {};
 
-Sk.drawing.treeStyle.cellWidth = 120;
-Sk.drawing.treeStyle.cellHeight = 40;
+Sk.drawing.treeStyle.cellWidth = 80;
+Sk.drawing.treeStyle.cellHeight = 25;
 Sk.drawing.treeStyle.padding = 20;
 Sk.drawing.treeStyle.margin = 5;
 Sk.drawing.treeStyle.textSize = 14;

@@ -71,7 +71,7 @@
 <script src="./mySrc/help.js" type="text/javascript"></script>
 <script src="./mySrc/parseTrees.js" type="text/javascript"></script>
 <script src="./mySrc/find.js" type="text/javascript"></script>
-<script src="./turtle/turtleTracker.js" type="text/javascript"></script>
+<script src="./mySrc/logger.js" type="text/javascript"></script>
 <script src="./turtle/turtleTasks.js" type="text/javascript"></script>
 
 <!-- CodeMirror -->
@@ -81,12 +81,14 @@
 <script src="./codemirror/codemirror-5.9/addon/edit/closebrackets.js" type="text/javascript"></script>
 <script src="./codemirror/codemirror-5.9/addon/hint/show-hint.js" type="text/javascript"></script>
 
-
 <link rel="stylesheet" href="codemirror/codemirror.css">
 <script src="codemirror/python.js" type="text/javascript"></script>
 
 <!-- Fabric.js -->
 <script src="./fabric/dist/fabric.js" type="text/javascript"></script>
+
+<!-- FileSaver -->
+<script src="./FileSaver.js/FileSaver.js" type="text/javascript"></script>
 
 <style type="text/css">
 td.newStyle1 {
@@ -221,6 +223,7 @@ r.circle(50)</textarea>
 				<td>
 					<img alt="Undo" height="50" width="50" src="img/btn-undo.png" onclick="myCodeMirror.undo()">
 					<img alt="Redo" height="50" width="50" src="img/btn-redo.png" onclick="myCodeMirror.redo()">
+					<img alt="Save log" height="50" width="50" src="img/btn-save.png" onclick="Logger.save()">
 				</td>
 			</tr>
 		</table>
@@ -232,8 +235,6 @@ r.circle(50)</textarea>
 </table>
 
 <script type="text/javascript">
-Sk.turtleTracker.reset();
-
 var resultsPage = document.getElementById("results");
 var ecd = document.getElementById("errCanvasDiv");
 var tc = document.getElementById("turtleCanvas");
@@ -307,8 +308,9 @@ var replaceLine = function (lineNum, replacement, tokensToBeReplaced) {
 			text += "\n";
 		}
 	}
+	Logger.log("Replacement chosen","line " + lineNum + " " + escape(replacement), text);
 	myCodeMirror.setValue(text);
-	myCodeMirror.setCursor(cur);
+	myCodeMirror.setCursor(cur,0);
 };
 
 var turtleDisplayed = false;
@@ -377,6 +379,13 @@ var debugOut = function(arg) {
 	}
 }
 
+var askName = function() {
+	var name = prompt("Please enter your logging number.");
+	Logger.setName(name);
+};
+
+askName();
+
 var run = function () {
 	displayResultsPane();
 	displayTurtle();
@@ -415,17 +424,19 @@ var run = function () {
 				return result;
 			});
 		   
-			myPromise.then(function(mod) {console.log('success');},	function(err) {displayErrorPane(); Sk.formattedOutput.unfixableErr(err);});
-			
+			myPromise.then(function(mod) {Logger.log("Success","none",prog);},	function(err) {Logger.log("Error","Unfixable",prog); displayErrorPane(); Sk.formattedOutput.unfixableErr(err);});
 		}
 		catch (err) {
 			displayErrorPane();
 			if (err === "Incorrect syntax")	{
+				Logger.log("Error","Suggestions made",prog);
 				console.log("Syntax was incorrect, but a fix was attempted.");
 			}
 			else {
+				Logger.log("Error","Unfixable",prog);
 				console.log(err);
 				Sk.formattedOutput.unfixableErr(err);
+				throw err;
 			}
 		}
 	}

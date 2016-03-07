@@ -220,7 +220,14 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs, requiresRep
 			
 			if (fixErrs) {
 				// Find a valid token that can be inserted at this point
-				var stack = this.stack.slice(this.lastNewLine-1);
+				// Split the stack according to the last stmt
+				var lastStmt = 0;
+				for (i in this.stack) {
+					if (this.stack[i].node.type === 323) {
+						lastStmt = i;
+					}
+				}
+				var stack = this.stack.slice(lastStmt);
 				var success = Sk.fix.unfinishedInfix(context, stack, fixErrs - 1, this.used_names);
 			}
 			

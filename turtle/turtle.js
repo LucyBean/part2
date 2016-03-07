@@ -916,9 +916,6 @@ function generateTurtleModule(_target) {
         proto.$stamp = function() {
             pushUndo(this);
             return this.addUpdate(function() {
-				if (Sk.turtleTracker) {
-					Sk.turtleTracker.addTrack(this);
-				}
                 drawTurtle(this, this.context());
             }, true);
         };
