@@ -28,7 +28,7 @@ Sk.parseTrees.extractPrintTree = function (node, f) {
 		}
 	}
 	else {
-		v = Sk.ilabelMeaning(node.type);
+		v = "";
 	}
 	
 	if (!node.children) {

@@ -2,7 +2,7 @@ Sk.drawing = {};
 Sk.drawing.treeStyle = {};
 Sk.drawing.bracketStyle = {};
 
-Sk.drawing.treeStyle.cellWidth = 80;
+Sk.drawing.treeStyle.cellWidth = 110;
 Sk.drawing.treeStyle.cellHeight = 25;
 Sk.drawing.treeStyle.padding = 20;
 Sk.drawing.treeStyle.margin = 5;
@@ -111,15 +111,28 @@ Sk.drawing.drawNodeFabric = function (canvas, node, info, offset) {
 		}
 	}
 	
-	var rect = new fabric.Rect({fill:colour, width:Sk.drawing.treeStyle.cellWidth, height:Sk.drawing.treeStyle.cellHeight, stroke:'black'});
-	
-	var text = new fabric.Text(t, {fontSize:Sk.drawing.treeStyle.textSize, fontFamily:'Segoe UI', textAlign:'center'});
-	text.set({left:(Sk.drawing.treeStyle.cellWidth-text.getWidth())/2, top:(Sk.drawing.treeStyle.cellHeight-text.getHeight())/2});
-	
-	var group = new fabric.Group([rect, text], {left:x, top:y});
-	group.hasControls = false;
-	
-	canvas.add(group);
+	// Draw the node with text
+	if (t !=="") {
+		var rect = new fabric.Rect({fill:colour, width:Sk.drawing.treeStyle.cellWidth, height:Sk.drawing.treeStyle.cellHeight, stroke:'black'});
+		
+		var text = new fabric.Text(t, {fontSize:Sk.drawing.treeStyle.textSize, fontFamily:'Segoe UI', textAlign:'center'});
+		text.set({left:(Sk.drawing.treeStyle.cellWidth-text.getWidth())/2, top:(Sk.drawing.treeStyle.cellHeight-text.getHeight())/2});
+		
+		var group = new fabric.Group([rect, text], {left:x, top:y});
+		group.selectable = false;
+		
+		canvas.add(group);
+	}
+	// Else draw as a circle
+	else {
+		if (colour === "#ffffff") {
+			colour = "#99ff99";
+		}
+		var newX = x + (Sk.drawing.treeStyle.cellWidth - Sk.drawing.treeStyle.cellHeight)/2;
+		var circ = new fabric.Circle({fill:colour, radius:Sk.drawing.treeStyle.cellHeight/2, stroke:'black', left:newX, top:y});
+		circ.selectable = false;
+		canvas.add(circ);
+	}
 	
 	// Draw the children
 	if (node.children) {

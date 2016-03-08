@@ -114,6 +114,11 @@ h1 {
 	padding:1px;
 	background-color:#CCFFCC;
 }
+span.codeStyle {
+	line-height: 1.8;
+	border-style:solid;
+	border-width:1px;
+}
 </style>
 </head>
 
@@ -127,46 +132,7 @@ h1 {
 		<td rowspan="2">&nbsp;</td>
 		<td class="newStyle1" style="width: 600px; height:600px;">
 			<div id="codeWindow" style="width: 600px; height:600px;">
-				<textarea id="yourCode">import turtle
-t = turtle.Turtle()
-t.shape("triangle")
-t.fillcolor(150,250,200)
-
-t.penup()
-t.setpos(-200,-100)
-t.setheading(30)
-t.pendown()
-
-nt = 5
-anglet = 360 / nt
-
-for i in range(nt):
-    t.forward(100)
-    t.left(anglet)
-    t.stamp()
-    
-s = turtle.Turtle()
-s.shape("circle")
-s.fillcolor(200,150,250)
-
-s.penup()
-s.setpos(100, 0)
-s.pendown()
-
-for i in range(10):
-    if (i%2 == 0):
-        s.right(60)
-        s.forward(30)
-    else:
-        s.left(60)
-        s.backward(30)
-    s.stamp()
-    
-r = turtle.Turtle()
-r.shape("square")
-r.pencolor(255,100,100)
-
-r.circle(50)</textarea>
+				<textarea id="yourCode">(5+)</textarea>
 			</div>
 			<div id="turtleWindow" style="display:none; width:600px; height:295px;">
 				<div id="errCanvasDiv" style="display:none; overflow:auto; overflow-y:auto; width:100%; height:100%; background-color:white;">
@@ -189,13 +155,13 @@ r.circle(50)</textarea>
 					the main panel.</div>
 			</div>
 			<div style="height:8px"></div>
-			<div id="results" class="rightMenuStyle">
+			<div id="results" class="rightMenuStyle" style="height:370px">
 				<h1>Results</h1>
-				<div id="resultDisplay" class="codeStyle" style="height:300px; overflow-y:auto;">
+				<div id="resultDisplay" class="codeStyle" style="overflow-y:auto;">
 				After you hit the run button, the results of your code will appear here.
 				</div>
 			</div>
-			<div id="errorDisplay" class="rightMenuStyle" style="height:300px; display:none; overflow-y:auto;">
+			<div id="errorDisplay" class="rightMenuStyle" style="height:370px; display:none; overflow-y:auto;">
 				<h1>Oh no! Looks like you had some errors...</h1>
 				<div id="errorOutput">Help for errors will appear here.</div>
 			</div>
@@ -248,6 +214,7 @@ var displayErrorPane = function () {
 	resultsPage.style.display = "none";
 	errorDisplay.style.display = "block";
 	
+	displayTurtle();
 	// Hide the turtle canvas and show the err canvas
 	ecd.style.display = "block";
 	tc.style.display = "none";
@@ -287,7 +254,7 @@ var replaceLine = function (lineNum, replacement, tokensToBeReplaced) {
 	for (i in ttbr) {
 		var slice = replacement.slice(last, ttbr[i].start);
 		last = ttbr[i].end;
-		var r = prompt("Please enter a choice from: " + ttbr[i].prompt + ".\nDo not include square brackets.");
+		var r = prompt("Please enter a value for " + ttbr[i].prompt + ".\nDo not include square brackets.");
 		newString += slice + r;
 	}
 	newString += replacement.slice(last);

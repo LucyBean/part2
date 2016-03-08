@@ -116,7 +116,7 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	
 	// if the line is an incomplete fragment then append a "..." with a tooltip
 	if (alt.incomplete) {
-		html += "<span class=\"codeStyle\" title=\"This indicates that the line was incomplete.\">...</span>";
+		html += "&nbsp;<span class=\"codeStyle\" title=\"This indicates that the line was incomplete.\">...</span>";
 	}
 	html += "<br/>";
 	
