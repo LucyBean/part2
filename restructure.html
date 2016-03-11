@@ -1,0 +1,389 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Lucy's Part II Project</title>
+<!-- skulpt -->
+<script src="./skulpt/support/closure-library/closure/goog/base.js" type="text/javascript"></script>
+<script src="./skulpt/src/env.js" type="text/javascript"></script>
+<script src="./skulpt/src/parser.js" type="text/javascript"></script>
+<script src="./skulpt/src/tokenize.js" type="text/javascript"></script>
+<script src="./skulpt/src/symtable.js" type="text/javascript"></script>
+<script src="./skulpt/src/compile.js" type="text/javascript"></script>
+<script src="./skulpt/gen/parse_tables.js" type="text/javascript"></script>
+<script src="./skulpt/gen/astnodes.js" type="text/javascript"></script>
+<script src="./skulpt/src/ast.js" type="text/javascript"></script>
+<script src="./skulpt/src/misceval.js" type="text/javascript"></script>
+<script src="./skulpt/src/type.js" type="text/javascript"></script>
+<script src="./skulpt/src/builtin.js" type="text/javascript"></script>
+<script src="./skulpt/src/abstract.js" type="text/javascript"></script>
+<script src="./skulpt/src/object.js" type="text/javascript"></script>
+<script src="./skulpt/src/function.js" type="text/javascript"></script>
+<script src="./skulpt/src/seqtype.js" type="text/javascript"></script>
+<script src="./skulpt/src/numtype.js" type="text/javascript"></script>
+<script src="./skulpt/src/list.js" type="text/javascript"></script>
+<script src="./skulpt/src/tuple.js" type="text/javascript"></script>
+<script src="./skulpt/src/module.js" type="text/javascript"></script>
+<script src="./skulpt/src/int.js" type="text/javascript"></script>
+<script src="./skulpt/src/bool.js" type="text/javascript"></script>
+<script src="./skulpt/src/str.js" type="text/javascript"></script>
+<script src="./skulpt/src/dict.js" type="text/javascript"></script>
+<script src="./skulpt/src/errors.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/enumerate.js" type="text/javascript"></script>
+<script src="./skulpt/src/set.js" type="text/javascript"></script>
+<script src="./skulpt/src/slice.js" type="text/javascript"></script>
+<script src="./skulpt/src/method.js" type="text/javascript"></script>
+<script src="./skulpt/src/structseq.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/sorted.js" type="text/javascript"></script>
+<script src="./skulpt/src/timsort.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/file.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/native.js" type="text/javascript"></script>
+<script src="./skulpt/src/ffi.js" type="text/javascript"></script>
+<script src="./skulpt/src/generator.js" type="text/javascript"></script>
+<script src="./skulpt/src/fromcodepoint.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/complex.js" type="text/javascript"></script>
+<script src="./skulpt/src/biginteger.js" type="text/javascript"></script>
+<script src="./skulpt/src/long.js" type="text/javascript"></script>
+<script src="./skulpt/src/float.js" type="text/javascript"></script>
+<script src="./skulpt/src/constants.js" type="text/javascript"></script>
+
+<script src="./skulpt/src/formatting.js" type="text/javascript"></script>
+<script src="./skulpt/src/print.js" type="text/javascript"></script>
+<script src="./skulpt/src/builtindict.js" type="text/javascript"></script>
+<script src="./skulpt/src/import.js" type="text/javascript"></script>
+
+<script src="skulpt/skulpt-stdlib.js" type="text/javascript"></script>
+<script src="skulpt/src/lib/turtle.js" type="text/javascript"></script>
+
+<!-- My stuff -->
+<script src="./mySrc/formattedOutput.js" type="text/javascript"></script>
+<script src="./mySrc/myadditions.js" type="text/javascript"></script>
+<script src="./mySrc/drawing.js" type="text/javascript"></script>
+<script src="./mySrc/ilabelMeaning.js" type="text/javascript"></script>
+<script src="./mySrc/debug.js" type="text/javascript"></script>
+<script src="./mySrc/fix.js" type="text/javascript"></script>
+<script src="./mySrc/help.js" type="text/javascript"></script>
+<script src="./mySrc/parseTrees.js" type="text/javascript"></script>
+<script src="./mySrc/find.js" type="text/javascript"></script>
+<script src="./mySrc/logger.js" type="text/javascript"></script>
+<script src="./turtle/turtleTasks.js" type="text/javascript"></script>
+
+<!-- CodeMirror -->
+<script src="./codemirror/codemirror.js" type="text/javascript"></script>
+<script src="./codemirror/codemirror-5.9/addon/selection/active-line.js" type="text/javascript"></script>
+<script src="./codemirror/codemirror-5.9/addon/edit/matchbrackets.js" type="text/javascript"></script>
+<script src="./codemirror/codemirror-5.9/addon/edit/closebrackets.js" type="text/javascript"></script>
+<script src="./codemirror/codemirror-5.9/addon/hint/show-hint.js" type="text/javascript"></script>
+<link rel="stylesheet" href="codemirror/codemirror.css">
+<script src="codemirror/python.js" type="text/javascript"></script>
+
+<!-- Fabric.js -->
+<script src="./fabric/dist/fabric.js" type="text/javascript"></script>
+
+<!-- FileSaver -->
+<script src="./FileSaver.js/FileSaver.js" type="text/javascript"></script>
+
+<style type="text/css">
+* {
+	box-sizing: border-box;
+	font-family:"Segoe UI";
+}
+html {
+	height:100%;
+}
+body {
+	height:97%;
+}
+table.main td {
+	margin: 5px;
+	padding: 10px;
+	background-color: #9999FF;
+	vertical-align: top;
+	text-align: left;
+}
+td.blank {
+	background-color: #ffffff;
+}
+td > div {
+	width: 100%;
+	height: 100%;
+	background-color: #cddefe;
+}
+div.turtle {
+	background-color:white;
+	width:1000px;
+	height:400px;
+	border:1px solid black;
+	box-sizing: content-box;
+}
+span.heading {
+	font-size: 24px;
+	font-weight: bold;
+}
+.codeStyle {
+	font-family:"Consolas";
+	padding:1px;
+	background-color:#CCFFCC;
+}
+span.codeStyle {
+	line-height: 1.8;
+	border-style:solid;
+	border-width:1px;
+}
+img {
+	vertical-align: middle;
+	margin: 5px;
+}
+</style>
+</head>
+
+<body>
+<!--body onload="askName()"-->
+	<table class="main" id="table" style="height:100%; width:100%">
+		<tr id="mainPanel">
+			<td class="rightCol">
+				<div id="codeWindow" style="overflow:auto;">
+					<textarea id="yourCode" style="width:100%; height:100%;">import turtle
+t = turtle.Turtle()
+t.shape("triangle")
+t.fillcolor(150,250,200)
+
+t.forward(300)</textarea>
+				</div>
+			</td>
+			<td style="width:400px; max-height:300px;">
+				<div id="welcomeDisplay">
+					<span class="heading">Welcome to my project.</span>
+				</div>
+				<div id="resultDisplay" style="display:none;">
+					<span class="heading">Results</span>
+					<div id="output" style="overflow-y:auto;">
+						Results of your code will appear here.
+					</div>
+				</div>
+				<div id="errorDisplay" style="display:none;">
+					<span class="heading">You had some errors</span>
+					<div id="errOut" style="height:300px; overflow-y:auto;">
+						Error messages will appear here.
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr id="turtlePanel" style="display:none; height:50%">
+			<td colspan="2">
+				<div id="errCanvasDiv" style="overflow:auto; overflow-y:auto; display:none; background-color:white;">
+					<canvas id="errCanvas"></canvas>
+				</div>
+				<div class="turtle" id="turtleCanvas">
+				</div>
+			</td>
+		</tr>
+		<tr id="menuPanel">
+			<td style="height:85px;" colspan="2">
+				<div>
+					<img alt="Run code button" title="Run the code and see results!" height="75" src="img/btn-run-unpressed.png" width="75" onclick="run()">			
+					<img alt="Display Turtle" title="Show/hide the turtle panel." height="75" src="img/btn-turtle-unpressed.png" width="75" onclick="toggleTurtle()">
+					<img alt="Task 1" height="75" src="img/btn-1-unpressed.png" width="75" onclick="loadTask(1)">
+					<img alt="Task 2" height="75" src="img/btn-2-unpressed.png" width="75" onclick="loadTask(2)">
+					<img alt="Task 3" height="75" src="img/btn-3-unpressed.png" width="75" onclick="loadTask(3)">
+					<img alt="Undo" height="75" width="75" src="img/btn-undo.png" onclick="myCodeMirror.undo()">
+					<img alt="Redo" height="75" width="75" src="img/btn-redo.png" onclick="myCodeMirror.redo()">
+					<img alt="Save log" height="75" width="75" src="img/btn-save.png" onclick="Logger.save()">
+				</div>
+			</td>
+		</tr>
+	</table>
+<script>
+var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourCode"), {
+		lineNumbers: true,
+		indentUnit: 4,
+		styleActiveLine: true,
+		matchBrackets: true,
+		autoCloseBrackets: true
+	});
+
+// Show/hide functions
+var turtleDisplayed = false;
+var showTurtle = function() {
+	var turtlePanel = document.getElementById("turtlePanel");
+	var mainPanel = document.getElementById("mainPanel");
+	mainPanel.style.height = "300px";
+	turtlePanel.style.display = "table-row";
+	turtleDisplayed = true;
+}
+var hideTurtle = function() {
+	var turtlePanel = document.getElementById("turtlePanel");
+	var mainPanel = document.getElementById("mainPanel");
+	turtlePanel.style.display = "none";
+	turtleDisplayed = false;
+}
+var toggleTurtle = function() {
+	if (turtleDisplayed) hideTurtle();
+	else showTurtle();
+}
+var displayWelcome = function() {
+	var wd = document.getElementById("welcomeDisplay");
+	var rd = document.getElementById("resultDisplay");
+	var ed = document.getElementById("errorDisplay");
+	
+	wd.style.display = "block";
+	rd.style.display = "none";
+	ed.style.display = "none";
+}
+var displayResults = function() {
+	var wd = document.getElementById("welcomeDisplay");
+	var rd = document.getElementById("resultDisplay");
+	var ed = document.getElementById("errorDisplay");
+	
+	wd.style.display = "none";
+	rd.style.display = "block";
+	ed.style.display = "none";
+}
+var displayErrors = function() {
+	var wd = document.getElementById("welcomeDisplay");
+	var rd = document.getElementById("resultDisplay");
+	var ed = document.getElementById("errorDisplay");
+	var ecd = document.getElementById("errCanvasDiv");
+	var tc = document.getElementById("turtleCanvas");
+	
+	ecd.style.display = "block";
+	tc.style.display = "none";
+	
+	wd.style.display = "none";
+	rd.style.display = "none";
+	ed.style.display = "block";
+	
+	showTurtle();
+}
+
+// Replacement function
+var replaceLine = function (lineNum, replacement, tokensToBeReplaced) {
+	// Replace all tokensToBeReplaced using prompts
+	var ttbr = tokensToBeReplaced;
+	var last = 0;
+	var newString = ""
+	for (i in ttbr) {
+		var slice = replacement.slice(last, ttbr[i].start);
+		last = ttbr[i].end;
+		var r = prompt("Please enter a value for " + ttbr[i].prompt + ".\nDo not include square brackets.");
+		newString += slice + r;
+	}
+	newString += replacement.slice(last);
+	replacement = newString;
+
+	var cur = myCodeMirror.getLine();
+	// Extract and replace the required line
+	var text = myCodeMirror.getValue();
+	var lines = Sk.help.splitToLines(text);
+	lines[lineNum-1] = replacement;
+	
+	// Join the lines back again
+	var text = "";
+	for (var i = 0; i < lines.length; i++) {
+		text += lines[i];
+		
+		if (i !== lines.length-1) {
+			text += "\n";
+		}
+	}
+	Logger.log("Replacement chosen","line " + lineNum + " " + escape(replacement), text);
+	myCodeMirror.setValue(text);
+	myCodeMirror.setCursor(cur,0);
+};
+
+// Canvas stuff
+var errCanvas = new fabric.Canvas("errCanvas");
+errCanvas.backgroundColor = "white";
+errCanvas.renderAll();
+
+// Logging stuff
+var askName = function() {
+	var name = prompt("Please enter your logging number.");
+	Logger.setName(name);
+};
+
+// Skulpt code
+var codeOutput = function (text) {
+	var output = document.getElementById("output");
+	output.innerHTML += text;
+}
+var builtinRead = function(x) {
+    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+            throw "File not found: '" + x + "'";
+    return Sk.builtinFiles["files"][x];
+}
+var debugOut = function(arg) {
+	var debug = true;
+	if (debug) {
+		console.log(arg);
+	}
+}
+Sk.formattedOutput.setOutputs({err:document.getElementById("errOut"), errCanvas:errCanvas, codeMirror:myCodeMirror, lineReplace:replaceLine});
+var run = function () {
+	var output = document.getElementById("output");
+	var errOut = document.getElementById("errOut");
+	displayResults();
+	showTurtle();
+	myCodeMirror.save();
+	var prog = document.getElementById("yourCode").value;
+	
+	// Display the turtle automatically if the first line of
+	// the program is "import turtle"
+	var firstLine = Sk.help.splitToLines(prog);
+	if (firstLine.indexOf("import turtle") === -1) {
+		hideTurtle();
+	}
+	else {
+		showTurtle();
+	}
+	
+	output.innerHTML = "";
+	errOut.innerHTML = "";
+	errCanvas.clear();
+	Sk.formattedOutput.reset();
+	
+	// Hide the err canvas and show the turtle
+	var tc = document.getElementById("turtleCanvas");
+	tc.style.display = "block";
+	document.getElementById("errCanvasDiv").style.display = "none";
+	
+	var turtleCanvas = document.getElementById("turtleCanvas");
+	
+	(Sk.TurtleGraphics || (Sk.TurtleGraphics = {})).target = "turtleCanvas";
+	Sk.configure({output:codeOutput, read:builtinRead, debugout:debugOut});
+
+	if (prog !== "") {
+		try {
+			var result = Sk.importMainWithBody("<stdin>", false, prog, true);
+		   
+			var myPromise = Sk.misceval.asyncToPromise(function() {
+				return result;
+			});
+		   
+			myPromise.then(function(mod) {Logger.log("Success","none",prog);},	function(err) {Logger.log("Error","Unfixable",prog); displayErrors(); Sk.formattedOutput.unfixableErr(err);});
+		}
+		catch (err) {
+			displayErrors();
+			if (err === "Incorrect syntax")	{
+				Logger.log("Error","Suggestions made",prog);
+				console.log("Syntax was incorrect, but a fix was attempted.");
+			}
+			else {
+				Logger.log("Error","Unfixable",prog);
+				console.log(err);
+				Sk.formattedOutput.unfixableErr(err);
+				throw err;
+			}
+		}
+	}
+}
+</script>
+</body>
+
+</html>

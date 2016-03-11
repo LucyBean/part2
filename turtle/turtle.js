@@ -81,8 +81,8 @@ function generateTurtleModule(_target) {
     _config = (function() {
         var defaultSetup = {
                 target     : "turtle", // DOM element or id of parent container
-                width      : 600, // if set to 0 it will use the target width
-                height     : 300, // if set to 0 it will use the target height
+                width      : 1000, // if set to 0 it will use the target width
+                height     : 400, // if set to 0 it will use the target height
                 animate    : true, // enabled/disable all animated rendering
                 bufferSize : 0, // default turtle buffer size
                 allowUndo  : true, // enable ability to use the undo buffer
