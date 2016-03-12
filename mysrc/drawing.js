@@ -15,10 +15,11 @@ Sk.drawing.bracketStyle.textSize = 24;
 
 // This will return the maximum depth of the tree (as a number of nodes)
 // Can be used to automatically scale the canvas
-Sk.drawing.addDrawingInformation = function (node, depth) {
+Sk.drawing.addDrawingInformation = function (node, depth, line) {
 	if (depth === undefined) {
 		depth = 0;
 	}
+	node.line = line;
 	
 	// node.x will represent the relative x co-ordinate of the node
 	// within its width box
@@ -33,7 +34,7 @@ Sk.drawing.addDrawingInformation = function (node, depth) {
 		
 		// Add drawing information to each child
 		for (var i = 0; i < node.children.length; i++) {
-			var childMaxDepth = Sk.drawing.addDrawingInformation(node.children[i], depth+1, Sk.drawing.treeStyle.cellWidth, Sk.drawing.treeStyle.padding);
+			var childMaxDepth = Sk.drawing.addDrawingInformation(node.children[i], depth+1, line);
 			
 			// Calculate the total width needed to display all the ancestors of this node
 			node.width += node.children[i].width;
@@ -68,7 +69,7 @@ Sk.drawing.addDrawingInformation = function (node, depth) {
 	}
 }
 
-Sk.drawing.drawTreeFabric = function (canvas, node, scaleCanvas, info) {
+Sk.drawing.drawTreeFabric = function (canvas, node, scaleCanvas, info, line) {
 	if (info === undefined) {
 		info = function (node) {
 			return node.val;
@@ -77,7 +78,7 @@ Sk.drawing.drawTreeFabric = function (canvas, node, scaleCanvas, info) {
 	
 	canvas.clear();
 	
-	var depth = Sk.drawing.addDrawingInformation(node);
+	var depth = Sk.drawing.addDrawingInformation(node, 0, line);
 	
 	if (scaleCanvas){
 		var width = node.width;
@@ -120,6 +121,8 @@ Sk.drawing.drawNodeFabric = function (canvas, node, info, offset) {
 		
 		var group = new fabric.Group([rect, text], {left:x, top:y});
 		group.selectable = false;
+		group.codePos = node.codePos;
+		group.line = node.line;
 		
 		canvas.add(group);
 	}

@@ -65,7 +65,7 @@ Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) 
 
 Sk.formattedOutput.setOriginalTree = function (original, lineNum) {
 	if (!Sk.formattedOutput.original) {
-		Sk.formattedOutput.original = {originial:original, lineNum:lineNum};
+		Sk.formattedOutput.original = {original:original, lineNum:lineNum};
 		var err = Sk.formattedOutput.err;
 		
 		// Display explanation and jump to line if possible
@@ -99,11 +99,12 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	
 	// Build the HTML that represents the line
 	// show the tree on mouseover
-	var html = "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true)\""
+	var line = escapeDoubleQuotes(stripTrailingNewLine(alt.context[2]));
+	var html = "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true, undefined, '" + line + "')\""
 	
 	// replace the line on click
 	if (Sk.formattedOutput.lineReplace) {
-		html += " onclick = \"Sk.formattedOutput.lineReplace(" + Sk.formattedOutput.original.lineNum + ", '" + stripTrailingNewLine(alt.context[2]) + "', lineReplacements[" + (index-1) + "])\"";
+		html += " onclick = \"Sk.formattedOutput.lineReplace(" + Sk.formattedOutput.original.lineNum + ", '" + line + "', lineReplacements[" + (index-1) + "])\"";
 	}
 	
 	// if there is an explanation, add it as a title (tooltip)

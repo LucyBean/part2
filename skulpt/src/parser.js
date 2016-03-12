@@ -154,10 +154,6 @@ Parser.prototype.addtoken = function (type, value, context, fixErrs, requiresRep
 					}
 					rootNode.flags = rootNode.flags || [];
 					rootNode.flags.push("SOL");
-					var tr = Sk.parseTrees.extractPrintTree(rootNode);
-					var trli = {tree:tr, line:context[2]};
-					
-					this.treeLines.push(trli);
 				}
 				
                 while (states[state].length === 1

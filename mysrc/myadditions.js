@@ -108,5 +108,6 @@ turtleKeywords = {
 	"circle":1,
 	"pencolor":1,
 	"fillcolor":1,
-	"stamp":1
+	"stamp":1,
+	"shape":1
 }

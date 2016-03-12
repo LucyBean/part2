@@ -6,6 +6,7 @@ Sk.parseTrees.extractPrintTree = function (node, f) {
 	// Okay so the token type isn't quite an ilabel here so I have to do this?
 	var v;
 	var t = Sk.Tokenizer.tokenNames[node.type];
+	var codePos = {line:node.lineno-1, ch:node.col_offset};
 	
 	if (f === undefined) {
 		f = [];
@@ -25,6 +26,7 @@ Sk.parseTrees.extractPrintTree = function (node, f) {
 		v = t;
 		if (ignoreTokens.indexOf(node.type) === -1) {
 			v = node.value;
+			codePos.len = v.length;
 		}
 	}
 	else {
@@ -32,7 +34,7 @@ Sk.parseTrees.extractPrintTree = function (node, f) {
 	}
 	
 	if (!node.children) {
-		return {val:v, tags:f};
+		return {val:v, tags:f, codePos:codePos};
 	}
 	// If this node has only one child, ignore this node
 	// If this node is a "simple_stmt" then ignore the trailing newline character
@@ -49,7 +51,7 @@ Sk.parseTrees.extractPrintTree = function (node, f) {
 		for (var i = 0; i < node.children.length; i++) {
 			c.push(Sk.parseTrees.extractPrintTree(node.children[i]));
 		}
-		return {val:v, children:c, tags:f};
+		return {val:v, children:c, tags:f, codePos:codePos};
 	}
 }
 

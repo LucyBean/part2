@@ -80,7 +80,6 @@
 <script src="./codemirror/codemirror-5.9/addon/edit/matchbrackets.js" type="text/javascript"></script>
 <script src="./codemirror/codemirror-5.9/addon/edit/closebrackets.js" type="text/javascript"></script>
 <script src="./codemirror/codemirror-5.9/addon/hint/show-hint.js" type="text/javascript"></script>
-
 <link rel="stylesheet" href="codemirror/codemirror.css">
 <script src="codemirror/python.js" type="text/javascript"></script>
 
@@ -143,28 +142,7 @@ span.codeStyle {
 			</div>
 		</td>
 		<td class="newStyle1" style="width: 400px" rowspan="2">
-			<div id="welcome" class="rightMenuStyle" style="height:300px;">
-				<h1>Welcome to my project.</h1>
-				<p>My project is looking at how syntax errors can be improved in order to help novice programmers.
-				</p>
-			</div>
-			<div id="taskWindow" class="rightMenuStyle" style="height:300px; display:none">
-				<h1>Tasks</h1>
-				<div id="taskText" style="height:250px; overflow-y:auto">Select 
-					a task to complete by clicking on one of the numbers below 
-					the main panel.</div>
-			</div>
-			<div style="height:8px"></div>
-			<div id="results" class="rightMenuStyle" style="height:370px">
-				<h1>Results</h1>
-				<div id="resultDisplay" class="codeStyle" style="overflow-y:auto;">
-				After you hit the run button, the results of your code will appear here.
-				</div>
-			</div>
-			<div id="errorDisplay" class="rightMenuStyle" style="height:370px; display:none; overflow-y:auto;">
-				<h1>Oh no! Looks like you had some errors...</h1>
-				<div id="errorOutput">Help for errors will appear here.</div>
-			</div>
+			
 		</td>
 		<td rowspan="2">&nbsp;</td>
 	</tr>
@@ -201,135 +179,13 @@ span.codeStyle {
 </table>
 
 <script type="text/javascript">
-var resultsPage = document.getElementById("results");
-var ecd = document.getElementById("errCanvasDiv");
-var tc = document.getElementById("turtleCanvas");
 
-var displayResultsPane = function () {
-	resultsPage.style.display = "block";
-	errorDisplay.style.display = "none";
-}
 
-var displayErrorPane = function () {
-	resultsPage.style.display = "none";
-	errorDisplay.style.display = "block";
-	
-	displayTurtle();
-	// Hide the turtle canvas and show the err canvas
-	ecd.style.display = "block";
-	tc.style.display = "none";
-}
 
-var displayWelcome = function () {
-	var welcome = document.getElementById("welcome");
-	var taskWindow = document.getElementById("taskWindow");
-	
-	welcome.style.display = "block";
-	taskWindow.style.display = "none";
-}
-
-var displayTasks = function () {
-	var welcome = document.getElementById("welcome");
-	var taskWindow = document.getElementById("taskWindow");
-	
-	welcome.style.display = "none";
-	taskWindow.style.display = "block";
-}
-
-var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourCode"), {
-		lineNumbers: true,
-		indentUnit: 4,
-		styleActiveLine: true,
-		matchBrackets: true,
-		autoCloseBrackets: true
-	});
-	
-myCodeMirror.setSize(600, 600);
-
-var replaceLine = function (lineNum, replacement, tokensToBeReplaced) {
-	// Replace all tokensToBeReplaced using prompts
-	var ttbr = tokensToBeReplaced;
-	var last = 0;
-	var newString = ""
-	for (i in ttbr) {
-		var slice = replacement.slice(last, ttbr[i].start);
-		last = ttbr[i].end;
-		var r = prompt("Please enter a value for " + ttbr[i].prompt + ".\nDo not include square brackets.");
-		newString += slice + r;
-	}
-	newString += replacement.slice(last);
-	replacement = newString;
-
-	var cur = myCodeMirror.getLine();
-	// Extract and replace the required line
-	var text = myCodeMirror.getValue();
-	var lines = Sk.help.splitToLines(text);
-	lines[lineNum-1] = replacement;
-	
-	// Join the lines back again
-	var text = "";
-	for (var i = 0; i < lines.length; i++) {
-		text += lines[i];
-		
-		if (i !== lines.length-1) {
-			text += "\n";
-		}
-	}
-	Logger.log("Replacement chosen","line " + lineNum + " " + escape(replacement), text);
-	myCodeMirror.setValue(text);
-	myCodeMirror.setCursor(cur,0);
-};
-
-var turtleDisplayed = false;
-
-var displayTurtle = function () {
-	turtleDisplayed = true;
-	var codeWindow = document.getElementById("codeWindow");
-	var turtleWindow = document.getElementById("turtleWindow");
-	myCodeMirror.setSize(600, 290);
-	codeWindow.style.height = "300px";
-	turtleWindow.style.display = "block";
-}
-
-var hideTurtle = function () {
-	turtleDisplayed = false;
-	var codeWindow = document.getElementById("codeWindow");
-	var turtleWindow = document.getElementById("turtleWindow");
-	myCodeMirror.setSize(600, 600);
-	codeWindow.style.height = "600px";
-	turtleWindow.style.display = "none";
-}
-
-var toggleTurtle = function () {
-	if (!turtleDisplayed) {
-		displayTurtle();
-
-	} else {
-		hideTurtle();
-	}
-}
-
-var loadTask = function (n) {
-	displayTasks();
-	
-	var task = Sk.turtleTasks[n];
-	
-	if (task) {
-		taskText.innerHTML = task.promptText;
-		myCodeMirror.setValue(task.initCode);
-	}
-}
-
-var errCanvas = new fabric.Canvas("errCanvas");
-errCanvas.setWidth(600);
-errCanvas.setHeight(300);
-errCanvas.backgroundColor = "white";
-errCanvas.renderAll();
 
 var output = document.getElementById("resultDisplay");
 var errOut = document.getElementById("errorOutput");
-var taskText = document.getElementById("taskText");
-Sk.formattedOutput.setOutputs({err:errOut, errCanvas:errCanvas, taskList:taskText, codeMirror:myCodeMirror, lineReplace:replaceLine});
+Sk.formattedOutput.setOutputs({err:errOut, errCanvas:errCanvas, codeMirror:myCodeMirror, lineReplace:replaceLine});
 
 var codeOutput = function (text) {
 	output.innerHTML += text;
@@ -345,13 +201,6 @@ var debugOut = function(arg) {
 		console.log(arg);
 	}
 }
-
-var askName = function() {
-	var name = prompt("Please enter your logging number.");
-	Logger.setName(name);
-};
-
-askName();
 
 var run = function () {
 	displayResultsPane();
