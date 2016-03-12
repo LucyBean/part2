@@ -412,9 +412,11 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 				// Extract the next non-space token
 				while (stringEndA[0] === " ") {
 					stringEndA = stringEndA.slice(1);
+					genContext(" ");
 				}
 				nextToken = Sk.Tokenizer.extractOneToken(stringEndA);
 				stringEndA = stringEndA.slice(nextToken.value.length);
+				context = genContext(nextToken.value);
 				
 				/*
 				do {

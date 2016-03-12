@@ -80,8 +80,8 @@ Sk.formattedOutput.setOriginalTree = function (original, lineNum) {
 		
 		// Display original
 		errCanvasContents.push(original.tree);
-		err.innerHTML += "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[0], true)\">" + original.text + "</span><br/>";
-		Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, original.tree, true);
+		err.innerHTML += "<span class=\"codeStyle\">" + original.text + "</span><br/>";
+		//Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, original.tree, true);
 	}
 }
 
