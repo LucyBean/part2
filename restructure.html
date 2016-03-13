@@ -135,9 +135,20 @@ span.codeStyle {
 	border-style:solid;
 	border-width:1px;
 }
-img {
-	vertical-align: middle;
+button {
+    background-color: #9999FF;
+    border: 1px solid #9999ff;
+	color: white;
+    padding: 10px 16px;
 	margin: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+	-webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+}
+button:hover {
+	background-color: #aaaaff;
 }
 </style>
 </head>
@@ -184,16 +195,13 @@ t.forward(300)</textarea>
 			</td>
 		</tr>
 		<tr id="menuPanel">
-			<td style="height:85px;" colspan="2">
+			<td style="height:75px;" colspan="2">
 				<div>
-					<img alt="Run code button" height="50" width="50" title="Run the code and see results!" src="img/btn-run-unpressed.png" onclick="run()">			
-					<img alt="Display Turtle" height="50" width="50" title="Show/hide the turtle panel." src="img/btn-turtle-unpressed.png" onclick="toggleTurtle()">
-					<img alt="Task 1" height="50" width="50" src="img/btn-1-unpressed.png" onclick="loadTask(1)">
-					<img alt="Task 2" height="50" width="50" src="img/btn-2-unpressed.png" onclick="loadTask(2)">
-					<img alt="Task 3" height="50" width="50" src="img/btn-3-unpressed.png" onclick="loadTask(3)">
-					<img alt="Undo" height="50" width="50" src="img/btn-undo.png" onclick="myCodeMirror.undo()">
-					<img alt="Redo" height="50" width="50" src="img/btn-redo.png" onclick="myCodeMirror.redo()">
-					<img alt="Save log" height="50" width="50" src="img/btn-save.png" onclick="Logger.save()">
+					<button onclick="run()">Run</button>
+					<button onclick="toggleTurtle()">Show/hide turtle</button>
+					<button onclick="myCodeMirror.undo()">Undo</button>
+					<button onclick="myCodeMirror.redo()">Redo</button>
+					<button onclick="Logger.save()">Save log</button>
 				</div>
 			</td>
 		</tr>
