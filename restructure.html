@@ -391,6 +391,8 @@ var run = function () {
 	Sk.configure({output:codeOutput, read:builtinRead, debugout:debugOut});
 
 	if (prog !== "") {
+		Logger.log("Running code","",prog);
+		Logger.store();
 		try {
 			var result = Sk.importMainWithBody("<stdin>", false, prog, true);
 		   

@@ -39,6 +39,7 @@ Logger.load = function() {
 	}
 	// Continue the log if there is a saved user
 	else {
+		confirm("Welcome back " + name);
 		var log = localStorage.savedLog;
 		Logger.setName(name);
 		Logger.savedLog = log;
@@ -48,7 +49,6 @@ Logger.load = function() {
 
 Logger.store = function () {
 	if (Logger.name && Logger.savedLog.length > 0) {
-		Logger.log("Log stored");
 		localStorage.setItem("logName", Logger.name);
 		localStorage.setItem("savedLog", Logger.savedLog);
 	}
