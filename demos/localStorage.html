@@ -1,0 +1,23 @@
+<html>
+<head>
+<script>
+var loadName = function () {
+	var name = localStorage.name;
+
+	if (name === undefined) {
+		name = prompt("What is your name?");
+		localStorage.setItem("name", name);
+	}
+	
+	document.getElementById("name").innerHTML = "Hello, " + name + "!";
+}
+var clearName = function () {
+	localStorage.removeItem("name");
+}
+</script>
+</head>
+<body onload="loadName()">
+<div id="name"></div>
+<button onclick="clearName()">Clear</button>
+</body>
+</html>

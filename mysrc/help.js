@@ -239,8 +239,8 @@ Sk.help.splitToLines = function (input) {
 }
 
 Sk.help.containsUnfinishedArgList = function(node) {
-	// Check whether this node is an arglist (type=259)
-	if (node.type === 259 || 335) {
+	// Check whether this node is an arglist (type=259 or 335)
+	if (node.type === 259 || node.type === 335) {
 		return true;
 	}
 	// Else check whether the rightmost child is
