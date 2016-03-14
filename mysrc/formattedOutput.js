@@ -100,7 +100,7 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	// Build the HTML that represents the line
 	// show the tree on mouseover
 	var line = escapeDoubleQuotes(stripTrailingNewLine(alt.context[2]));
-	var html = "<span class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true, undefined, '" + line + "')\""
+	var html = "<button class=\"codeStyle\" onmouseover=\"Sk.drawing.drawTreeFabric(Sk.formattedOutput.errCanvas, errCanvasContents[" + index + "], true, undefined, '" + line + "')\""
 	
 	// replace the line on click
 	if (Sk.formattedOutput.lineReplace) {
@@ -113,7 +113,7 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	}
 	
 	// close the tag
-	html += ">" + stripTrailingNewLine(alt.text) + "</span>";
+	html += ">" + stripTrailingNewLine(alt.text) + "</button>";
 	
 	// if the line is an incomplete fragment then append a "..." with a tooltip
 	if (alt.incomplete) {

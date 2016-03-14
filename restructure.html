@@ -91,7 +91,6 @@
 <style type="text/css">
 * {
 	box-sizing: border-box;
-	font-family:"Segoe UI";
 }
 html {
 	height:100%;
@@ -102,7 +101,7 @@ body {
 table.main td {
 	margin: 5px;
 	padding: 10px;
-	background-color: #9999FF;
+	background-color: #7777FF;
 	vertical-align: top;
 	text-align: left;
 }
@@ -113,6 +112,15 @@ td > div {
 	width: 100%;
 	height: 100%;
 	background-color: #cddefe;
+	font-family:"Segoe UI";
+}
+.rightPanel > div {
+	padding: 8px;
+}
+.rightPanel > div > div {
+	background-color:#aaaaff;
+	height:300px;
+	overflow-y:auto;
 }
 div.turtle {
 	background-color:white;
@@ -127,18 +135,12 @@ span.heading {
 }
 .codeStyle {
 	font-family:"Consolas";
-	padding:1px;
-	background-color:#CCFFCC;
-}
-span.codeStyle {
-	line-height: 1.8;
-	border-style:solid;
-	border-width:1px;
 }
 button {
-    background-color: #9999FF;
+    background-color: #7777FF;
     border: 1px solid #9999ff;
 	color: white;
+	font-family:"Segoe UI";
     padding: 10px 16px;
 	margin: 5px;
     text-align: center;
@@ -146,6 +148,9 @@ button {
     font-size: 18px;
 	-webkit-transition-duration: 0.4s; /* Safari */
     transition-duration: 0.4s;
+}
+button.codeStyle {
+	text-align:left;
 }
 button:hover {
 	background-color: #aaaaff;
@@ -163,18 +168,20 @@ button:hover {
 t = turtle.Turtle()
 t.shape("triangle")
 t.fillcolor(150,250,200)
+print 12
 
 t.forward(300)</textarea>
 				</div>
 			</td>
-			<td style="width:400px; max-height:300px;">
+			<td class = "rightPanel" style="width:400px;">
 				<div id="welcomeDisplay">
 					<span class="heading">Welcome to my project.</span>
+					<p>My project is about improving syntax error usability for novice programmers.</p>
 				</div>
 				<div id="resultDisplay" style="display:none;">
 					<span class="heading">Results</span>
+					<p>Results of your code will appear here, if any.</p>
 					<div id="output" style="overflow-y:auto;">
-						Results of your code will appear here.
 					</div>
 				</div>
 				<div id="errorDisplay" style="display:none;">
@@ -202,6 +209,7 @@ t.forward(300)</textarea>
 					<button onclick="myCodeMirror.undo()">Undo</button>
 					<button onclick="myCodeMirror.redo()">Redo</button>
 					<button onclick="Logger.save()">Save log</button>
+					<button onclick="loadTask(0)">Task 1</button>
 				</div>
 			</td>
 		</tr>
@@ -267,6 +275,19 @@ var displayErrors = function() {
 	ed.style.display = "block";
 	
 	showTurtle();
+}
+
+// Tasks
+var loadTask = function (num) {
+	var tasks = [
+		"import turtle\nt = turtle.Turtle()\n\nt.forward(100)\nt.left(45)\nt.forward(30)\n"
+	];
+	
+	var t = tasks[num];
+	if (t) {
+		Logger.log("Loaded task",num);
+		myCodeMirror.setValue(tasks[num]);
+	}
 }
 
 // Replacement function
@@ -351,7 +372,7 @@ errCanvas.on('mouse:out', function (e) {
 // Skulpt code
 var codeOutput = function (text) {
 	var output = document.getElementById("output");
-	output.innerHTML += text;
+	output.innerHTML += "<span class = \"codeStyle\">" + text + "</span>";
 }
 var builtinRead = function(x) {
     if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
