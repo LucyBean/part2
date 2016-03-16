@@ -162,18 +162,12 @@ button:hover {
 <body onload="Logger.load()" onunload="Logger.store()">
 	<table class="main" id="table" style="height:100%; width:100%">
 		<tr id="mainPanel">
-			<td class="rightCol">
+			<td>
 				<div id="codeWindow" style="overflow:auto;">
-					<textarea id="yourCode" style="width:100%; height:100%;">import turtle
-t = turtle.Turtle()
-t.shape("triangle")
-t.fillcolor(150,250,200)
-print 12
-
-t.forward(300)</textarea>
+					<textarea id="yourCode" style="width:100%; height:100%;"></textarea>
 				</div>
 			</td>
-			<td class = "rightPanel" style="width:400px;">
+			<td class="rightPanel" style="width:400px;">
 				<div id="welcomeDisplay">
 					<span class="heading">Welcome to my project.</span>
 					<p>My project is about improving syntax error usability for novice programmers.</p>
@@ -210,6 +204,10 @@ t.forward(300)</textarea>
 					<button onclick="myCodeMirror.redo()">Redo</button>
 					<button onclick="Logger.save()">Save log</button>
 					<button onclick="loadTask(0)">Task 1</button>
+					<button onclick="loadTask(1)">Task 2</button>
+					<button onclick="loadTask(2)">Task 3</button>
+					<button onclick="loadTask(3)">Task 4a</button>
+					<button onclick="loadTask(4)">Task 4b</button>
 				</div>
 			</td>
 		</tr>
@@ -280,8 +278,12 @@ var displayErrors = function() {
 // Tasks
 var loadTask = function (num) {
 	var tasks = [
-		"import turtle\nt = turtle.Turtle()\n\nt.forward(100)\nt.left(45)\nt.forward(30)\n"
-	];
+		"import turtle\nt = turtle.Turtle()\n\nt.forward(100)\nt.left(45)\nt.forward(30)\n",
+		"import turtle\nt = turtle.Turtle()\n\nfor i in range(6):\n    t.forward(40)\n    t.left(45)\n",
+		"import turtle\nt = turtle.Turtle()\n\ndef drawSquare():\n    for i in range(4):\n        t.forward(40)\n        t.left(90)\n\ndrawSquare()\n",
+		"import turtle\nfrom random import randint\nt = turtle.Turtle()\n\nlength = randint(10,100)\n\nfor i in range(4):\n    t.forward(length)\n    t.left(90)\n",
+		"import turtle\nfrom random import randint\nt = turtle.Turtle()\n\nwhile True:\n    t.forward(20)\n    angle = randint(-45,45)\n    t.left(angle)\n"
+		];
 	
 	var t = tasks[num];
 	if (t) {
@@ -370,6 +372,7 @@ errCanvas.on('mouse:out', function (e) {
 });
 
 // Skulpt code
+Sk.formattedOutput.setOutputs({err:document.getElementById("errOut"), errCanvas:errCanvas, codeMirror:myCodeMirror, lineReplace:replaceLine});
 var codeOutput = function (text) {
 	var output = document.getElementById("output");
 	output.innerHTML += "<span class = \"codeStyle\">" + text + "</span>";
@@ -385,7 +388,11 @@ var debugOut = function(arg) {
 		console.log(arg);
 	}
 }
-Sk.formattedOutput.setOutputs({err:document.getElementById("errOut"), errCanvas:errCanvas, codeMirror:myCodeMirror, lineReplace:replaceLine});
+var runTimeErr = function (err) {
+	Logger.log("Error","Run time.",prog);
+	displayErrors();
+	Sk.formattedOutput.unfixableErr(err);
+}
 var run = function () {
 	var output = document.getElementById("output");
 	var errOut = document.getElementById("errOut");
@@ -429,16 +436,16 @@ var run = function () {
 				return result;
 			});
 		   
-			myPromise.then(function(mod) {Logger.log("Success","none",prog);},	function(err) {Logger.log("Error","Unfixable",prog); displayErrors(); Sk.formattedOutput.unfixableErr(err);});
+			myPromise.then(function(mod) {Logger.log("Success","none",prog);},	runTimeErr);
 		}
 		catch (err) {
 			displayErrors();
 			if (err === "Incorrect syntax")	{
-				Logger.log("Error","Suggestions made",prog);
+				Logger.log("Error","Suggestions made.",prog);
 				console.log("Syntax was incorrect, but a fix was attempted.");
 			}
 			else {
-				Logger.log("Error","Unfixable",prog);
+				Logger.log("Error","Unfixable syntax error.",prog);
 				console.log(err);
 				Sk.formattedOutput.unfixableErr(err);
 				throw err;

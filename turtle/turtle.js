@@ -548,7 +548,7 @@ function generateTurtleModule(_target) {
             this._size       = 1;
             this._filling    = false;
             this._undoBuffer = [];
-            this._speed      = 3;
+            this._speed      = 6;
             this._computed_speed = 5;
             this._state      = undefined;
 
