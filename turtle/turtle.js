@@ -601,12 +601,20 @@ function generateTurtleModule(_target) {
         proto.$position = proto.$pos = function() {
             return [this.$xcor(), this.$ycor()];
         };
-        proto.$position.returnType = function(value) {
+	    proto.$position.returnType = function(value) {
             return new Sk.builtin.tuple([
                     Sk.builtin.float_(value[0]),
                     Sk.builtin.float_(value[1])
             ]);
         };
+		
+		proto.$offscreen = function() {
+			var height = getHeight()/2;
+			var width = getWidth()/2;
+			
+			return this.$xcor() > width || this.$xcor() < -width || this.$ycor() > height || this.$ycor() < -height;
+		}
+		proto.$offscreen.returnType = Types.Boolean;
 
         proto.$towards = function(x,y) {
             var coords  = getCoordinates(x,y),

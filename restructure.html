@@ -278,11 +278,11 @@ var displayErrors = function() {
 // Tasks
 var loadTask = function (num) {
 	var tasks = [
-		"import turtle\nt = turtle.Turtle()\n\nt.forward(100)\nt.left(45)\nt.forward(30)\n",
-		"import turtle\nt = turtle.Turtle()\n\nfor i in range(6):\n    t.forward(40)\n    t.left(45)\n",
-		"import turtle\nt = turtle.Turtle()\n\ndef drawSquare():\n    for i in range(4):\n        t.forward(40)\n        t.left(90)\n\ndrawSquare()\n",
-		"import turtle\nfrom random import randint\nt = turtle.Turtle()\n\nlength = randint(10,100)\n\nfor i in range(4):\n    t.forward(length)\n    t.left(90)\n",
-		"import turtle\nfrom random import randint\nt = turtle.Turtle()\n\nwhile True:\n    t.forward(20)\n    angle = randint(-45,45)\n    t.left(angle)\n"
+		"import turtle\nt = turtle.Turtle()\n\nt.forward(100)\t\t# Go forward 100 units\nt.left(45)\t\t\t# Turn left 45 degrees\nt.forward(30)\t\t# Go forwards 30 units\n",
+		"import turtle\nt = turtle.Turtle()\n\nfor i in range(6):\t# Repeat the following lines 6 times.\n    t.forward(40)\n    t.left(45)\n",
+		"import turtle\nt = turtle.Turtle()\n\ndef drawSquare():\t\t# Define a new procedure, drawSquare\n    for i in range(4):\n        t.forward(40)\n        t.left(90)\n\ndrawSquare()\t\t\t# Call drawSquare\n",
+		"import turtle\nfrom random import randint\nt = turtle.Turtle()\n\nlength = randint(10,100)\t# ‘length’ has a random value between 10 and 100\n\nfor i in range(4):\n    t.forward(length)\t\t# Go forward ‘length’ units\n    t.left(90)\n",
+		"import turtle\nfrom random import randint\nt = turtle.Turtle()\n\nwhile True:\t\t\t\t\t# Infinite loop\n    t.forward(20)\n    angle = randint(-45,45)\t# ‘angle’ has a random value between -45 and 45\n    t.left(angle)\n"
 		];
 	
 	var t = tasks[num];
@@ -375,6 +375,7 @@ errCanvas.on('mouse:out', function (e) {
 Sk.formattedOutput.setOutputs({err:document.getElementById("errOut"), errCanvas:errCanvas, codeMirror:myCodeMirror, lineReplace:replaceLine});
 var codeOutput = function (text) {
 	var output = document.getElementById("output");
+	if (text === "\n") text = "<br/>";
 	output.innerHTML += "<span class = \"codeStyle\">" + text + "</span>";
 }
 var builtinRead = function(x) {
