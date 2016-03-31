@@ -354,6 +354,11 @@ Sk.fix.testFix = function (prevTokens, manualAddTokens, stringEnd, fixErrs) {
 		fixErrs = 0;
 	}
 	
+	// Strip spaces from front of currentLine
+	while (currentLine[0] === " ") {
+			currentLine = currentLine.slice(1);
+		}
+	
 	var fixedLine = currentLine;
 	var reportLine;
 	for (i in manualAddTokens) {

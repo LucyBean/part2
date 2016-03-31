@@ -217,7 +217,7 @@ var single_quoted = {
 }());
 
 
-var tabsize = 8;
+var tabsize = 4;
 
 function contains (a, obj) {
     var i = a.length;

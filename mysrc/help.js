@@ -112,6 +112,7 @@ Sk.help.tokensToString = function (tokens) {
 	var lastEnd = 0;
 	for (var i = 0; i < tokens.length; i++) {
 		var blankSpace = tokens[i].start - lastEnd;
+		if (blankSpace < 0) blankSpace = tokens[i].start;
 		s += " ".repeat(blankSpace) + tokens[i].value;
 		lastEnd = tokens[i].start + tokens[i].value.length;
 	}

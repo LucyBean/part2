@@ -184,6 +184,13 @@ button:hover {
 						Error messages will appear here.
 					</div>
 				</div>
+				<div id="settingDisplay" style="display:none;">
+					<span class="heading">Settings</span>
+					<p>
+						<input id="useTurtle" type="checkbox" checked>Use turtle<br/>
+						<button>Clear log</button>
+					</p>
+				</div>
 			</td>
 		</tr>
 		<tr id="turtlePanel" style="display:none; height:50%">
@@ -208,6 +215,7 @@ button:hover {
 					<button onclick="loadTask(2)">Task 3</button>
 					<button onclick="loadTask(3)">Task 4a</button>
 					<button onclick="loadTask(4)">Task 4b</button>
+					<button onclick="displaySettings()">Settings</button>
 				</div>
 			</td>
 		</tr>
@@ -244,24 +252,29 @@ var displayWelcome = function() {
 	var wd = document.getElementById("welcomeDisplay");
 	var rd = document.getElementById("resultDisplay");
 	var ed = document.getElementById("errorDisplay");
+	var sd = document.getElementById("settingDisplay");
 	
 	wd.style.display = "block";
 	rd.style.display = "none";
 	ed.style.display = "none";
+	sd.style.display = "none";
 }
 var displayResults = function() {
 	var wd = document.getElementById("welcomeDisplay");
 	var rd = document.getElementById("resultDisplay");
 	var ed = document.getElementById("errorDisplay");
+	var sd = document.getElementById("settingDisplay");
 	
 	wd.style.display = "none";
 	rd.style.display = "block";
 	ed.style.display = "none";
+	sd.style.display = "none";
 }
 var displayErrors = function() {
 	var wd = document.getElementById("welcomeDisplay");
 	var rd = document.getElementById("resultDisplay");
 	var ed = document.getElementById("errorDisplay");
+	var sd = document.getElementById("settingDisplay");
 	var ecd = document.getElementById("errCanvasDiv");
 	var tc = document.getElementById("turtleCanvas");
 	
@@ -271,24 +284,39 @@ var displayErrors = function() {
 	wd.style.display = "none";
 	rd.style.display = "none";
 	ed.style.display = "block";
+	sd.style.display = "none";
 	
 	showTurtle();
+}
+var displaySettings = function() {
+	var wd = document.getElementById("welcomeDisplay");
+	var rd = document.getElementById("resultDisplay");
+	var ed = document.getElementById("errorDisplay");
+	var sd = document.getElementById("settingDisplay");
+	
+	wd.style.display = "none";
+	rd.style.display = "none";
+	ed.style.display = "none";
+	sd.style.display = "block";
 }
 
 // Tasks
 var loadTask = function (num) {
+
 	var tasks = [
-		"import turtle\nt = turtle.Turtle()\n\nt.forward(100)\t\t# Go forward 100 units\nt.left(45)\t\t\t# Turn left 45 degrees\nt.forward(30)\t\t# Go forwards 30 units\n",
-		"import turtle\nt = turtle.Turtle()\n\nfor i in range(6):\t# Repeat the following lines 6 times.\n    t.forward(40)\n    t.left(45)\n",
-		"import turtle\nt = turtle.Turtle()\n\ndef drawSquare():\t\t# Define a new procedure, drawSquare\n    for i in range(4):\n        t.forward(40)\n        t.left(90)\n\ndrawSquare()\t\t\t# Call drawSquare\n",
-		"import turtle\nfrom random import randint\nt = turtle.Turtle()\n\nlength = randint(10,100)\t# ‘length’ has a random value between 10 and 100\n\nfor i in range(4):\n    t.forward(length)\t\t# Go forward ‘length’ units\n    t.left(90)\n",
-		"import turtle\nfrom random import randint\nt = turtle.Turtle()\n\nwhile True:\t\t\t\t\t# Infinite loop\n    t.forward(20)\n    angle = randint(-45,45)\t# ‘angle’ has a random value between -45 and 45\n    t.left(angle)\n"
+		"t.forward(100)\t\t# Go forward 100 units\nt.left(45)\t\t\t# Turn left 45 degrees\nt.forward(30)\t\t# Go forwards 30 units\n",
+		"for i in range(6):\t# Repeat the following lines 6 times.\n\tt.forward(40)\n\tt.left(45)\n",
+		"def drawSquare():\t\t# Define a new procedure, drawSquare\n\tfor i in range(4):\n\t\tt.forward(40)\n\t\tt.left(90)\n\ndrawSquare()\t\t\t# Call drawSquare\n",
+		"from random import randint\n\nlength = randint(10,100)\t# ‘length’ has a random value between 10 and 100\n\nfor i in range(4):\n\tt.forward(length)\t\t# Go forward ‘length’ units\n\tt.left(90)\n",
+		"from random import randint\n\nwhile True:\t\t\t\t\t# Infinite loop\n\tt.forward(20)\n\tangle = randint(-45,45)\t# ‘angle’ has a random value between -45 and 45\n\tt.left(angle)\n"
 		];
 	
 	var t = tasks[num];
 	if (t) {
 		Logger.log("Loaded task",num);
 		myCodeMirror.setValue(tasks[num]);
+		var ut = document.getElementById("useTurtle");
+		ut.checked = true;
 	}
 }
 
@@ -312,9 +340,16 @@ var replaceLine = function (lineNum, replacement, tokensToBeReplaced, log) {
 
 	var cur = myCodeMirror.getLine();
 	// Extract and replace the required line
+	// Copy across any whitespace at the start of the line
 	var text = myCodeMirror.getValue();
 	var lines = Sk.help.splitToLines(text);
-	lines[lineNum-1] = replacement;
+	var old = lines[lineNum-1];
+	var whitespace = "";
+	while (old[0] === " " || old[0] === "\t") {
+		whitespace += old[0];
+		old = old.slice(1);
+	}
+	lines[lineNum-1] = whitespace + replacement;
 	
 	// Join the lines back again
 	var text = "";
@@ -402,15 +437,21 @@ var run = function () {
 	myCodeMirror.save();
 	var prog = document.getElementById("yourCode").value;
 	
-	// Display the turtle automatically if the first line of
-	// the program is "import turtle"
-	var firstLine = Sk.help.splitToLines(prog);
-	if (firstLine.indexOf("import turtle") === -1) {
-		hideTurtle();
-	}
-	else {
+	// Display the turtle if "Use turtle" setting is true or if there is an "import turtle" line
+	// Also append turtle preamble code if necessary
+	var ut = document.getElementById("useTurtle");
+	var lines = Sk.help.splitToLines(prog);
+	if (lines.indexOf("import turtle") !== -1) {
 		showTurtle();
 	}
+	else if (ut.checked) {
+		showTurtle();
+		prog = "import turtle\nt = turtle.Turtle()\n" + prog;
+	}
+	else {
+		hideTurtle();
+	}
+
 	
 	output.innerHTML = "";
 	errOut.innerHTML = "";
