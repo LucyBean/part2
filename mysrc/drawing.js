@@ -103,15 +103,6 @@ Sk.drawing.drawNodeFabric = function (canvas, node, info, offset) {
 	var t = info(node);
 	var colour = "#ffffff";
 	
-	if (node.tags) {
-		if (node.tags.indexOf("Appended") !== -1) {
-			colour = "#ffaaaa";
-		}
-		else if (node.tags.indexOf("SOL") !== -1) {
-			colour = "#aaaaff";
-		}
-	}
-	
 	// Draw the node with text
 	if (t !=="") {
 		var rect = new fabric.Rect({fill:colour, width:Sk.drawing.treeStyle.cellWidth, height:Sk.drawing.treeStyle.cellHeight, stroke:'black'});
@@ -128,9 +119,7 @@ Sk.drawing.drawNodeFabric = function (canvas, node, info, offset) {
 	}
 	// Else draw as a circle
 	else {
-		if (colour === "#ffffff") {
-			colour = "#99ff99";
-		}
+		colour = "#99ff99";
 		var newX = x + (Sk.drawing.treeStyle.cellWidth - Sk.drawing.treeStyle.cellHeight)/2;
 		var circ = new fabric.Circle({fill:colour, radius:Sk.drawing.treeStyle.cellHeight/2, stroke:'black', left:newX, top:y});
 		circ.selectable = false;

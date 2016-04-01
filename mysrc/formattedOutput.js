@@ -24,7 +24,14 @@ Sk.formattedOutput.reset = function () {
 
 Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) {
 	var err = Sk.formattedOutput.err;
-	lineNum++;
+	
+	// Adjust lineNum to reflect the appended lines if <ut> (useTurtle) is checked
+	if (ut.checked) {
+		lineNum--;
+	}
+	else {
+		lineNum++;
+	}
 	
 	err.innerHTML = "";
 	errCanvasContents = [];
@@ -65,6 +72,10 @@ Sk.formattedOutput.suggestBrackets = function (original, alternatives, lineNum) 
 
 Sk.formattedOutput.setOriginalTree = function (original, lineNum) {
 	if (!Sk.formattedOutput.original) {
+		// Adjust lineNum to reflect the appended lines if <ut> (useTurtle) is checked
+		if (ut.checked) {
+			lineNum -= 2;
+		}
 		Sk.formattedOutput.original = {original:original, lineNum:lineNum};
 		var err = Sk.formattedOutput.err;
 		
@@ -149,6 +160,11 @@ Sk.formattedOutput.suggestStringFix = function (original, fix, lineNum) {
 	err.innerHTML = "";
 	errCanvasContents = [];
 	
+	// Adjust lineNum to reflect the appended lines if <ut> (useTurtle) is checked
+	if (ut.checked) {
+		lineNum -= 2;
+	}
+	
 	// Display explanation
 	if (lineNum) {
 		err.innerHTML += "There is an unterminated string on line " + lineNum + ".<br/>";
@@ -185,6 +201,10 @@ Sk.formattedOutput.unfixableErr = function (err) {
 	var tb = err.traceback;
 	if (tb && Sk.formattedOutput.codeMirror) {
 		var lineNum = tb[0].lineno;
+		// Adjust lineNum to reflect the appended lines if <ut> (useTurtle) is checked
+		if (ut.checked) {
+			lineNum -= 2;
+		}
 		var line = Sk.formattedOutput.codeMirror.getLine(lineNum-1);
 		Sk.formattedOutput.codeMirror.setCursor(lineNum-1);
 		errOut.innerHTML += "<span class=\"codeStyle\">" + line + "</span>";
