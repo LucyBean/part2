@@ -155,10 +155,25 @@ button.codeStyle {
 button:hover {
 	background-color: #aaaaff;
 }
+/* The container div - needed to position the dropdown content */
+.dropdown {
+	z-index:100;
+    position: relative;
+    display: inline-block;
+}
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    background-color: #f3f3f3;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
 </style>
 </head>
 
-<body>
 <body onload="Logger.load()" onunload="Logger.store()">
 	<table class="main" id="table" style="height:100%; width:100%">
 		<tr id="mainPanel">
@@ -179,7 +194,7 @@ button:hover {
 					</div>
 				</div>
 				<div id="errorDisplay" style="display:none;">
-					<span class="heading">You had some errors</span>
+					<span class="heading">Your code had some errors</span>
 					<div id="errOut" style="height:300px; overflow-y:auto;">
 						Error messages will appear here.
 					</div>
@@ -209,12 +224,16 @@ button:hover {
 					<button onclick="toggleTurtle()">Show/hide turtle</button>
 					<button onclick="myCodeMirror.undo()">Undo</button>
 					<button onclick="myCodeMirror.redo()">Redo</button>
+					<div class="dropdown">
+						<button onclick="myFunction()" class="dropbtn">Load task</button>
+						<div id="myDropdown" class="dropdown-content">
+							<button onclick="loadTask(0)">1</button>
+							<button onclick="loadTask(1)">2</button>
+					 		<button onclick="loadTask(2)">3</button>
+					 		<button onclick="loadTask(3)">4</button>
+						</div>
+					</div>
 					<button onclick="Logger.save()">Save log</button>
-					<button onclick="loadTask(0)">Task 1</button>
-					<button onclick="loadTask(1)">Task 2</button>
-					<button onclick="loadTask(2)">Task 3</button>
-					<button onclick="loadTask(3)">Task 4a</button>
-					<button onclick="loadTask(4)">Task 4b</button>
 					<button onclick="displaySettings()">Settings</button>
 				</div>
 			</td>
@@ -228,6 +247,7 @@ var myCodeMirror = CodeMirror.fromTextArea(document.getElementById("yourCode"), 
 		matchBrackets: true,
 		autoCloseBrackets: true
 	});
+var ut = document.getElementById("useTurtle");
 
 // Show/hide functions
 var turtleDisplayed = false;
@@ -299,6 +319,25 @@ var displaySettings = function() {
 	ed.style.display = "none";
 	sd.style.display = "block";
 }
+/* When the user clicks on the button, 
+toggle between hiding and showing the dropdown content */
+function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+// Close the dropdown menu if the user clicks outside of it
+window.onclick = function(event) {
+  if (!event.target.matches('.dropbtn')) {
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
 
 // Tasks
 var loadTask = function (num) {
@@ -307,7 +346,6 @@ var loadTask = function (num) {
 		"t.forward(100)\t\t# Go forward 100 units\nt.left(45)\t\t\t# Turn left 45 degrees\nt.forward(30)\t\t# Go forwards 30 units\n",
 		"for i in range(6):\t# Repeat the following lines 6 times.\n\tt.forward(40)\n\tt.left(45)\n",
 		"def drawSquare():\t\t# Define a new procedure, drawSquare\n\tfor i in range(4):\n\t\tt.forward(40)\n\t\tt.left(90)\n\ndrawSquare()\t\t\t# Call drawSquare\n",
-		"from random import randint\n\nlength = randint(10,100)\t# ‘length’ has a random value between 10 and 100\n\nfor i in range(4):\n\tt.forward(length)\t\t# Go forward ‘length’ units\n\tt.left(90)\n",
 		"from random import randint\n\nwhile True:\t\t\t\t\t# Infinite loop\n\tt.forward(20)\n\tangle = randint(-45,45)\t# ‘angle’ has a random value between -45 and 45\n\tt.left(angle)\n"
 		];
 	
@@ -315,7 +353,6 @@ var loadTask = function (num) {
 	if (t) {
 		Logger.log("Loaded task",num);
 		myCodeMirror.setValue(tasks[num]);
-		var ut = document.getElementById("useTurtle");
 		ut.checked = true;
 	}
 }
@@ -439,7 +476,6 @@ var run = function () {
 	
 	// Display the turtle if "Use turtle" setting is true or if there is an "import turtle" line
 	// Also append turtle preamble code if necessary
-	var ut = document.getElementById("useTurtle");
 	var lines = Sk.help.splitToLines(prog);
 	if (lines.indexOf("import turtle") !== -1) {
 		showTurtle();
