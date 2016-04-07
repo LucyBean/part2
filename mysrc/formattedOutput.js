@@ -115,7 +115,7 @@ Sk.formattedOutput.suggestAlternativeTree = function (alt) {
 	
 	// replace the line on click
 	if (Sk.formattedOutput.lineReplace) {
-		html += " onclick = \"Sk.formattedOutput.lineReplace(" + Sk.formattedOutput.original.lineNum + ", '" + line + "', lineReplacements[" + (index-1) + "])\"";
+		html += " onclick = \"Sk.formattedOutput.lineReplace(" + Sk.formattedOutput.original.lineNum + ", '" + line + "', lineReplacements[" + (index-1) + "]); run()\"";
 	}
 	
 	// if there is an explanation, add it as a title (tooltip)
